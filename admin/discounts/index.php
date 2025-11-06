@@ -1,0 +1,71 @@
+<?php
+$page_title = 'Discounts - Admin';
+include '../../includes/header.php';
+include '../../config/config.php';
+requireAdmin();
+
+$discounts = $conn->query("SELECT * FROM discount_codes ORDER BY created_at DESC");
+?>
+
+<?php include '../../includes/admin_navbar.php'; ?>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Discount Codes</h2>
+        <a href="create.php" class="btn btn-primary">Add New Discount</a>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Code</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Applies To</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($discounts->num_rows > 0): ?>
+                            <?php while ($discount = $discounts->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?php echo $discount['discount_id']; ?></td>
+                                    <td><strong><?php echo htmlspecialchars($discount['code']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($discount['discount_type']); ?></td>
+                                    <td><?php echo $discount['discount_type'] === 'percentage' ? $discount['discount_value'] . '%' : '₱' . number_format($discount['discount_value'], 2); ?></td>
+                                    <td><?php echo htmlspecialchars($discount['applies_to']); ?></td>
+                                    <td>
+                                        <?php if ($discount['is_active']): ?>
+                                            <span class="badge badge-success">Active</span>
+                                        <?php else: ?>
+                                            <span class="badge badge-danger">Inactive</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <a href="edit.php?id=<?php echo $discount['discount_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <form method="POST" action="delete.php" class="d-inline">
+                                            <input type="hidden" name="discount_id" value="<?php echo $discount['discount_id']; ?>">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this discount?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7" class="text-center">No discounts found.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php include '../../includes/foot.php'; ?>
+

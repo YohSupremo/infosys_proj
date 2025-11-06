@@ -1,0 +1,147 @@
+<?php
+include '../../config/config.php';
+requireLogin();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_SESSION['user_id'];
+    $address_id = intval($_POST['address_id'] ?? 0);
+    $payment_method = sanitize($_POST['payment_method'] ?? 'Cash on Delivery');
+    $discount_code = sanitize($_POST['discount_code'] ?? '');
+    
+    // Verify address belongs to user
+    $addr_stmt = $conn->prepare("SELECT address_id FROM user_addresses WHERE address_id = ? AND user_id = ?");
+    $addr_stmt->bind_param("ii", $address_id, $user_id);
+    $addr_stmt->execute();
+    $addr_result = $addr_stmt->get_result();
+    
+    if ($addr_result->num_rows === 0) {
+        header('Location: index.php?error=invalid_address');
+        exit();
+    }
+    $addr_stmt->close();
+    
+    // Get cart items
+    $cart_stmt = $conn->prepare("SELECT cart_id FROM shopping_cart WHERE user_id = ?");
+    $cart_stmt->bind_param("i", $user_id);
+    $cart_stmt->execute();
+    $cart_result = $cart_stmt->get_result();
+    
+    if ($cart_result->num_rows === 0) {
+        header('Location: index.php?error=empty_cart');
+        exit();
+    }
+    
+    $cart = $cart_result->fetch_assoc();
+    $cart_id = $cart['cart_id'];
+    
+    $items_stmt = $conn->prepare("SELECT ci.*, p.product_name, p.price, p.stock_quantity FROM cart_items ci JOIN products p ON ci.product_id = p.product_id WHERE ci.cart_id = ?");
+    $items_stmt->bind_param("i", $cart_id);
+    $items_stmt->execute();
+    $items_result = $items_stmt->get_result();
+    
+    $cart_items = [];
+    $subtotal = 0;
+    
+    while ($item = $items_result->fetch_assoc()) {
+        if ($item['quantity'] > $item['stock_quantity']) {
+            header('Location: index.php?error=insufficient_stock');
+            exit();
+        }
+        $item_total = $item['price'] * $item['quantity'];
+        $subtotal += $item_total;
+        $cart_items[] = $item;
+    }
+    $items_stmt->close();
+    $cart_stmt->close();
+    
+    // Process discount
+    $discount_id = null;
+    $discount_amount = 0;
+    
+    if ($discount_code) {
+        $disc_stmt = $conn->prepare("SELECT * FROM discount_codes WHERE code = ? AND is_active = 1 AND (expiration_date IS NULL OR expiration_date > NOW()) AND (usage_limit IS NULL OR times_used < usage_limit)");
+        $disc_stmt->bind_param("s", $discount_code);
+        $disc_stmt->execute();
+        $disc_result = $disc_stmt->get_result();
+        
+        if ($disc_result->num_rows > 0) {
+            $discount = $disc_result->fetch_assoc();
+            $discount_id = $discount['discount_id'];
+            
+            // Calculate discount based on type
+            if ($discount['discount_type'] === 'percentage') {
+                $discount_amount = ($subtotal * $discount['discount_value']) / 100;
+                if ($discount['max_discount_amount'] && $discount_amount > $discount['max_discount_amount']) {
+                    $discount_amount = $discount['max_discount_amount'];
+                }
+            } else {
+                $discount_amount = $discount['discount_value'];
+            }
+            
+            if ($discount['min_purchase_amount'] && $subtotal < $discount['min_purchase_amount']) {
+                $discount_amount = 0;
+                $discount_id = null;
+            }
+        }
+        $disc_stmt->close();
+    }
+    
+    $total_amount = $subtotal - $discount_amount;
+    
+    // Create order
+    $order_stmt = $conn->prepare("INSERT INTO orders (user_id, address_id, discount_id, payment_method, subtotal, discount_amount, total_amount) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $order_stmt->bind_param("iiisddd", $user_id, $address_id, $discount_id, $payment_method, $subtotal, $discount_amount, $total_amount);
+    $order_stmt->execute();
+    $order_id = $conn->insert_id;
+    $order_stmt->close();
+    
+    // Create order items and update stock
+    foreach ($cart_items as $item) {
+        $item_subtotal = $item['price'] * $item['quantity'];
+        $order_item_stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
+        $order_item_stmt->bind_param("iisidd", $order_id, $item['product_id'], $item['product_name'], $item['quantity'], $item['price'], $item_subtotal);
+        $order_item_stmt->execute();
+        $order_item_stmt->close();
+        
+        // Update stock
+        $new_stock = $item['stock_quantity'] - $item['quantity'];
+        $update_stock = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE product_id = ?");
+        $update_stock->bind_param("ii", $new_stock, $item['product_id']);
+        $update_stock->execute();
+        $update_stock->close();
+        
+        // Record inventory history
+        $inv_stmt = $conn->prepare("INSERT INTO inventory_history (product_id, transaction_type, quantity_change, previous_stock, new_stock, reference_id, reference_type) VALUES (?, 'sale', ?, ?, ?, ?, 'order')");
+        $qty_change = -$item['quantity'];
+        $inv_stmt->bind_param("iiiii", $item['product_id'], $qty_change, $item['stock_quantity'], $new_stock, $order_id);
+        $inv_stmt->execute();
+        $inv_stmt->close();
+    }
+    
+    // Update discount usage
+    if ($discount_id) {
+        $update_disc = $conn->prepare("UPDATE discount_codes SET times_used = times_used + 1 WHERE discount_id = ?");
+        $update_disc->bind_param("i", $discount_id);
+        $update_disc->execute();
+        $update_disc->close();
+        
+        $disc_usage = $conn->prepare("INSERT INTO discount_usage (discount_id, user_id, order_id, discount_amount) VALUES (?, ?, ?, ?)");
+        $disc_usage->bind_param("iiid", $discount_id, $user_id, $order_id, $discount_amount);
+        $disc_usage->execute();
+        $disc_usage->close();
+    }
+    
+    // Clear cart
+    $clear_cart = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ?");
+    $clear_cart->bind_param("i", $cart_id);
+    $clear_cart->execute();
+    $clear_cart->close();
+    
+    header("Location: success.php?order_id=$order_id");
+    exit();
+} else {
+    header('Location: index.php');
+    exit();
+}
+?>
+
