@@ -2,59 +2,6 @@
 // Calculate base path to admin directory
 $admin_base = '';
 
-// Method 1: Use backtrace (most reliable)
-if (function_exists('debug_backtrace')) {
-    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-    if (isset($backtrace[0]['file'])) {
-        $calling_file = str_replace('\\', '/', $backtrace[0]['file']);
-        if (preg_match('#/admin/(.+)$#', $calling_file, $matches)) {
-            $path_after_admin = $matches[1];
-            $path_parts = explode('/', $path_after_admin);
-            // Remove filename (last part)
-            if (count($path_parts) > 1) {
-                array_pop($path_parts);
-                $depth = count($path_parts);
-                if ($depth > 0) {
-                    $admin_base = str_repeat('../', $depth);
-                }
-            }
-        }
-    }
-}
-
-// Method 2: Fallback using SCRIPT_NAME
-if (empty($admin_base) && isset($_SERVER['SCRIPT_NAME'])) {
-    $script_name = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
-    if (preg_match('#/admin/(.+)$#', $script_name, $matches)) {
-        $path_after_admin = $matches[1];
-        $path_parts = explode('/', $path_after_admin);
-        if (count($path_parts) > 1) {
-            array_pop($path_parts);
-            $depth = count($path_parts);
-            if ($depth > 0) {
-                $admin_base = str_repeat('../', $depth);
-            }
-        }
-    }
-}
-
-// Method 3: Use REQUEST_URI as final fallback
-if (empty($admin_base) && isset($_SERVER['REQUEST_URI'])) {
-    $request_uri = str_replace('\\', '/', $_SERVER['REQUEST_URI']);
-    // Remove query string
-    $request_uri = strtok($request_uri, '?');
-    if (preg_match('#/admin/(.+)$#', $request_uri, $matches)) {
-        $path_after_admin = $matches[1];
-        $path_parts = explode('/', $path_after_admin);
-        if (count($path_parts) > 1) {
-            array_pop($path_parts);
-            $depth = count($path_parts);
-            if ($depth > 0) {
-                $admin_base = str_repeat('../', $depth);
-            }
-        }
-    }
-}
 ?>
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">

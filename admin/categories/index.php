@@ -1,7 +1,10 @@
 <?php
 $page_title = 'Categories - Admin';
+
 include '../../includes/header.php';
 include '../../config/config.php';
+
+
 requireAdmin();
 
 $categories = $conn->query("SELECT c.*, pc.category_name as parent_name FROM categories c LEFT JOIN categories pc ON c.parent_category_id = pc.category_id ORDER BY c.category_name");

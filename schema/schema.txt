@@ -1,0 +1,427 @@
+-- NBA Apparel E-Commerce Database Schema
+-- Normalized database design with proper relationships including M:N
+
+-- ============================================
+-- USER MANAGEMENT
+-- ============================================
+
+-- User Roles Table
+
+create database infosys;
+use infosys;
+
+CREATE TABLE roles (
+    role_id INT PRIMARY KEY AUTO_INCREMENT,
+    role_name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Users Table
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    role_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    contact_number VARCHAR(20),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+);
+
+-- User Addresses Table (supports multiple addresses per user)
+CREATE TABLE user_addresses (
+    address_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    country VARCHAR(100) NOT NULL DEFAULT 'Philippines',
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- ============================================
+-- PRODUCT MANAGEMENT
+-- ============================================
+
+-- NBA Teams Table
+CREATE TABLE nba_teams (
+    team_id INT PRIMARY KEY AUTO_INCREMENT,
+    team_name VARCHAR(100) NOT NULL UNIQUE,
+    team_code VARCHAR(10) NOT NULL UNIQUE,
+    city VARCHAR(100),
+    conference VARCHAR(20),
+    division VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Product Categories Table
+CREATE TABLE categories (
+    category_id INT PRIMARY KEY AUTO_INCREMENT,
+    category_name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    parent_category_id INT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_category_id) REFERENCES categories(category_id)
+);
+
+-- Products Table
+CREATE TABLE products (
+    product_id INT PRIMARY KEY AUTO_INCREMENT,
+    team_id INT,
+    product_name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock_quantity INT NOT NULL DEFAULT 0,
+    image_url VARCHAR(500),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (team_id) REFERENCES nba_teams(team_id),
+    CHECK (price >= 0),
+    CHECK (stock_quantity >= 0)
+);
+
+-- Product-Category Junction Table (Many-to-Many)
+-- Allows products to belong to multiple categories
+CREATE TABLE product_categories (
+    product_id INT NOT NULL,
+    category_id INT NOT NULL,
+    is_primary BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (product_id, category_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+);
+
+-- ============================================
+-- DISCOUNT MANAGEMENT
+-- ============================================
+
+-- Discount Codes Table
+CREATE TABLE discount_codes (
+    discount_id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    discount_type ENUM('percentage', 'fixed_amount') NOT NULL,
+    discount_value DECIMAL(10, 2) NOT NULL,
+    min_purchase_amount DECIMAL(10, 2) DEFAULT 0,
+    max_discount_amount DECIMAL(10, 2),
+    usage_limit INT,
+    times_used INT DEFAULT 0,
+    applies_to ENUM('all', 'specific_products', 'specific_categories') DEFAULT 'all',
+    start_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expiration_date TIMESTAMP NULL DEFAULT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CHECK (discount_value > 0),
+    CHECK (usage_limit IS NULL OR usage_limit > 0)
+);
+
+-- Discount-Product Junction Table (Many-to-Many)
+-- Defines which products a discount applies to
+CREATE TABLE discount_products (
+    discount_id INT NOT NULL,
+    product_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (discount_id, product_id),
+    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+);
+
+-- Discount-Category Junction Table (Many-to-Many)
+-- Defines which categories a discount applies to
+CREATE TABLE discount_categories (
+    discount_id INT NOT NULL,
+    category_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (discount_id, category_id),
+    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+);
+
+-- ============================================
+-- SHOPPING CART
+-- ============================================
+
+-- Shopping Cart Table
+CREATE TABLE shopping_cart (
+    cart_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_cart (user_id)
+);
+
+-- Cart Items Table
+CREATE TABLE cart_items (
+    cart_item_id INT PRIMARY KEY AUTO_INCREMENT,
+    cart_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cart_id) REFERENCES shopping_cart(cart_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    CHECK (quantity > 0),
+    UNIQUE KEY unique_cart_product (cart_id, product_id)
+);
+
+-- ============================================
+-- ORDER MANAGEMENT
+-- ============================================
+
+-- Orders Table
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    address_id INT NOT NULL,
+    discount_id INT,
+    order_status ENUM('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled') DEFAULT 'Pending',
+    payment_method VARCHAR(50) DEFAULT 'Cash on Delivery',
+    subtotal DECIMAL(10, 2) NOT NULL,
+    discount_amount DECIMAL(10, 2) DEFAULT 0,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (address_id) REFERENCES user_addresses(address_id),
+    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id),
+    CHECK (subtotal >= 0),
+    CHECK (discount_amount >= 0),
+    CHECK (total_amount >= 0)
+);
+
+-- Order Items Table
+CREATE TABLE order_items (
+    order_item_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    product_name VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(10, 2) NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    CHECK (quantity > 0),
+    CHECK (unit_price >= 0),
+    CHECK (subtotal >= 0)
+);
+
+-- Order Status History Table
+CREATE TABLE order_status_history (
+    history_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    old_status VARCHAR(50),
+    new_status VARCHAR(50) NOT NULL,
+    changed_by INT,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (changed_by) REFERENCES users(user_id)
+);
+
+-- Discount Usage Tracking
+CREATE TABLE discount_usage (
+    usage_id INT PRIMARY KEY AUTO_INCREMENT,
+    discount_id INT NOT NULL,
+    user_id INT NOT NULL,
+    order_id INT NOT NULL,
+    discount_amount DECIMAL(10, 2) NOT NULL,
+    used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+);
+
+-- ============================================
+-- INVENTORY & SUPPLIER MANAGEMENT
+-- ============================================
+
+-- Suppliers Table
+CREATE TABLE suppliers (
+    supplier_id INT PRIMARY KEY AUTO_INCREMENT,
+    supplier_name VARCHAR(255) NOT NULL,
+    contact_person VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    address TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Supplier-Product Junction Table (Many-to-Many)
+-- Tracks which suppliers provide which products
+CREATE TABLE supplier_products (
+    supplier_id INT NOT NULL,
+    product_id INT NOT NULL,
+    cost_per_unit DECIMAL(10, 2) NOT NULL,
+    is_preferred BOOLEAN DEFAULT FALSE,
+    last_supplied_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (supplier_id, product_id),
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+    CHECK (cost_per_unit >= 0)
+);
+
+-- Restocking Transactions Table
+CREATE TABLE restocking_transactions (
+    restock_id INT PRIMARY KEY AUTO_INCREMENT,
+    supplier_id INT NOT NULL,
+    manager_id INT NOT NULL,
+    total_cost DECIMAL(10, 2) NOT NULL,
+    restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id),
+    FOREIGN KEY (manager_id) REFERENCES users(user_id),
+    CHECK (total_cost >= 0)
+);
+
+-- Restocking Items Table
+CREATE TABLE restocking_items (
+    restock_item_id INT PRIMARY KEY AUTO_INCREMENT,
+    restock_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    cost_per_unit DECIMAL(10, 2) NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (restock_id) REFERENCES restocking_transactions(restock_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    CHECK (quantity > 0),
+    CHECK (cost_per_unit >= 0),
+    CHECK (subtotal >= 0)
+);
+
+-- Inventory History Table
+CREATE TABLE inventory_history (
+    history_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    transaction_type ENUM('restock', 'sale', 'adjustment') NOT NULL,
+    quantity_change INT NOT NULL,
+    previous_stock INT NOT NULL,
+    new_stock INT NOT NULL,
+    reference_id INT,
+    reference_type VARCHAR(50),
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    FOREIGN KEY (product_id) REFERENCES products(product_id),
+    FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
+
+-- ============================================
+-- INDEXES FOR PERFORMANCE
+-- ============================================
+
+-- User indexes
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role_id);
+CREATE INDEX idx_users_active ON users(is_active);
+
+-- Product indexes
+CREATE INDEX idx_products_team ON products(team_id);
+CREATE INDEX idx_products_active ON products(is_active);
+CREATE INDEX idx_products_name ON products(product_name);
+
+-- Product-Category indexes
+CREATE INDEX idx_product_categories_product ON product_categories(product_id);
+CREATE INDEX idx_product_categories_category ON product_categories(category_id);
+CREATE INDEX idx_product_categories_primary ON product_categories(is_primary);
+
+-- Order indexes
+CREATE INDEX idx_orders_user ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(order_status);
+CREATE INDEX idx_orders_date ON orders(order_date);
+
+-- Discount indexes
+CREATE INDEX idx_discount_code ON discount_codes(code);
+CREATE INDEX idx_discount_active ON discount_codes(is_active);
+CREATE INDEX idx_discount_dates ON discount_codes(start_date, expiration_date);
+CREATE INDEX idx_discount_applies ON discount_codes(applies_to);
+
+-- Discount junction indexes
+CREATE INDEX idx_discount_products_discount ON discount_products(discount_id);
+CREATE INDEX idx_discount_products_product ON discount_products(product_id);
+CREATE INDEX idx_discount_categories_discount ON discount_categories(discount_id);
+CREATE INDEX idx_discount_categories_category ON discount_categories(category_id);
+
+-- Inventory indexes
+CREATE INDEX idx_inventory_product ON inventory_history(product_id);
+CREATE INDEX idx_inventory_type ON inventory_history(transaction_type);
+CREATE INDEX idx_inventory_date ON inventory_history(created_at);
+
+-- Supplier-Product indexes
+CREATE INDEX idx_supplier_products_supplier ON supplier_products(supplier_id);
+CREATE INDEX idx_supplier_products_product ON supplier_products(product_id);
+CREATE INDEX idx_supplier_products_preferred ON supplier_products(is_preferred);
+
+-- ============================================
+-- INITIAL DATA
+-- ============================================
+
+-- Insert default roles
+INSERT INTO roles (role_name, description) VALUES
+('Admin', 'Full system access and management'),
+('Inventory Manager', 'Manages inventory and restocking'),
+('Customer', 'Regular customer with shopping privileges');
+
+-- Insert sample NBA teams
+INSERT INTO nba_teams (team_name, team_code, city, conference, division) VALUES
+('Los Angeles Lakers', 'LAL', 'Los Angeles', 'Western', 'Pacific'),
+('Golden State Warriors', 'GSW', 'San Francisco', 'Western', 'Pacific'),
+('Boston Celtics', 'BOS', 'Boston', 'Eastern', 'Atlantic'),
+('Miami Heat', 'MIA', 'Miami', 'Eastern', 'Southeast'),
+('Chicago Bulls', 'CHI', 'Chicago', 'Eastern', 'Central'),
+('Brooklyn Nets', 'BKN', 'Brooklyn', 'Eastern', 'Atlantic'),
+('Phoenix Suns', 'PHX', 'Phoenix', 'Western', 'Pacific'),
+('Milwaukee Bucks', 'MIL', 'Milwaukee', 'Eastern', 'Central');
+
+-- Insert sample categories with hierarchy
+INSERT INTO categories (category_name, description, parent_category_id) VALUES
+('Jerseys', 'Official NBA team jerseys', NULL),
+('T-Shirts', 'Casual NBA team t-shirts', NULL),
+('Hoodies', 'NBA team hoodies and sweatshirts', NULL),
+('Caps', 'NBA team caps and hats', NULL),
+('Shorts', 'NBA team shorts', NULL),
+('Accessories', 'NBA team accessories and merchandise', NULL),
+('Premium', 'Premium and limited edition items', NULL),
+('Sale', 'Items on sale', NULL);
+
+-- ============================================
+-- SAMPLE USAGE EXAMPLES
+-- ============================================
+
+-- Example: Create a product that belongs to multiple categories
+-- INSERT INTO products (team_id, product_name, price, stock_quantity) 
+-- VALUES (1, 'Lakers Championship Jersey', 129.99, 50);
+-- 
+-- INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+-- (1, 1, TRUE),  -- Primary category: Jerseys
+-- (1, 7, FALSE); -- Secondary category: Premium
+
+-- Example: Create a discount for specific categories
+-- INSERT INTO discount_codes (code, discount_type, discount_value, applies_to, start_date)
+-- VALUES ('JERSEY20', 'percentage', 20.00, 'specific_categories', NOW());
+-- 
+-- INSERT INTO discount_categories (discount_id, category_id) VALUES
+-- (1, 1); -- Applies to Jerseys category
+
+-- Example: Create a discount for specific products
+-- INSERT INTO discount_codes (code, discount_type, discount_value, applies_to, start_date)
+-- VALUES ('LAKERS10', 'percentage', 10.00, 'specific_products', NOW());
+-- 
+-- INSERT INTO discount_products (discount_id, product_id) VALUES
+-- (2, 1), (2, 2), (2, 3); -- Applies to specific Lakers products
