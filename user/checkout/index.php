@@ -6,8 +6,12 @@ requireLogin();
 
 $user_id = $_SESSION['user_id'];
 $error = '';
+$discount_message = '';
+$discount_amount = 0;
 
-// Get cart
+// ========================
+// FETCH CART
+// ========================
 $cart_stmt = $conn->prepare("SELECT cart_id FROM shopping_cart WHERE user_id = ?");
 $cart_stmt->bind_param("i", $user_id);
 $cart_stmt->execute();
@@ -20,7 +24,12 @@ if ($cart_result->num_rows > 0) {
     $cart = $cart_result->fetch_assoc();
     $cart_id = $cart['cart_id'];
     
-    $items_stmt = $conn->prepare("SELECT ci.*, p.product_name, p.price, p.stock_quantity FROM cart_items ci JOIN products p ON ci.product_id = p.product_id WHERE ci.cart_id = ?");
+    $items_stmt = $conn->prepare("
+        SELECT ci.*, p.product_name, p.price, p.stock_quantity 
+        FROM cart_items ci 
+        JOIN products p ON ci.product_id = p.product_id 
+        WHERE ci.cart_id = ?
+    ");
     $items_stmt->bind_param("i", $cart_id);
     $items_stmt->execute();
     $items_result = $items_stmt->get_result();
@@ -38,20 +47,88 @@ if ($cart_result->num_rows > 0) {
 } else {
     $error = "Your cart is empty.";
 }
-
 $cart_stmt->close();
 
-// Get addresses
-$addresses_stmt = $conn->prepare("SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, created_at DESC");
+// ========================
+// FETCH ADDRESSES
+// ========================
+$addresses_stmt = $conn->prepare("
+    SELECT * FROM user_addresses 
+    WHERE user_id = ? 
+    ORDER BY is_default DESC, created_at DESC
+");
 $addresses_stmt->bind_param("i", $user_id);
 $addresses_stmt->execute();
 $addresses_result = $addresses_stmt->get_result();
 
-// Get discount codes
-$discounts_stmt = $conn->query("SELECT * FROM discount_codes WHERE is_active = 1 AND (expiration_date IS NULL OR expiration_date > NOW()) AND (usage_limit IS NULL OR times_used < usage_limit) ORDER BY code");
-?>
+// ========================
+// DISCOUNT CODE LOGIC
+// ========================
 
-<?php include '../../includes/navbar.php'; ?>
+// Handle "Apply Discount"
+if (isset($_POST['apply_discount'])) {
+    $entered_code = trim($_POST['discount_code']);
+    $_SESSION['discount_code'] = $entered_code;
+
+    if ($entered_code !== '') {
+        $discounts_stmt = $conn->prepare("
+            SELECT * FROM discount_codes 
+            WHERE is_active = 1 
+            AND (expiration_date IS NULL OR expiration_date > NOW()) 
+            AND (usage_limit IS NULL OR times_used < usage_limit)
+            AND code = ?
+            LIMIT 1
+        ");
+        $discounts_stmt->bind_param("s", $entered_code);
+        $discounts_stmt->execute();
+        $result = $discounts_stmt->get_result();
+
+        if ($result && $result->num_rows > 0) {
+            $discount = $result->fetch_assoc();
+            $discount_type = $discount['discount_type'];
+            $discount_value = $discount['discount_value'];
+
+            if ($discount_type == 'fixed_amount') {
+                $discount_amount = $discount_value;
+            } elseif ($discount_type == 'percentage') {
+                $discount_amount = $subtotal * ($discount_value / 100);
+            }
+
+            $_SESSION['discount_value'] = $discount_amount;
+            $_SESSION['discount_type'] = $discount_type;
+            $discount_message = "Discount applied: {$discount_value}" . ($discount_type == 'percentage' ? "%" : " PHP");
+        } else {
+            unset($_SESSION['discount_code'], $_SESSION['discount_value'], $_SESSION['discount_type']);
+            $discount_message = "Invalid or expired discount code.";
+        }
+
+        $discounts_stmt->close();
+    }
+}
+
+// Apply any stored discount
+if (!empty($_SESSION['discount_value'])) {
+    $discount_amount = $_SESSION['discount_value'];
+    $subtotal -= $discount_amount;
+    if ($subtotal < 0) $subtotal = 0;
+}
+
+// ========================
+// HANDLE PLACE ORDER
+// ========================
+if (isset($_POST['order_placed'])) {
+    if (!empty($_POST['address_id']) && !empty($_POST['payment_method'])) {
+        $_SESSION['selected_address'] = $_POST['address_id'];
+        $_SESSION['payment_method'] = $_POST['payment_method'];
+        header("Location: place_order.php");
+        exit();
+    } else {
+        $error = "Please select a shipping address and payment method.";
+    }
+}
+
+include '../../includes/navbar.php';
+?>
 
 <div class="container my-5">
     <h2 class="mb-4">Checkout</h2>
@@ -63,7 +140,7 @@ $discounts_stmt = $conn->query("SELECT * FROM discount_codes WHERE is_active = 1
         <div class="alert alert-info">Your cart is empty.</div>
         <a href="../products/index.php" class="btn btn-primary">Continue Shopping</a>
     <?php else: ?>
-        <form method="POST" action="place_order.php">
+        <form method="POST" action="">
             <div class="row">
                 <div class="col-md-8">
                     <!-- Shipping Address -->
@@ -115,11 +192,24 @@ $discounts_stmt = $conn->query("SELECT * FROM discount_codes WHERE is_active = 1
                             <h5 class="mb-0">Discount Code (Optional)</h5>
                         </div>
                         <div class="card-body">
-                            <input type="text" class="form-control" name="discount_code" placeholder="Enter discount code">
+                            <div class="input-group">
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    name="discount_code" 
+                                    placeholder="Enter discount code"
+                                    value="<?php echo htmlspecialchars($_SESSION['discount_code'] ?? ''); ?>"
+                                >
+                                <button type="submit" name="apply_discount" class="btn btn-outline-primary">Apply</button>
+                            </div>
+                            <?php if (!empty($discount_message)): ?>
+                                <div class="mt-2 alert alert-info"><?php echo $discount_message; ?></div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
                 
+                <!-- ORDER SUMMARY -->
                 <div class="col-md-4">
                     <div class="card cart-summary">
                         <div class="card-header">
@@ -135,18 +225,18 @@ $discounts_stmt = $conn->query("SELECT * FROM discount_codes WHERE is_active = 1
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
                                 <span>Subtotal:</span>
-                                <span><strong>₱<?php echo number_format($subtotal, 2); ?></strong></span>
+                                <span><strong>₱<?php echo number_format($subtotal + $discount_amount, 2); ?></strong></span>
                             </div>
                             <div class="d-flex justify-content-between mb-3">
                                 <span>Discount:</span>
-                                <span id="discount_amount">₱0.00</span>
+                                <span id="discount_amount">₱<?php echo number_format($discount_amount, 2); ?></span>
                             </div>
                             <hr>
                             <div class="d-flex justify-content-between mb-3">
                                 <span><strong>Total:</strong></span>
                                 <span><strong id="total_amount">₱<?php echo number_format($subtotal, 2); ?></strong></span>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100" <?php echo $addresses_result->num_rows == 0 ? 'disabled' : ''; ?>>Place Order</button>
+                            <button type="submit" name="order_placed" class="btn btn-primary w-100" <?php echo $addresses_result->num_rows == 0 ? 'disabled' : ''; ?>>Place Order</button>
                         </div>
                     </div>
                 </div>
@@ -156,4 +246,3 @@ $discounts_stmt = $conn->query("SELECT * FROM discount_codes WHERE is_active = 1
 </div>
 
 <?php include '../../includes/foot.php'; ?>
-
