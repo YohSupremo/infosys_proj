@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="form-check-label" for="is_default">Set as default address</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Address</button>
-                        <a href="addresses.php" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="<?php echo BASE_URL; ?>/user/account/addresses.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
             </div>

@@ -26,6 +26,7 @@ CREATE TABLE users (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     contact_number VARCHAR(20),
+    profile_photo VARCHAR(500) DEFAULT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -101,6 +102,17 @@ CREATE TABLE product_categories (
     PRIMARY KEY (product_id, category_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+);
+
+-- Product Images Table (Multiple Photos - MP1)
+CREATE TABLE product_images (
+    image_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    is_primary BOOLEAN DEFAULT FALSE,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
 -- ============================================
@@ -323,6 +335,66 @@ CREATE TABLE inventory_history (
 );
 
 -- ============================================
+-- PRODUCT REVIEWS (MP4)
+-- ============================================
+
+-- Product Reviews Table
+CREATE TABLE product_reviews (
+    review_id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    user_id INT NOT NULL,
+    order_id INT NOT NULL,
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    review_text TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_product_order (user_id, product_id, order_id)
+);
+
+-- ============================================
+-- MYSQL VIEWS
+-- ============================================
+
+-- Order Details View (ITIM211 Requirement)
+CREATE OR REPLACE VIEW v_order_details AS
+SELECT 
+    o.order_id,
+    o.user_id,
+    u.first_name,
+    u.last_name,
+    u.email,
+    o.address_id,
+    ua.address_line1,
+    ua.address_line2,
+    ua.city,
+    ua.state,
+    ua.postal_code,
+    ua.country,
+    o.discount_id,
+    dc.code AS discount_code,
+    o.order_status,
+    o.payment_method,
+    o.subtotal,
+    o.discount_amount,
+    o.total_amount,
+    o.order_date,
+    o.updated_at,
+    oi.order_item_id,
+    oi.product_id,
+    oi.product_name,
+    oi.quantity,
+    oi.unit_price,
+    oi.subtotal AS item_subtotal
+FROM orders o
+JOIN users u ON o.user_id = u.user_id
+JOIN user_addresses ua ON o.address_id = ua.address_id
+LEFT JOIN discount_codes dc ON o.discount_id = dc.discount_id
+LEFT JOIN order_items oi ON o.order_id = oi.order_id;
+
+-- ============================================
 -- INDEXES FOR PERFORMANCE
 -- ============================================
 
@@ -367,6 +439,15 @@ CREATE INDEX idx_inventory_date ON inventory_history(created_at);
 CREATE INDEX idx_supplier_products_supplier ON supplier_products(supplier_id);
 CREATE INDEX idx_supplier_products_product ON supplier_products(product_id);
 CREATE INDEX idx_supplier_products_preferred ON supplier_products(is_preferred);
+
+-- Review indexes
+CREATE INDEX idx_reviews_product ON product_reviews(product_id);
+CREATE INDEX idx_reviews_user ON product_reviews(user_id);
+CREATE INDEX idx_reviews_order ON product_reviews(order_id);
+
+-- Product Images indexes
+CREATE INDEX idx_product_images_product ON product_images(product_id);
+CREATE INDEX idx_product_images_primary ON product_images(is_primary);
 
 -- ============================================
 -- INITIAL DATA

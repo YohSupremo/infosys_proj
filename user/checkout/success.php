@@ -46,8 +46,8 @@ $order_stmt->close();
                     </div>
                     
                     <div class="mt-4">
-                        <a href="../orders.php/view.php?id=<?php echo $order['order_id']; ?>" class="btn btn-primary">View Order Details</a>
-                        <a href="../products/index.php" class="btn btn-outline-primary">Continue Shopping</a>
+                        <a href="<?php echo BASE_URL; ?>/user/orders.php/view.php?id=<?php echo $order['order_id']; ?>" class="btn btn-primary">View Order Details</a>
+                        <a href="<?php echo BASE_URL; ?>/user/products/index.php" class="btn btn-outline-primary">Continue Shopping</a>
                     </div>
                 </div>
             </div>

@@ -10,8 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     
+    // Server-side validation
     if (empty($email) || empty($password)) {
         $error = 'Please fill in all fields.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address.';
     } else {
         $stmt = $conn->prepare("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.email = ? AND u.is_active = 1");
         $stmt->bind_param("s", $email);
@@ -29,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['role_id'] = $user['role_id'];
                 
                 if ($user['role_name'] === 'Admin') {
-                    header('Location: ../../admin/dashboard.php');
+                    header('Location: ' . BASE_URL . '/admin/dashboard.php');
                 } else {
-                    header('Location: ../../index.php');
+                    header('Location: ' . BASE_URL . '/index.php');
                 }
                 exit();
             } else {
@@ -65,20 +68,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" action="">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password">
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
                     
                     <div class="mt-3 text-center">
-                        <a href="forgot_password.php">Forgot Password?</a>
+                        <a href="<?php echo BASE_URL; ?>/user/auth/forgot_password.php">Forgot Password?</a>
                     </div>
                     <div class="mt-2 text-center">
-                        <p>Don't have an account? <a href="register.php">Register here</a></p>
+                        <p>Don't have an account? <a href="<?php echo BASE_URL; ?>/user/auth/register.php">Register here</a></p>
                     </div>
                 </div>
             </div>

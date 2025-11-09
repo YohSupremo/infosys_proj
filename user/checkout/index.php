@@ -117,13 +117,25 @@ if (!empty($_SESSION['discount_value'])) {
 // HANDLE PLACE ORDER
 // ========================
 if (isset($_POST['order_placed'])) {
-    if (!empty($_POST['address_id']) && !empty($_POST['payment_method'])) {
-        $_SESSION['selected_address'] = $_POST['address_id'];
-        $_SESSION['payment_method'] = $_POST['payment_method'];
-        header("Location: place_order.php");
-        exit();
-    } else {
+    // Server-side validation
+    $address_id = intval($_POST['address_id'] ?? 0);
+    $payment_method = sanitize($_POST['payment_method'] ?? '');
+    
+    if (empty($address_id) || empty($payment_method)) {
         $error = "Please select a shipping address and payment method.";
+    } else {
+        // Get discount code from session or form
+        $discount_code = sanitize($_POST['discount_code'] ?? $_SESSION['discount_code'] ?? '');
+        
+        // Redirect to place_order.php with POST data via form submission
+        // We'll use a hidden form to submit the data
+        $_SESSION['checkout_data'] = [
+            'address_id' => $address_id,
+            'payment_method' => $payment_method,
+            'discount_code' => $discount_code
+        ];
+        header("Location: " . BASE_URL . "/user/checkout/place_order.php");
+        exit();
     }
 }
 
@@ -135,10 +147,10 @@ include '../../includes/navbar.php';
     
     <?php if ($error): ?>
         <div class="alert alert-danger"><?php echo $error; ?></div>
-        <a href="../cart/index.php" class="btn btn-primary">Back to Cart</a>
+        <a href="<?php echo BASE_URL; ?>/user/cart/index.php" class="btn btn-primary">Back to Cart</a>
     <?php elseif (count($cart_items) == 0): ?>
         <div class="alert alert-info">Your cart is empty.</div>
-        <a href="../products/index.php" class="btn btn-primary">Continue Shopping</a>
+        <a href="<?php echo BASE_URL; ?>/user/products/index.php" class="btn btn-primary">Continue Shopping</a>
     <?php else: ?>
         <form method="POST" action="">
             <div class="row">
@@ -152,7 +164,7 @@ include '../../includes/navbar.php';
                             <?php if ($addresses_result->num_rows > 0): ?>
                                 <?php while ($address = $addresses_result->fetch_assoc()): ?>
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="address_id" id="address_<?php echo $address['address_id']; ?>" value="<?php echo $address['address_id']; ?>" <?php echo $address['is_default'] ? 'checked' : ''; ?> required>
+                                        <input class="form-check-input" type="radio" name="address_id" id="address_<?php echo $address['address_id']; ?>" value="<?php echo $address['address_id']; ?>" <?php echo $address['is_default'] ? 'checked' : ''; ?>>
                                         <label class="form-check-label" for="address_<?php echo $address['address_id']; ?>">
                                             <strong><?php echo htmlspecialchars($address['address_line1']); ?></strong><br>
                                             <?php if ($address['address_line2']): ?>
@@ -163,10 +175,10 @@ include '../../includes/navbar.php';
                                         </label>
                                     </div>
                                 <?php endwhile; ?>
-                                <a href="../account/add_address.php" class="btn btn-outline-primary btn-sm">Add New Address</a>
+                                <a href="<?php echo BASE_URL; ?>/user/account/add_address.php" class="btn btn-outline-primary btn-sm">Add New Address</a>
                             <?php else: ?>
                                 <div class="alert alert-warning">No addresses found. Please add a shipping address.</div>
-                                <a href="../account/add_address.php" class="btn btn-primary">Add Address</a>
+                                <a href="<?php echo BASE_URL; ?>/user/account/add_address.php" class="btn btn-primary">Add Address</a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -177,7 +189,7 @@ include '../../includes/navbar.php';
                             <h5 class="mb-0">Payment Method</h5>
                         </div>
                         <div class="card-body">
-                            <select class="form-select" name="payment_method" required>
+                            <select class="form-select" name="payment_method">
                                 <option value="Cash on Delivery" selected>Cash on Delivery</option>
                                 <option value="GCash">GCash</option>
                                 <option value="PayPal">PayPal</option>

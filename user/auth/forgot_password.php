@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </form>
                     
                     <div class="mt-3 text-center">
-                        <a href="login.php">Back to Login</a>
+                        <a href="<?php echo BASE_URL; ?>/user/auth/login.php">Back to Login</a>
                     </div>
                 </div>
             </div>

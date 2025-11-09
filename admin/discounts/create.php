@@ -165,7 +165,7 @@ $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 OR
                             <label class="form-check-label" for="is_active">Active</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Discount</button>
-                        <a href="index.php" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="<?php echo BASE_URL; ?>/admin/discounts/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
             </div>

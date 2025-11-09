@@ -2,11 +2,15 @@
 include '../../config/config.php';
 requireLogin();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Get checkout data from session (set by checkout/index.php)
+if (isset($_SESSION['checkout_data'])) {
     $user_id = $_SESSION['user_id'];
-    $address_id = intval($_POST['address_id'] ?? 0);
-    $payment_method = sanitize($_POST['payment_method'] ?? 'Cash on Delivery');
-    $discount_code = sanitize($_POST['discount_code'] ?? '');
+    $address_id = intval($_SESSION['checkout_data']['address_id'] ?? 0);
+    $payment_method = sanitize($_SESSION['checkout_data']['payment_method'] ?? 'Cash on Delivery');
+    $discount_code = sanitize($_SESSION['checkout_data']['discount_code'] ?? '');
+    
+    // Clear session data
+    unset($_SESSION['checkout_data']);
     
     // Verify address belongs to user
     $addr_stmt = $conn->prepare("SELECT address_id FROM user_addresses WHERE address_id = ? AND user_id = ?");
@@ -15,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $addr_result = $addr_stmt->get_result();
     
     if ($addr_result->num_rows === 0) {
-        header('Location: index.php?error=invalid_address');
+        header('Location: ' . BASE_URL . '/user/checkout/index.php?error=invalid_address');
         exit();
     }
     $addr_stmt->close();
@@ -27,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cart_result = $cart_stmt->get_result();
     
     if ($cart_result->num_rows === 0) {
-        header('Location: index.php?error=empty_cart');
+        header('Location: ' . BASE_URL . '/user/checkout/index.php?error=empty_cart');
         exit();
     }
     
@@ -44,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     while ($item = $items_result->fetch_assoc()) {
         if ($item['quantity'] > $item['stock_quantity']) {
-            header('Location: index.php?error=insufficient_stock');
+            header('Location: ' . BASE_URL . '/user/checkout/index.php?error=insufficient_stock');
             exit();
         }
         $item_total = $item['price'] * $item['quantity'];
@@ -58,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $discount_id = null;
     $discount_amount = 0;
     
-    if ($discount_code) {
+    if (!empty($discount_code)) {
         $disc_stmt = $conn->prepare("SELECT * FROM discount_codes WHERE code = ? AND is_active = 1 AND (expiration_date IS NULL OR expiration_date > NOW()) AND (usage_limit IS NULL OR times_used < usage_limit)");
         $disc_stmt->bind_param("s", $discount_code);
         $disc_stmt->execute();
@@ -66,27 +70,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($disc_result->num_rows > 0) {
             $discount = $disc_result->fetch_assoc();
-            $discount_id = $discount['discount_id'];
             
-            // Calculate discount based on type
-            if ($discount['discount_type'] === 'percentage') {
-                $discount_amount = ($subtotal * $discount['discount_value']) / 100;
-                if ($discount['max_discount_amount'] && $discount_amount > $discount['max_discount_amount']) {
-                    $discount_amount = $discount['max_discount_amount'];
+            // Check minimum purchase amount first
+            if (!$discount['min_purchase_amount'] || $subtotal >= $discount['min_purchase_amount']) {
+                $discount_id = $discount['discount_id'];
+                
+                // Calculate discount based on type
+                if ($discount['discount_type'] === 'percentage') {
+                    $discount_amount = ($subtotal * $discount['discount_value']) / 100;
+                    if ($discount['max_discount_amount'] && $discount_amount > $discount['max_discount_amount']) {
+                        $discount_amount = $discount['max_discount_amount'];
+                    }
+                } else {
+                    $discount_amount = $discount['discount_value'];
                 }
-            } else {
-                $discount_amount = $discount['discount_value'];
-            }
-            
-            if ($discount['min_purchase_amount'] && $subtotal < $discount['min_purchase_amount']) {
-                $discount_amount = 0;
-                $discount_id = null;
             }
         }
         $disc_stmt->close();
     }
     
     $total_amount = $subtotal - $discount_amount;
+    if ($total_amount < 0) $total_amount = 0;
     
     // Create order
     $order_stmt = $conn->prepare("INSERT INTO orders (user_id, address_id, discount_id, payment_method, subtotal, discount_amount, total_amount) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -137,10 +141,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $clear_cart->execute();
     $clear_cart->close();
     
-    header("Location: success.php?order_id=$order_id");
+    header("Location: " . BASE_URL . "/user/checkout/success.php?order_id=$order_id");
     exit();
 } else {
-    header('Location: index.php');
+    header('Location: ' . BASE_URL . '/user/checkout/index.php');
     exit();
 }
 ?>

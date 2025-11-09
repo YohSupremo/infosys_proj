@@ -38,6 +38,17 @@ while ($cat = $cat_result->fetch_assoc()) {
 }
 $cat_stmt->close();
 
+// Get product images (MP1 Requirement)
+$images_stmt = $conn->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY display_order ASC, is_primary DESC");
+$images_stmt->bind_param("i", $product_id);
+$images_stmt->execute();
+$images_result = $images_stmt->get_result();
+$product_images = [];
+while ($img = $images_result->fetch_assoc()) {
+    $product_images[] = $img;
+}
+$images_stmt->close();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_name = sanitize($_POST['product_name'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
@@ -97,8 +108,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $cat_stmt->close();
             }
             
+            // Handle multiple image uploads (MP1 Requirement)
+            if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+                $upload_dir = '../../assets/images/products/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
+                
+                // Get current max display_order
+                $max_order_stmt = $conn->prepare("SELECT MAX(display_order) as max_order FROM product_images WHERE product_id = ?");
+                $max_order_stmt->bind_param("i", $product_id);
+                $max_order_stmt->execute();
+                $max_order_result = $max_order_stmt->get_result();
+                $max_order = $max_order_result->fetch_assoc()['max_order'] ?? 0;
+                $max_order_stmt->close();
+                
+                foreach ($_FILES['images']['name'] as $key => $filename) {
+                    if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
+                        $file_ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                        
+                        if (in_array($file_ext, $allowed_exts)) {
+                            $new_filename = uniqid() . '.' . $file_ext;
+                            $upload_path = $upload_dir . $new_filename;
+                            
+                            if (move_uploaded_file($_FILES['images']['tmp_name'][$key], $upload_path)) {
+                                $image_path = 'assets/images/products/' . $new_filename;
+                                $max_order++;
+                                $is_primary = 0; // Don't set new images as primary automatically
+                                
+                                $img_stmt = $conn->prepare("INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES (?, ?, ?, ?)");
+                                $img_stmt->bind_param("isii", $product_id, $image_path, $is_primary, $max_order);
+                                $img_stmt->execute();
+                                $img_stmt->close();
+                            }
+                        }
+                    }
+                }
+            }
+            
             $success = 'Product updated successfully!';
-            header('Location: index.php?success=1');
+            header('Location: ' . BASE_URL . '/admin/products/index.php?success=1');
             exit();
         } else {
             $error = 'Failed to update product.';
@@ -136,7 +187,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                     <form method="POST" action="" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="product_name" class="form-label">Product Name *</label>
-                            <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo htmlspecialchars($product['product_name']); ?>" required>
+                            <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo htmlspecialchars($product['product_name']); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
@@ -145,11 +196,11 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="price" class="form-label">Price *</label>
-                                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="<?php echo $product['price']; ?>" required>
+                                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="<?php echo $product['price']; ?>">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="stock_quantity" class="form-label">Stock Quantity *</label>
-                                <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" min="0" value="<?php echo $product['stock_quantity']; ?>" required>
+                                <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" min="0" value="<?php echo $product['stock_quantity']; ?>">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -181,23 +232,52 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                             <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
                         </div>
                         <div class="mb-3">
-                            <label for="image" class="form-label">Product Image</label>
+                            <label for="image" class="form-label">Primary Product Image</label>
                             <?php if ($product['image_url']): ?>
                                 <div class="mb-2">
                                     <img src="../../<?php echo htmlspecialchars($product['image_url']); ?>" style="max-width: 200px;" class="img-thumbnail">
                                 </div>
                             <?php endif; ?>
                             <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <small class="text-muted">This updates the main product image</small>
                             <div id="imagePreview" class="image-upload-preview mt-2" style="display: none;">
-                                <img id="previewImg" src="" alt="Preview">
+                                <img id="previewImg" src="" alt="Preview" style="max-width: 200px;">
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Existing Product Images (MP1 - Multiple Photos)</label>
+                            <?php if (count($product_images) > 0): ?>
+                                <div class="row mb-3">
+                                    <?php foreach ($product_images as $img): ?>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="position-relative">
+                                                <img src="../../<?php echo htmlspecialchars($img['image_url']); ?>" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
+                                                <?php if ($img['is_primary']): ?>
+                                                    <span class="badge bg-primary position-absolute top-0 start-0 m-1">Primary</span>
+                                                <?php endif; ?>
+                                                <a href="<?php echo BASE_URL; ?>/admin/products/delete_image.php?image_id=<?php echo $img['image_id']; ?>&product_id=<?php echo $product_id; ?>" 
+                                                   class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" 
+                                                   onclick="return confirm('Delete this image?')">×</a>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <p class="text-muted">No additional images. Upload images below.</p>
+                            <?php endif; ?>
+                        </div>
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Add More Product Images</label>
+                            <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple>
+                            <small class="text-muted">You can select multiple images to add</small>
+                            <div id="imagesPreview" class="mt-2"></div>
                         </div>
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" <?php echo $product['is_active'] ? 'checked' : ''; ?>>
                             <label class="form-check-label" for="is_active">Active</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Update Product</button>
-                        <a href="index.php" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="<?php echo BASE_URL; ?>/admin/products/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
             </div>
@@ -206,6 +286,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
 </div>
 
 <script>
+// Single image preview
 document.getElementById('image').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -215,6 +296,25 @@ document.getElementById('image').addEventListener('change', function(e) {
             document.getElementById('imagePreview').style.display = 'block';
         }
         reader.readAsDataURL(file);
+    }
+});
+
+// Multiple images preview
+document.getElementById('images').addEventListener('change', function(e) {
+    const preview = document.getElementById('imagesPreview');
+    preview.innerHTML = '';
+    
+    if (e.target.files.length > 0) {
+        Array.from(e.target.files).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'd-inline-block me-2 mb-2';
+                div.innerHTML = '<img src="' + e.target.result + '" style="max-width: 100px; max-height: 100px; object-fit: cover;" class="img-thumbnail"><br><small>New Image ' + (index + 1) + '</small>';
+                preview.appendChild(div);
+            }
+            reader.readAsDataURL(file);
+        });
     }
 });
 </script>

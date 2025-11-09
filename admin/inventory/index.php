@@ -2,7 +2,7 @@
 $page_title = 'Inventory - Admin';
 include '../../includes/header.php';
 include '../../config/config.php';
-requireAdmin();
+requireAdminOrInventoryManager();
 
 $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id WHERE p.is_active = 1 ORDER BY p.stock_quantity ASC, p.product_name");
 ?>
@@ -12,7 +12,7 @@ $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Inventory</h2>
-        <a href="restock.php" class="btn btn-primary">Restock Products</a>
+        <a href="<?php echo BASE_URL; ?>/admin/inventory/restock.php" class="btn btn-primary">Restock Products</a>
     </div>
     
     <div class="card">
@@ -52,7 +52,7 @@ $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="restock.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-outline-primary">Restock</a>
+                                        <a href="<?php echo BASE_URL; ?>/admin/inventory/restock.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-outline-primary">Restock</a>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>

@@ -2,7 +2,7 @@
 $page_title = 'Restock Products - Admin';
 include '../../includes/header.php';
 include '../../config/config.php';
-requireAdmin();
+requireAdminOrInventoryManager();
 
 $error = '';
 $success = '';
@@ -110,7 +110,7 @@ $product_id = intval($_GET['product_id'] ?? 0);
                     <form method="POST" action="" id="restockForm">
                         <div class="mb-3">
                             <label for="supplier_id" class="form-label">Supplier *</label>
-                            <select class="form-select" id="supplier_id" name="supplier_id" required>
+                            <select class="form-select" id="supplier_id" name="supplier_id">
                                 <option value="0">Select Supplier</option>
                                 <?php while ($supplier = $suppliers->fetch_assoc()): ?>
                                     <option value="<?php echo $supplier['supplier_id']; ?>"><?php echo htmlspecialchars($supplier['supplier_name']); ?></option>
@@ -123,7 +123,7 @@ $product_id = intval($_GET['product_id'] ?? 0);
                                 <div class="row">
                                     <div class="col-md-5 mb-2">
                                         <label class="form-label">Product *</label>
-                                        <select class="form-select product-select" name="products[]" required>
+                                        <select class="form-select product-select" name="products[]">
                                             <option value="">Select Product</option>
                                             <?php 
                                             $products_list->data_seek(0);
@@ -137,11 +137,11 @@ $product_id = intval($_GET['product_id'] ?? 0);
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Quantity *</label>
-                                        <input type="number" class="form-control" name="quantities[]" min="1" required>
+                                        <input type="number" class="form-control" name="quantities[]" min="1">
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Cost per Unit *</label>
-                                        <input type="number" class="form-control" name="costs[]" step="0.01" min="0" required>
+                                        <input type="number" class="form-control" name="costs[]" step="0.01" min="0">
                                     </div>
                                     <div class="col-md-1 mb-2">
                                         <label class="form-label">&nbsp;</label>
@@ -159,7 +159,7 @@ $product_id = intval($_GET['product_id'] ?? 0);
                         </div>
                         
                         <button type="submit" class="btn btn-primary">Complete Restocking</button>
-                        <a href="index.php" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="<?php echo BASE_URL; ?>/admin/inventory/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
             </div>

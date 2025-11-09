@@ -18,7 +18,7 @@ $result = $stmt->get_result();
     <h2 class="mb-4">My Addresses</h2>
     
     <div class="mb-3">
-        <a href="add_address.php" class="btn btn-primary">Add New Address</a>
+        <a href="<?php echo BASE_URL; ?>/user/account/add_address.php" class="btn btn-primary">Add New Address</a>
     </div>
     
     <div class="row">
@@ -37,7 +37,7 @@ $result = $stmt->get_result();
                             <p class="mb-1"><?php echo htmlspecialchars($address['city']); ?>, <?php echo htmlspecialchars($address['state']); ?> <?php echo htmlspecialchars($address['postal_code']); ?></p>
                             <p class="mb-1"><?php echo htmlspecialchars($address['country']); ?></p>
                             <div class="mt-3">
-                                <a href="edit_address.php?id=<?php echo $address['address_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a href="<?php echo BASE_URL; ?>/user/account/edit_address.php?id=<?php echo $address['address_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
                                 <form method="POST" action="delete_address.php" class="d-inline">
                                     <input type="hidden" name="address_id" value="<?php echo $address['address_id']; ?>">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this address?')">Delete</button>

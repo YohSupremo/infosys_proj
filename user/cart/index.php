@@ -102,7 +102,7 @@ $cart_stmt->close();
                 </div>
             <?php else: ?>
                 <div class="alert alert-info">Your cart is empty.</div>
-                <a href="../products/index.php" class="btn btn-primary">Continue Shopping</a>
+                <a href="<?php echo BASE_URL; ?>/user/products/index.php" class="btn btn-primary">Continue Shopping</a>
             <?php endif; ?>
         </div>
         
@@ -122,7 +122,7 @@ $cart_stmt->close();
                         <span><strong>₱<?php echo number_format($total, 2); ?></strong></span>
                     </div>
                     <?php if (count($cart_items) > 0): ?>
-                        <a href="../checkout/index.php" class="btn btn-primary w-100">Proceed to Checkout</a>
+                        <a href="<?php echo BASE_URL; ?>/user/checkout/index.php" class="btn btn-primary w-100">Proceed to Checkout</a>
                     <?php endif; ?>
                 </div>
             </div>

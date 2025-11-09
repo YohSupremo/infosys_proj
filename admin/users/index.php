@@ -12,7 +12,7 @@ $users = $conn->query("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.ro
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Users</h2>
-        <a href="create.php" class="btn btn-primary">Add New User</a>
+        <a href="<?php echo BASE_URL; ?>/admin/users/create.php" class="btn btn-primary">Add New User</a>
     </div>
     
     <div class="card">
@@ -45,7 +45,7 @@ $users = $conn->query("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.ro
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="edit.php?id=<?php echo $user['user_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <a href="<?php echo BASE_URL; ?>/admin/users/edit.php?id=<?php echo $user['user_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
                                         <form method="POST" action="delete.php" class="d-inline">
                                             <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this user?')">Delete</button>

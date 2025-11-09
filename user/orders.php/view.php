@@ -120,7 +120,7 @@ $items_result = $items_stmt->get_result();
     </div>
     
     <div class="mt-3">
-        <a href="index.php" class="btn btn-outline-primary">Back to Orders</a>
+        <a href="<?php echo BASE_URL; ?>/user/orders.php/index.php" class="btn btn-outline-primary">Back to Orders</a>
     </div>
 </div>
 

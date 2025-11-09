@@ -59,7 +59,10 @@ $stmt->close();
                         </tr>
                     </table>
                     
-                    <a href="edit_profile.php" class="btn btn-primary">Edit Profile</a>
+                    <div class="d-flex gap-2">
+                        <a href="<?php echo BASE_URL; ?>/user/account/edit_profile.php" class="btn btn-primary">Edit Profile</a>
+                        <a href="<?php echo BASE_URL; ?>/user/account/deactivate.php" class="btn btn-outline-danger">Deactivate Account</a>
+                    </div>
                 </div>
             </div>
         </div>

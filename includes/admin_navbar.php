@@ -1,7 +1,10 @@
 
-
 <?php 
-$base_url = '/infosys_proj  ';?>
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/infosys_proj');
+}
+$base_url = BASE_URL;
+?>
 
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">

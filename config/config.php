@@ -1,4 +1,7 @@
 <?php
+// Base URL configuration
+define('BASE_URL', '/infosys_proj');
+
 // Database configuration
 $db_host = 'localhost';
 $db_user = 'root';
@@ -34,7 +37,7 @@ function hasRole($role_name) {
 // Helper function to require login
 function requireLogin() {
     if (!isLoggedIn()) {
-        header('Location: ../user/auth/login.php');
+        header('Location: ' . BASE_URL . '/user/auth/login.php');
         exit();
     }
 }
@@ -43,7 +46,16 @@ function requireLogin() {
 function requireAdmin() {
     requireLogin();
     if (!hasRole('Admin')) {
-        header('Location: ../index.php');
+        header('Location: ' . BASE_URL . '/index.php');
+        exit();
+    }
+}
+
+// Helper function to require admin or inventory manager
+function requireAdminOrInventoryManager() {
+    requireLogin();
+    if (!hasRole('Admin') && !hasRole('Inventory Manager')) {
+        header('Location: ' . BASE_URL . '/index.php');
         exit();
     }
 }

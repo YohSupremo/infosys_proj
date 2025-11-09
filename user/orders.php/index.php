@@ -46,7 +46,7 @@ $orders_result = $orders_stmt->get_result();
                                 <span class="badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($order['order_status']); ?></span>
                             </td>
                             <td>
-                                <a href="view.php?id=<?php echo $order['order_id']; ?>" class="btn btn-sm btn-primary">View</a>
+                                <a href="<?php echo BASE_URL; ?>/user/orders.php/view.php?id=<?php echo $order['order_id']; ?>" class="btn btn-sm btn-primary">View</a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -55,7 +55,7 @@ $orders_result = $orders_stmt->get_result();
         </div>
     <?php else: ?>
         <div class="alert alert-info">You have no orders yet.</div>
-        <a href="../products/index.php" class="btn btn-primary">Start Shopping</a>
+        <a href="<?php echo BASE_URL; ?>/user/products/index.php" class="btn btn-primary">Start Shopping</a>
     <?php endif; ?>
 </div>
 

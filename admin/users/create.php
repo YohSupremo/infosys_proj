@@ -98,7 +98,7 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                             <label class="form-check-label" for="is_active">Active</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Add User</button>
-                        <a href="index.php" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="<?php echo BASE_URL; ?>/admin/users/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
             </div>
