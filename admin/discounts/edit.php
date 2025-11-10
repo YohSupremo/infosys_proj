@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Discount code already exists.';
         } else {
             $update_stmt = $conn->prepare("UPDATE discount_codes SET code = ?, description = ?, discount_type = ?, discount_value = ?, min_purchase_amount = ?, max_discount_amount = ?, usage_limit = ?, applies_to = ?, start_date = ?, expiration_date = ?, is_active = ? WHERE discount_id = ?");
-            $update_stmt->bind_param("sssdddississi", $code, $description, $discount_type, $discount_value, $min_purchase_amount, $max_discount_amount, $usage_limit, $applies_to, $start_date, $expiration_date, $is_active, $discount_id);
+            $update_stmt->bind_param("sssdddisssii", $code, $description, $discount_type, $discount_value, $min_purchase_amount, $max_discount_amount, $usage_limit, $applies_to, $start_date, $expiration_date, $is_active, $discount_id);
             
             if ($update_stmt->execute()) {
                 // Update products

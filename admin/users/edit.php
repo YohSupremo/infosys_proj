@@ -32,6 +32,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role_id = intval($_POST['role_id'] ?? 0);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $password = $_POST['password'] ?? '';
+	$uploaded_photo_path = null;
+	
+	// Handle profile photo upload (optional)
+	if (isset($_FILES['profile_photo']) && isset($_FILES['profile_photo']['tmp_name']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
+		$upload_dir = '../../assets/images/profiles/';
+		if (!is_dir($upload_dir)) {
+			mkdir($upload_dir, 0777, true);
+		}
+		$file_ext = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
+		$allowed_exts = array('jpg', 'jpeg', 'png', 'gif');
+		if (in_array($file_ext, $allowed_exts)) {
+			$new_filename = uniqid() . '.' . $file_ext;
+			$upload_path_fs = $upload_dir . $new_filename;
+			if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $upload_path_fs)) {
+				// Store relative path for public access
+				$uploaded_photo_path = 'assets/images/profiles/' . $new_filename;
+			}
+		}
+	}
     
     if (empty($first_name) || empty($last_name) || $role_id <= 0) {
         $error = 'Please fill in all required fields.';
@@ -41,12 +60,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Password must be at least 6 characters long.';
             } else {
                 $password_hash = password_hash($password, PASSWORD_DEFAULT);
-                $update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ?, password_hash = ? WHERE user_id = ?");
-                $update_stmt->bind_param("sssissi", $first_name, $last_name, $contact_number, $role_id, $is_active, $password_hash, $user_id);
+				if ($uploaded_photo_path) {
+					$update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ?, password_hash = ?, profile_photo = ? WHERE user_id = ?");
+					$update_stmt->bind_param("sssisssi", $first_name, $last_name, $contact_number, $role_id, $is_active, $password_hash, $uploaded_photo_path, $user_id);
+				} else {
+					$update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ?, password_hash = ? WHERE user_id = ?");
+					$update_stmt->bind_param("sssissi", $first_name, $last_name, $contact_number, $role_id, $is_active, $password_hash, $user_id);
+				}
             }
         } else {
-            $update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ? WHERE user_id = ?");
-            $update_stmt->bind_param("sssiii", $first_name, $last_name, $contact_number, $role_id, $is_active, $user_id);
+			if ($uploaded_photo_path) {
+				$update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ?, profile_photo = ? WHERE user_id = ?");
+				$update_stmt->bind_param("sssiisi", $first_name, $last_name, $contact_number, $role_id, $is_active, $uploaded_photo_path, $user_id);
+			} else {
+				$update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ? WHERE user_id = ?");
+				$update_stmt->bind_param("sssiii", $first_name, $last_name, $contact_number, $role_id, $is_active, $user_id);
+			}
         }
         
         if (!isset($error) || empty($error)) {
@@ -70,7 +99,7 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
     <h2 class="mb-4">Edit User</h2>
     
     <div class="row">
-        <div class="col-md-6">
+		<div class="col-md-8">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">User Information</h5>
@@ -80,7 +109,7 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+					<form method="POST" action="" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="first_name" class="form-label">First Name *</label>
@@ -95,6 +124,17 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
                         </div>
+						<div class="mb-3">
+							<label class="form-label d-block">Profile Photo</label>
+							<div class="d-flex align-items-center">
+								<?php
+								$current_photo = !empty($user['profile_photo']) ? $user['profile_photo'] : 'assets/images/placeholder.jpg';
+								?>
+								<img src="<?php echo BASE_URL . '/' . $current_photo; ?>" alt="Profile" style="width:60px;height:60px;object-fit:cover" class="rounded me-3">
+								<input type="file" class="form-control" name="profile_photo" accept="image/*" style="max-width:320px;">
+							</div>
+							<small class="text-muted">Upload a JPG/PNG/GIF image. Max ~2MB.</small>
+						</div>
                         <div class="mb-3">
                             <label for="password" class="form-label">New Password (leave blank to keep current)</label>
                             <input type="password" class="form-control" id="password" name="password">

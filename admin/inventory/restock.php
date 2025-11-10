@@ -88,7 +88,13 @@ $products_list = $conn->query("SELECT * FROM products WHERE is_active = 1 ORDER 
 $product_id = intval($_GET['product_id'] ?? 0);
 ?>
 
-<?php include '../../includes/admin_navbar.php'; ?>
+<?php
+if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manager') {
+	include '../../includes/inventory_navbar.php';
+} else {
+	include '../../includes/admin_navbar.php';
+}
+?>
 
 <div class="container my-5">
     <h2 class="mb-4">Restock Products</h2>

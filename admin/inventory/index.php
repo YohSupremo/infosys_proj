@@ -7,7 +7,13 @@ requireAdminOrInventoryManager();
 $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id WHERE p.is_active = 1 ORDER BY p.stock_quantity ASC, p.product_name");
 ?>
 
-<?php include '../../includes/admin_navbar.php'; ?>
+<?php
+if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manager') {
+	include '../../includes/inventory_navbar.php';
+} else {
+	include '../../includes/admin_navbar.php';
+}
+?>
 
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">

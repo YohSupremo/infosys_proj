@@ -24,7 +24,7 @@ if ($order_result->num_rows === 0) {
 $order = $order_result->fetch_assoc();
 $order_stmt->close();
 
-$items_stmt = $conn->prepare("SELECT * FROM order_items WHERE order_id = ?");
+$items_stmt = $conn->prepare("SELECT oi.*, p.image_url FROM order_items oi LEFT JOIN products p ON oi.product_id = p.product_id WHERE oi.order_id = ?");
 $items_stmt->bind_param("i", $order_id);
 $items_stmt->execute();
 $items_result = $items_stmt->get_result();
@@ -45,6 +45,7 @@ $items_result = $items_stmt->get_result();
                     <table class="table">
                         <thead>
                             <tr>
+								<th></th>
                                 <th>Product</th>
                                 <th>Quantity</th>
                                 <th>Unit Price</th>
@@ -54,6 +55,12 @@ $items_result = $items_stmt->get_result();
                         <tbody>
                             <?php while ($item = $items_result->fetch_assoc()): ?>
                                 <tr>
+									<td style="width:60px">
+										<?php
+										$thumb = !empty($item['image_url']) ? $item['image_url'] : 'assets/images/placeholder.jpg';
+										?>
+										<img src="<?php echo BASE_URL . '/' . $thumb; ?>" alt="Product" style="width:50px;height:50px;object-fit:cover" class="rounded">
+									</td>
                                     <td><?php echo htmlspecialchars($item['product_name']); ?></td>
                                     <td><?php echo $item['quantity']; ?></td>
                                     <td>₱<?php echo number_format($item['unit_price'], 2); ?></td>

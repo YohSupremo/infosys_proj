@@ -4,7 +4,7 @@ include '../../includes/header.php';
 include '../../config/config.php';
 requireAdmin();
 
-$discounts = $conn->query("SELECT * FROM discount_codes ORDER BY created_at DESC");
+$discounts = $conn->query("SELECT dc.*, (SELECT COUNT(*) FROM discount_usage du WHERE du.discount_id = dc.discount_id) AS times_used FROM discount_codes dc ORDER BY dc.created_at DESC");
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -40,11 +40,18 @@ $discounts = $conn->query("SELECT * FROM discount_codes ORDER BY created_at DESC
                                     <td><?php echo $discount['discount_type'] === 'percentage' ? $discount['discount_value'] . '%' : '₱' . number_format($discount['discount_value'], 2); ?></td>
                                     <td><?php echo htmlspecialchars($discount['applies_to']); ?></td>
                                     <td>
-                                        <?php if ($discount['is_active']): ?>
-                                            <span class="badge badge-success">Active</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-danger">Inactive</span>
-                                        <?php endif; ?>
+										<?php
+										$usage_limit = $discount['usage_limit'] ? intval($discount['usage_limit']) : null;
+										$times_used = $discount['times_used'] ? intval($discount['times_used']) : 0;
+										if (!is_null($usage_limit) && $times_used >= $usage_limit): ?>
+											<span class="badge bg-secondary">Max Usage</span>
+										<?php else: ?>
+											<?php if ($discount['is_active']): ?>
+												<span class="badge bg-success">Active</span>
+											<?php else: ?>
+												<span class="badge bg-danger">Inactive</span>
+											<?php endif; ?>
+										<?php endif; ?>
                                     </td>
                                     <td>
                                         <a href="edit.php?id=<?php echo $discount['discount_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>

@@ -27,7 +27,7 @@ $order = $order_result->fetch_assoc();
 $order_stmt->close();
 
 // Get order items
-$items_stmt = $conn->prepare("SELECT * FROM order_items WHERE order_id = ?");
+$items_stmt = $conn->prepare("SELECT oi.*, p.image_url FROM order_items oi LEFT JOIN products p ON oi.product_id = p.product_id WHERE oi.order_id = ?");
 $items_stmt->bind_param("i", $order_id);
 $items_stmt->execute();
 $items_result = $items_stmt->get_result();
@@ -48,6 +48,7 @@ $items_result = $items_stmt->get_result();
                     <table class="table">
                         <thead>
                             <tr>
+								<th></th>
                                 <th>Product</th>
                                 <th>Quantity</th>
                                 <th>Unit Price</th>
@@ -57,6 +58,12 @@ $items_result = $items_stmt->get_result();
                         <tbody>
                             <?php while ($item = $items_result->fetch_assoc()): ?>
                                 <tr>
+									<td style="width:60px">
+										<?php
+										$thumb = !empty($item['image_url']) ? $item['image_url'] : 'assets/images/placeholder.jpg';
+										?>
+										<img src="<?php echo BASE_URL . '/' . $thumb; ?>" alt="Product" style="width:50px;height:50px;object-fit:cover" class="rounded">
+									</td>
                                     <td><?php echo htmlspecialchars($item['product_name']); ?></td>
                                     <td><?php echo $item['quantity']; ?></td>
                                     <td>₱<?php echo number_format($item['unit_price'], 2); ?></td>
@@ -77,12 +84,12 @@ $items_result = $items_stmt->get_result();
                 <div class="card-body">
                     <p><strong>Order Date:</strong><br><?php echo date('F d, Y h:i A', strtotime($order['order_date'])); ?></p>
                     <p><strong>Status:</strong><br>
-                        <?php
-                        $status_class = 'badge-warning';
-                        if ($order['order_status'] === 'Delivered') $status_class = 'badge-success';
-                        elseif ($order['order_status'] === 'Cancelled') $status_class = 'badge-danger';
-                        ?>
-                        <span class="badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($order['order_status']); ?></span>
+						<?php
+						$status_class = 'bg-warning text-dark';
+						if ($order['order_status'] === 'Delivered') $status_class = 'bg-success';
+						elseif ($order['order_status'] === 'Cancelled') $status_class = 'bg-danger';
+						?>
+						<span class="badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($order['order_status']); ?></span>
                     </p>
                     <p><strong>Payment Method:</strong><br><?php echo htmlspecialchars($order['payment_method']); ?></p>
                     

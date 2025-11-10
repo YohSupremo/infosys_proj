@@ -2,7 +2,7 @@
 $page_title = 'Inventory Report - Admin';
 include '../../includes/header.php';
 include '../../config/config.php';
-requireAdmin();
+requireAdminOrInventoryManager();
 
 $products = $conn->query("SELECT p.*, t.team_name, 
     (SELECT SUM(quantity_change) FROM inventory_history WHERE product_id = p.product_id AND transaction_type = 'restock') as total_restocked,
@@ -13,7 +13,13 @@ $products = $conn->query("SELECT p.*, t.team_name,
     ORDER BY p.product_name");
 ?>
 
-<?php include '../../includes/admin_navbar.php'; ?>
+<?php
+if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manager') {
+	include '../../includes/inventory_navbar.php';
+} else {
+	include '../../includes/admin_navbar.php';
+}
+?>
 
 <div class="container my-5">
     <h2 class="mb-4">Inventory Report</h2>
@@ -45,11 +51,11 @@ $products = $conn->query("SELECT p.*, t.team_name,
                                     <td><?php echo $product['total_sold'] ?: 0; ?></td>
                                     <td>
                                         <?php if ($product['stock_quantity'] == 0): ?>
-                                            <span class="badge badge-danger">Out of Stock</span>
+											<span class="badge bg-danger">Out of Stock</span>
                                         <?php elseif ($product['stock_quantity'] < 10): ?>
-                                            <span class="badge badge-warning">Low Stock</span>
+											<span class="badge bg-warning text-dark">Low Stock</span>
                                         <?php else: ?>
-                                            <span class="badge badge-success">In Stock</span>
+											<span class="badge bg-success">In Stock</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

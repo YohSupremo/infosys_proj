@@ -38,11 +38,11 @@ $users = $conn->query("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.ro
                                     <td><?php echo htmlspecialchars($user['email']); ?></td>
                                     <td><?php echo htmlspecialchars($user['role_name']); ?></td>
                                     <td>
-                                        <?php if ($user['is_active']): ?>
-                                            <span class="badge badge-success">Active</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-danger">Inactive</span>
-                                        <?php endif; ?>
+										<?php if ($user['is_active']): ?>
+											<span class="badge bg-success">Active</span>
+										<?php else: ?>
+											<span class="badge bg-danger">Inactive</span>
+										<?php endif; ?>
                                     </td>
                                     <td>
                                         <a href="<?php echo BASE_URL; ?>/admin/users/edit.php?id=<?php echo $user['user_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>

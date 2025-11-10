@@ -2,12 +2,18 @@
 $page_title = 'Inventory History - Admin';
 include '../../includes/header.php';
 include '../../config/config.php';
-requireAdmin();
+requireAdminOrInventoryManager();
 
 $history = $conn->query("SELECT ih.*, p.product_name, u.first_name, u.last_name FROM inventory_history ih JOIN products p ON ih.product_id = p.product_id LEFT JOIN users u ON ih.created_by = u.user_id ORDER BY ih.created_at DESC LIMIT 100");
 ?>
 
-<?php include '../../includes/admin_navbar.php'; ?>
+<?php
+if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manager') {
+	include '../../includes/inventory_navbar.php';
+} else {
+	include '../../includes/admin_navbar.php';
+}
+?>
 
 <div class="container my-5">
     <h2 class="mb-4">Inventory History</h2>
@@ -35,11 +41,11 @@ $history = $conn->query("SELECT ih.*, p.product_name, u.first_name, u.last_name 
                                     <td><?php echo htmlspecialchars($item['product_name']); ?></td>
                                     <td>
                                         <?php
-                                        $type_class = 'badge-info';
-                                        if ($item['transaction_type'] === 'sale') $type_class = 'badge-danger';
-                                        elseif ($item['transaction_type'] === 'restock') $type_class = 'badge-success';
+										$type_class = 'bg-info text-dark';
+										if ($item['transaction_type'] === 'sale') $type_class = 'bg-danger';
+										elseif ($item['transaction_type'] === 'restock') $type_class = 'bg-success';
                                         ?>
-                                        <span class="badge <?php echo $type_class; ?>"><?php echo htmlspecialchars($item['transaction_type']); ?></span>
+										<span class="badge <?php echo $type_class; ?>"><?php echo htmlspecialchars($item['transaction_type']); ?></span>
                                     </td>
                                     <td>
                                         <strong class="<?php echo $item['quantity_change'] > 0 ? 'text-success' : 'text-danger'; ?>">

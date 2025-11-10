@@ -42,11 +42,11 @@ $discounts = $conn->query("SELECT dc.*,
                                     <td>₱<?php echo number_format($discount['total_discount_amount'] ?: 0, 2); ?></td>
                                     <td><?php echo $discount['usage_limit'] ?: 'Unlimited'; ?></td>
                                     <td>
-                                        <?php if ($discount['is_active']): ?>
-                                            <span class="badge badge-success">Active</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-danger">Inactive</span>
-                                        <?php endif; ?>
+										<?php if ($discount['is_active']): ?>
+											<span class="badge bg-success">Active</span>
+										<?php else: ?>
+											<span class="badge bg-danger">Inactive</span>
+										<?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
