@@ -44,6 +44,7 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 										$type_class = 'bg-info text-dark';
 										if ($item['transaction_type'] === 'sale') $type_class = 'bg-danger';
 										elseif ($item['transaction_type'] === 'restock') $type_class = 'bg-success';
+										elseif ($item['transaction_type'] === 'adjustment') $type_class = 'bg-warning text-dark';
                                         ?>
 										<span class="badge <?php echo $type_class; ?>"><?php echo htmlspecialchars($item['transaction_type']); ?></span>
                                     </td>

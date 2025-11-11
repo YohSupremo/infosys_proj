@@ -2,7 +2,7 @@
 $page_title = 'Product Details - NBA Shop';
 include '../../includes/header.php';
 include '../../config/config.php';
-requireLogin();
+// Allow unauthenticated users to view product details
 
 $product_id = intval($_GET['id'] ?? 0);
 
@@ -30,13 +30,35 @@ $cat_stmt->execute();
 $categories = $cat_stmt->get_result();
 
 // Get product images (MP1 Requirement - Multiple Photos)
+// Include main product image from products table as the first image
+$product_images = [];
+
+// Add main product image if it exists
+if (!empty($product['image_url'])) {
+    $product_images[] = [
+        'image_url' => $product['image_url'],
+        'is_primary' => 1,
+        'display_order' => 0
+    ];
+}
+
+// Get additional images from product_images table
 $images_stmt = $conn->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY is_primary DESC, display_order ASC");
 $images_stmt->bind_param("i", $product_id);
 $images_stmt->execute();
 $images_result = $images_stmt->get_result();
-$product_images = [];
 while ($img = $images_result->fetch_assoc()) {
-    $product_images[] = $img;
+    // Skip if this image is already in the array (shouldn't happen, but just in case)
+    $exists = false;
+    foreach ($product_images as $existing) {
+        if ($existing['image_url'] === $img['image_url']) {
+            $exists = true;
+            break;
+        }
+    }
+    if (!$exists) {
+        $product_images[] = $img;
+    }
 }
 $images_stmt->close();
 
@@ -46,11 +68,15 @@ $reviews_stmt->bind_param("i", $product_id);
 $reviews_stmt->execute();
 $reviews_result = $reviews_stmt->get_result();
 
-// Check if current user can review (has completed order)
-$user_id = $_SESSION['user_id'];
+// Check if current user can review (has completed order) - Any user who purchased can review
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 $can_review = false;
 $reviewable_orders = [];
-if (hasRole('Customer')) {
+$user_has_review = false;
+$user_review_id = null;
+
+if ($user_id) {
+    // Check if user has any delivered orders containing this product
     $order_check = $conn->prepare("SELECT DISTINCT o.order_id FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.user_id = ? AND oi.product_id = ? AND o.order_status = 'Delivered'");
     $order_check->bind_param("ii", $user_id, $product_id);
     $order_check->execute();
@@ -62,12 +88,27 @@ if (hasRole('Customer')) {
         }
     }
     $order_check->close();
+    
+    // Check if user already has a review for this product
+    $user_review_check = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? LIMIT 1");
+    $user_review_check->bind_param("ii", $user_id, $product_id);
+    $user_review_check->execute();
+    $user_review_result = $user_review_check->get_result();
+    $user_has_review = $user_review_result->num_rows > 0;
+    $user_review_id = $user_has_review ? $user_review_result->fetch_assoc()['review_id'] : null;
+    $user_review_check->close();
 }
 ?>
 
 <?php include '../../includes/navbar.php'; ?>
 
 <div class="container my-5">
+    <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Review deleted successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
     <div class="row">
         <div class="col-md-6">
             <!-- Product Images (MP1 - Multiple Photos) -->
@@ -89,9 +130,9 @@ if (hasRole('Customer')) {
                             </div>
                         <?php endforeach; ?>
                     </div>
+                <?php else: ?>
+                    <!-- Single image - no thumbnail gallery needed -->
                 <?php endif; ?>
-            <?php elseif ($product['image_url']): ?>
-                <img src="../../<?php echo htmlspecialchars($product['image_url']); ?>" class="img-fluid rounded" alt="<?php echo htmlspecialchars($product['product_name']); ?>">
             <?php else: ?>
                 <img src="../../assets/images/placeholder.jpg" class="img-fluid rounded" alt="No image">
             <?php endif; ?>
@@ -122,21 +163,48 @@ if (hasRole('Customer')) {
             <p><strong>Stock Available:</strong> <?php echo $product['stock_quantity']; ?></p>
             
             <?php if ($product['stock_quantity'] > 0): ?>
-                <form method="POST" action="../cart/add.php">
-                    <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
-                    <div class="mb-3">
-                        <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="<?php echo $product['stock_quantity']; ?>">
+                <?php if (isLoggedIn()): ?>
+                    <form method="POST" action="../cart/add.php">
+                        <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="<?php echo $product['stock_quantity']; ?>">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
+                    </form>
+                <?php else: ?>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> <strong>You need to login to shop.</strong>
+                        <p class="mb-2 mt-2">Please login or create an account to add items to your cart.</p>
+                        <div class="d-flex gap-2">
+                            <a href="<?php echo BASE_URL; ?>/user/auth/login.php" class="btn btn-primary">Login</a>
+                            <a href="<?php echo BASE_URL; ?>/user/auth/register.php" class="btn btn-outline-primary">Register</a>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
-                </form>
+                <?php endif; ?>
             <?php else: ?>
                 <div class="alert alert-warning">Out of Stock</div>
             <?php endif; ?>
             
             <?php if ($can_review): ?>
-                <div class="mt-3">
-                    <a href="<?php echo BASE_URL; ?>/user/reviews/create.php?product_id=<?php echo $product_id; ?>&order_id=<?php echo $reviewable_orders[0]; ?>" class="btn btn-outline-primary">Write a Review</a>
+                <div class="mt-3 p-3 bg-light rounded">
+                    <h5>Write a Review</h5>
+                    <p class="text-muted small">You purchased this product. Share your experience!</p>
+                    <?php if ($user_has_review): ?>
+                        <a href="<?php echo BASE_URL; ?>/user/reviews/edit.php?id=<?php echo $user_review_id; ?>" class="btn btn-success">
+                            <i class="bi bi-pencil"></i> Edit Your Review
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>/user/reviews/create.php?product_id=<?php echo $product_id; ?>&order_id=<?php echo $reviewable_orders[0]; ?>" class="btn btn-primary">
+                            <i class="bi bi-star"></i> Write a Review
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php elseif (!hasRole('Admin') && !hasRole('Inventory Manager')): ?>
+                <div class="mt-3 p-3 bg-light rounded">
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-info-circle"></i> You can review this product after your order is delivered.
+                    </p>
                 </div>
             <?php endif; ?>
         </div>
@@ -145,7 +213,14 @@ if (hasRole('Customer')) {
     <!-- Reviews Section (MP4 Requirement) -->
     <div class="row mt-5">
         <div class="col-12">
-            <h3>Customer Reviews</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Customer Reviews</h3>
+                <?php if ($can_review && !$user_has_review): ?>
+                    <a href="<?php echo BASE_URL; ?>/user/reviews/create.php?product_id=<?php echo $product_id; ?>&order_id=<?php echo $reviewable_orders[0]; ?>" class="btn btn-primary">
+                        <i class="bi bi-star"></i> Write a Review
+                    </a>
+                <?php endif; ?>
+            </div>
             <?php if ($reviews_result->num_rows > 0): ?>
                 <?php while ($review = $reviews_result->fetch_assoc()): ?>
                     <div class="card mb-3">
@@ -166,9 +241,23 @@ if (hasRole('Customer')) {
                                     <p class="mb-0"><?php echo nl2br(htmlspecialchars($review['review_text'])); ?></p>
                                     <small class="text-muted"><?php echo date('M d, Y', strtotime($review['created_at'])); ?></small>
                                 </div>
-                                <?php if ($review['user_id'] == $user_id): ?>
-                                    <a href="<?php echo BASE_URL; ?>/user/reviews/edit.php?id=<?php echo $review['review_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <?php endif; ?>
+                                <div class="d-flex gap-2">
+                                    <?php if ($user_id && $review['user_id'] == $user_id): ?>
+                                        <a href="<?php echo BASE_URL; ?>/user/reviews/edit.php?id=<?php echo $review['review_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <a href="<?php echo BASE_URL; ?>/user/reviews/delete.php?id=<?php echo $review['review_id']; ?>&product_id=<?php echo $product_id; ?>" 
+                                           class="btn btn-sm btn-outline-danger" 
+                                           onclick="return confirm('Are you sure you want to delete your review? This action cannot be undone.');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if ($user_id && hasRole('Admin')): ?>
+                                        <a href="<?php echo BASE_URL; ?>/admin/reviews/delete.php?id=<?php echo $review['review_id']; ?>&product_id=<?php echo $product_id; ?>" 
+                                           class="btn btn-sm btn-outline-danger" 
+                                           onclick="return confirm('Are you sure you want to delete this review? This action cannot be undone.');">
+                                            <i class="bi bi-trash"></i> Admin Delete
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -20,6 +20,27 @@ $stmt->close();
     <h2 class="mb-4">My Profile</h2>
     
     <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <?php if (!empty($user['profile_photo'])): ?>
+                        <img src="../../<?php echo htmlspecialchars($user['profile_photo']); ?>" 
+                             class="img-fluid rounded-circle mb-3" 
+                             alt="Profile Photo" 
+                             style="width: 200px; height: 200px; object-fit: cover; border: 4px solid #007bff;">
+                    <?php else: ?>
+                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 200px; height: 200px; margin: 0 auto;">
+                            <i class="bi bi-person-circle" style="font-size: 150px; color: white;"></i>
+                        </div>
+                    <?php endif; ?>
+                    <h4><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h4>
+                    <p class="text-muted mb-0">
+                        <span class="badge bg-primary"><?php echo htmlspecialchars($user['role_name']); ?></span>
+                    </p>
+                </div>
+            </div>
+        </div>
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">

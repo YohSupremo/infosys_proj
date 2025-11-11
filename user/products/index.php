@@ -2,7 +2,7 @@
 $page_title = 'Products - NBA Shop';
 include '../../includes/header.php';
 include '../../config/config.php';
-requireLogin();
+// Allow unauthenticated users to view products
 
 $search = sanitize($_GET['search'] ?? '');
 $team_id = intval($_GET['team_id'] ?? 0);

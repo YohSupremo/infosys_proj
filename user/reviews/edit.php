@@ -4,6 +4,53 @@ include '../../includes/header.php';
 include '../../config/config.php';
 requireLogin();
 
+$bad_words = [
+    "fuck", "shit", "bitch", "asshole",
+    "putangina", "gago", "punyeta", "tarantado",
+    "hayop", "leche", "walang hiya", "pakshet"
+];
+
+function censorText($text, $bad_words) {
+    // Map common character substitutions for obfuscation (e.g., "sh1t", "f*ck")
+    $sub_map = [
+        'a' => '[a@4]',
+        'i' => '[i1!|]',
+        'o' => '[o0]',
+        'e' => '[e3]',
+        's' => '[s5$z]',
+        'u' => '[uüv]',
+        't' => '[t7+]',
+    ];
+
+    foreach ($bad_words as $word) {
+        // Escape regex special characters based on delimiter '/'
+        $escaped = preg_quote($word, '/');
+
+        // Allow flexible spaces in multi-word phrases (e.g., "walang hiya")
+        $escaped = str_replace('\ ', '\s+', $escaped);
+
+        // Add fuzzy matching for character substitutions
+        $pattern_chars = '';
+        foreach (str_split($escaped) as $ch) {
+            $lower = strtolower($ch);
+            if (isset($sub_map[$lower])) {
+                $pattern_chars .= $sub_map[$lower];
+            } else {
+                $pattern_chars .= $ch;
+            }
+        }
+
+        // Build full regex pattern
+        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
+
+        // Replace matches with asterisks (same length as original word)
+        $replacement = str_repeat('*', mb_strlen($word));
+        $text = preg_replace($pattern, $replacement, $text);
+    }
+
+    return $text;
+}
+
 $review_id = intval($_GET['id'] ?? 0);
 $user_id = $_SESSION['user_id'];
 $error = '';
@@ -41,12 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Review must be at least 10 characters long.';
     } else {
         // Apply regex filter for bad words (MP4 Requirement)
-        $bad_words = ['bad', 'terrible', 'awful', 'horrible', 'worst']; // Add more as needed
-        $filtered_text = $review_text;
-        foreach ($bad_words as $word) {
-            $pattern = '/\b' . preg_quote($word, '/') . '\b/i';
-            $filtered_text = preg_replace($pattern, str_repeat('*', strlen($word)), $filtered_text);
-        }
+        $filtered_text = censorText($review_text, $bad_words);
         
         $update_stmt = $conn->prepare("UPDATE product_reviews SET rating = ?, review_text = ? WHERE review_id = ? AND user_id = ?");
         $update_stmt->bind_param("isii", $rating, $filtered_text, $review_id, $user_id);

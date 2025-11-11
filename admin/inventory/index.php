@@ -18,7 +18,11 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Inventory</h2>
-        <a href="<?php echo BASE_URL; ?>/admin/inventory/restock.php" class="btn btn-primary">Restock Products</a>
+        <div class="d-flex gap-2">
+            <a href="<?php echo BASE_URL; ?>/admin/inventory/restock.php" class="btn btn-primary">Restock Products</a>
+            <a href="<?php echo BASE_URL; ?>/admin/inventory/adjust_stock.php" class="btn btn-outline-primary">Adjust Stock</a>
+            <a href="<?php echo BASE_URL; ?>/admin/inventory/history.php" class="btn btn-outline-secondary">View History</a>
+        </div>
     </div>
     
     <div class="card">
@@ -58,7 +62,10 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="<?php echo BASE_URL; ?>/admin/inventory/restock.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-outline-primary">Restock</a>
+                                        <div class="btn-group" role="group">
+                                <a href="<?php echo BASE_URL; ?>/admin/inventory/restock.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-outline-primary">Restock</a>
+                                <a href="<?php echo BASE_URL; ?>/admin/inventory/adjust_stock.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-sm btn-outline-warning">Adjust</a>
+                            </div>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>

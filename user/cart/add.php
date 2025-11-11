@@ -1,6 +1,16 @@
 <?php
 include '../../config/config.php';
-requireLogin();
+
+// Check if user is logged in
+if (!isLoggedIn()) {
+    $_SESSION['redirect_message'] = 'You need to login to shop. Please login to add items to your cart.';
+    // Store the product_id to redirect back after login
+    if (isset($_POST['product_id'])) {
+        $_SESSION['redirect_after_login'] = BASE_URL . '/user/products/view.php?id=' . intval($_POST['product_id']);
+    }
+    header('Location: ' . BASE_URL . '/user/auth/login.php');
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_id = intval($_POST['product_id'] ?? 0);

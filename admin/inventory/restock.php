@@ -176,17 +176,21 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 <script>
 document.getElementById('addProduct').addEventListener('click', function() {
     const container = document.getElementById('productsContainer');
-    const newRow = container.querySelector('.product-row').cloneNode(true);
+    const template = container.querySelector('.product-row');
+    const newRow = template.cloneNode(true);
     newRow.querySelectorAll('input, select').forEach(input => {
         input.value = '';
     });
     container.appendChild(newRow);
 });
 
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-product')) {
-        if (document.querySelectorAll('.product-row').length > 1) {
-            e.target.closest('.product-row').remove();
+// Use event delegation for remove buttons (works for dynamically added rows)
+document.getElementById('productsContainer').addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-product') || e.target.closest('.remove-product')) {
+        const button = e.target.classList.contains('remove-product') ? e.target : e.target.closest('.remove-product');
+        const rows = document.querySelectorAll('.product-row');
+        if (rows.length > 1) {
+            button.closest('.product-row').remove();
         } else {
             alert('At least one product is required.');
         }

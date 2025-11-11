@@ -3,6 +3,13 @@ $page_title = 'NBA Shop - Official NBA Apparel';
 include 'includes/header.php';
 include 'config/config.php';
 
+// Check for redirect message
+$redirect_message = '';
+if (isset($_SESSION['redirect_message'])) {
+    $redirect_message = $_SESSION['redirect_message'];
+    unset($_SESSION['redirect_message']);
+}
+
 // Get featured products
 $featured_query = "SELECT p.*, t.team_name, t.team_code 
                    FROM products p 
@@ -85,6 +92,31 @@ $featured_result = $conn->query($featured_query);
         <h1>Welcome to NBA Shop</h1>
         <p>Get Your Favorite Team's Official Apparel</p>
         <a href="<?php echo BASE_URL; ?>/user/products/index.php" class="btn btn-primary btn-lg">Shop Now</a>
+    </div>
+</div>
+
+<div class="container my-3">
+    <?php if ($redirect_message): ?>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($redirect_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+</div>
+
+<div class="container my-3">
+    <!-- Search Bar -->
+    <div class="card">
+        <div class="card-body">
+            <form method="GET" action="<?php echo BASE_URL; ?>/user/products/index.php">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" name="search" placeholder="Search products by name or description..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

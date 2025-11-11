@@ -37,6 +37,7 @@ function hasRole($role_name) {
 // Helper function to require login
 function requireLogin() {
     if (!isLoggedIn()) {
+        $_SESSION['redirect_message'] = 'Please login to access this page.';
         header('Location: ' . BASE_URL . '/user/auth/login.php');
         exit();
     }
@@ -46,6 +47,7 @@ function requireLogin() {
 function requireAdmin() {
     requireLogin();
     if (!hasRole('Admin')) {
+        $_SESSION['redirect_message'] = 'You do not have permissions to access this page.';
         header('Location: ' . BASE_URL . '/index.php');
         exit();
     }
@@ -55,6 +57,7 @@ function requireAdmin() {
 function requireAdminOrInventoryManager() {
     requireLogin();
     if (!hasRole('Admin') && !hasRole('Inventory Manager')) {
+        $_SESSION['redirect_message'] = 'You do not have permissions to access this page.';
         header('Location: ' . BASE_URL . '/index.php');
         exit();
     }

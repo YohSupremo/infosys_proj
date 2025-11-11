@@ -4,6 +4,53 @@ include '../../includes/header.php';
 include '../../config/config.php';
 requireLogin();
 
+$bad_words = [
+    "fuck", "shit", "bitch", "asshole",
+    "putangina", "gago", "punyeta", "tarantado",
+    "hayop", "leche", "walang hiya", "pakshet"
+];
+
+function censorText($text, $bad_words) {
+    // Map common character substitutions for obfuscation (e.g., "sh1t", "f*ck")
+    $sub_map = [
+        'a' => '[a@4]',
+        'i' => '[i1!|]',
+        'o' => '[o0]',
+        'e' => '[e3]',
+        's' => '[s5$z]',
+        'u' => '[uüv]',
+        't' => '[t7+]',
+    ];
+
+    foreach ($bad_words as $word) {
+        // Escape regex special characters based on delimiter '/'
+        $escaped = preg_quote($word, '/');
+
+        // Allow flexible spaces in multi-word phrases (e.g., "walang hiya")
+        $escaped = str_replace('\ ', '\s+', $escaped);
+
+        // Add fuzzy matching for character substitutions
+        $pattern_chars = '';
+        foreach (str_split($escaped) as $ch) {
+            $lower = strtolower($ch);
+            if (isset($sub_map[$lower])) {
+                $pattern_chars .= $sub_map[$lower];
+            } else {
+                $pattern_chars .= $ch;
+            }
+        }
+
+        // Build full regex pattern
+        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
+
+        // Replace matches with asterisks (same length as original word)
+        $replacement = str_repeat('*', mb_strlen($word));
+        $text = preg_replace($pattern, $replacement, $text);
+    }
+
+    return $text;
+}
+
 $product_id = intval($_GET['product_id'] ?? 0);
 $order_id = intval($_GET['order_id'] ?? 0);
 $user_id = $_SESSION['user_id'];
@@ -56,16 +103,11 @@ if ($order_result->num_rows === 0) {
             $error = 'Review must be at least 10 characters long.';
         } else {
             // Apply regex filter for bad words (MP4 Requirement)
-            $bad_words = ['bad', 'terrible', 'awful', 'horrible', 'worst']; // Add more as needed
-            $filtered_text = $review_text;
-            foreach ($bad_words as $word) {
-                $pattern = '/\b' . preg_quote($word, '/') . '\b/i';
-                $filtered_text = preg_replace($pattern, str_repeat('*', strlen($word)), $filtered_text);
-            }
-            
+            $filtered_text = censorText($review_text, $bad_words);
+
             $insert_stmt = $conn->prepare("INSERT INTO product_reviews (product_id, user_id, order_id, rating, review_text) VALUES (?, ?, ?, ?, ?)");
             $insert_stmt->bind_param("iiiis", $product_id, $user_id, $order_id, $rating, $filtered_text);
-            
+
             if ($insert_stmt->execute()) {
                 $success = 'Review submitted successfully!';
                 header('Location: ' . BASE_URL . '/user/products/view.php?id=' . $product_id . '&success=1');

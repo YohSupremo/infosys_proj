@@ -31,6 +31,31 @@ $items_stmt = $conn->prepare("SELECT oi.*, p.image_url FROM order_items oi LEFT 
 $items_stmt->bind_param("i", $order_id);
 $items_stmt->execute();
 $items_result = $items_stmt->get_result();
+
+// Check which products can be reviewed (only if order is Delivered)
+$can_review_products = [];
+if ($order['order_status'] === 'Delivered') {
+    while ($item = $items_result->fetch_assoc()) {
+        // Check if review already exists for this product and order
+        $review_check = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? AND order_id = ?");
+        $review_check->bind_param("iii", $user_id, $item['product_id'], $order_id);
+        $review_check->execute();
+        $review_result = $review_check->get_result();
+        
+        $has_review = $review_result->num_rows > 0;
+        $review_id = $has_review ? $review_result->fetch_assoc()['review_id'] : null;
+        
+        $can_review_products[$item['product_id']] = [
+            'can_review' => true,
+            'has_review' => $has_review,
+            'review_id' => $review_id
+        ];
+        
+        $review_check->close();
+    }
+    // Reset result pointer
+    $items_result->data_seek(0);
+}
 ?>
 
 <?php include '../../includes/navbar.php'; ?>
@@ -64,10 +89,29 @@ $items_result = $items_stmt->get_result();
 										?>
 										<img src="<?php echo BASE_URL . '/' . $thumb; ?>" alt="Product" style="width:50px;height:50px;object-fit:cover" class="rounded">
 									</td>
-                                    <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                                    <td>
+                                        <div>
+                                            <strong><?php echo htmlspecialchars($item['product_name']); ?></strong>
+                                            <br>
+                                            <a href="<?php echo BASE_URL; ?>/user/products/view.php?id=<?php echo $item['product_id']; ?>" class="btn btn-sm btn-outline-primary mt-1">View Product</a>
+                                        </div>
+                                    </td>
                                     <td><?php echo $item['quantity']; ?></td>
                                     <td>₱<?php echo number_format($item['unit_price'], 2); ?></td>
-                                    <td>₱<?php echo number_format($item['subtotal'], 2); ?></td>
+                                    <td>
+                                        <div>₱<?php echo number_format($item['subtotal'], 2); ?></div>
+                                        <?php if ($order['order_status'] === 'Delivered' && isset($can_review_products[$item['product_id']])): ?>
+                                            <?php if ($can_review_products[$item['product_id']]['has_review']): ?>
+                                                <a href="<?php echo BASE_URL; ?>/user/reviews/edit.php?id=<?php echo $can_review_products[$item['product_id']]['review_id']; ?>" class="btn btn-sm btn-success mt-2">
+                                                    <i class="bi bi-star-fill"></i> Edit Review
+                                                </a>
+                                            <?php else: ?>
+                                                <a href="<?php echo BASE_URL; ?>/user/reviews/create.php?product_id=<?php echo $item['product_id']; ?>&order_id=<?php echo $order_id; ?>" class="btn btn-sm btn-primary mt-2">
+                                                    <i class="bi bi-star"></i> Write Review
+                                                </a>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
                             <?php endwhile; ?>
                         </tbody>

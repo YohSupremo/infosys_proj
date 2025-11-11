@@ -6,6 +6,13 @@ include '../../config/config.php';
 $error = '';
 $success = '';
 $reactivate = '';
+$redirect_message = '';
+
+// Check for redirect message
+if (isset($_SESSION['redirect_message'])) {
+    $redirect_message = $_SESSION['redirect_message'];
+    unset($_SESSION['redirect_message']);
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if(isset($_POST['login'])){
@@ -35,7 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['role_name'] = $user['role_name'];
                 $_SESSION['role_id'] = $user['role_id'];
                 
-                if ($user['role_id'] === 1) {
+                // Check if there's a redirect after login (e.g., from add to cart)
+                if (isset($_SESSION['redirect_after_login'])) {
+                    $redirect_url = $_SESSION['redirect_after_login'];
+                    unset($_SESSION['redirect_after_login']);
+                    header('Location: ' . $redirect_url);
+                } elseif ($user['role_id'] === 1) {
                     header('Location: ' . BASE_URL . '/admin/dashboard.php');
                 } else if($user['role_id'] == 2) {
                     header('Location: ' . BASE_URL . '/admin/inventory_dashboard.php');
@@ -75,6 +87,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include '../../includes/navbar.php'; ?>
 
 <div class="container my-5">
+    <?php if ($redirect_message): ?>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <?php echo htmlspecialchars($redirect_message); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="card">
