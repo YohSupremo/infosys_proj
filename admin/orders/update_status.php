@@ -3,6 +3,7 @@ $page_title = 'Update Order Status - Admin';
 include '../../includes/header.php';
 include '../../config/config.php';
 include '../../config/email_config.php';
+require '../../vendor/autoload.php';
 requireAdmin();
 
 $order_id = intval($_GET['id'] ?? 0);

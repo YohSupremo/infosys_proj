@@ -33,14 +33,14 @@ $orders = $conn->query("SELECT o.*, u.first_name, u.last_name FROM orders o JOIN
                                     <td>#<?php echo $order['order_id']; ?></td>
                                     <td><?php echo htmlspecialchars($order['first_name'] . ' ' . $order['last_name']); ?></td>
                                     <td>₱<?php echo number_format($order['total_amount'], 2); ?></td>
-                                    <td>
-                                        <?php
-                                        $status_class = 'badge-warning';
-                                        if ($order['order_status'] === 'Delivered') $status_class = 'badge-success';
-                                        elseif ($order['order_status'] === 'Cancelled') $status_class = 'badge-danger';
-                                        ?>
-                                        <span class="badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($order['order_status']); ?></span>
-                                    </td>
+									<td>
+										<?php
+										$status_class = 'bg-warning text-dark';
+										if ($order['order_status'] === 'Delivered') $status_class = 'bg-success';
+										elseif ($order['order_status'] === 'Cancelled') $status_class = 'bg-danger';
+										?>
+										<span class="badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($order['order_status']); ?></span>
+									</td>
                                     <td><?php echo date('M d, Y', strtotime($order['order_date'])); ?></td>
                                     <td>
                                         <a href="view.php?id=<?php echo $order['order_id']; ?>" class="btn btn-sm btn-primary">View</a>

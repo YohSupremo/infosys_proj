@@ -81,13 +81,13 @@ $items_result = $items_stmt->get_result();
                 <div class="card-body">
                     <p><strong>Customer:</strong><br><?php echo htmlspecialchars($order['first_name'] . ' ' . $order['last_name']); ?><br><?php echo htmlspecialchars($order['email']); ?></p>
                     <p><strong>Order Date:</strong><br><?php echo date('F d, Y h:i A', strtotime($order['order_date'])); ?></p>
-                    <p><strong>Status:</strong><br>
-                        <?php
-                        $status_class = 'badge-warning';
-                        if ($order['order_status'] === 'Delivered') $status_class = 'badge-success';
-                        elseif ($order['order_status'] === 'Cancelled') $status_class = 'badge-danger';
-                        ?>
-                        <span class="badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($order['order_status']); ?></span>
+					<p><strong>Status:</strong><br>
+						<?php
+						$status_class = 'bg-warning text-dark';
+						if ($order['order_status'] === 'Delivered') $status_class = 'bg-success';
+						elseif ($order['order_status'] === 'Cancelled') $status_class = 'bg-danger';
+						?>
+						<span class="badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($order['order_status']); ?></span>
                     </p>
                     <p><strong>Payment Method:</strong><br><?php echo htmlspecialchars($order['payment_method']); ?></p>
                     <p><strong>Shipping Address:</strong><br>

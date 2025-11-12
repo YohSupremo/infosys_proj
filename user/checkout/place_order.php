@@ -4,6 +4,8 @@ requireLogin();
 
 // Get checkout data from session (set by checkout/index.php)
 if (isset($_SESSION['checkout_data'])) {
+	require '../../config/email_config.php';
+	require '../../vendor/autoload.php';
     $user_id = $_SESSION['user_id'];
     $address_id = intval($_SESSION['checkout_data']['address_id'] ?? 0);
     $payment_method = sanitize($_SESSION['checkout_data']['payment_method'] ?? 'Cash on Delivery');
@@ -141,6 +143,37 @@ if (isset($_SESSION['checkout_data'])) {
     $clear_cart->execute();
     $clear_cart->close();
     
+	// Send order confirmation email to customer
+	$user_stmt = $conn->prepare("SELECT first_name, last_name, email FROM users WHERE user_id = ?");
+	$user_stmt->bind_param("i", $user_id);
+	$user_stmt->execute();
+	$user_res = $user_stmt->get_result();
+	if ($user_res && $user_res->num_rows > 0) {
+		$u = $user_res->fetch_assoc();
+		// Fetch items for email
+		$oi_stmt = $conn->prepare("SELECT product_name, quantity, unit_price, subtotal FROM order_items WHERE order_id = ?");
+		$oi_stmt->bind_param("i", $order_id);
+		$oi_stmt->execute();
+		$oi_res = $oi_stmt->get_result();
+		$order_items = array();
+		while ($row = $oi_res->fetch_assoc()) {
+			$order_items[] = $row;
+		}
+		$oi_stmt->close();
+		// Send status email (Pending)
+		sendOrderStatusEmail(
+			$u['email'],
+			$u['first_name'] . ' ' . $u['last_name'],
+			$order_id,
+			'Pending',
+			$order_items,
+			$subtotal,
+			$discount_amount,
+			$total_amount
+		);
+	}
+	$user_stmt->close();
+	
     header("Location: " . BASE_URL . "/user/checkout/success.php?order_id=$order_id");
     exit();
 } else {
