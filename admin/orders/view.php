@@ -34,7 +34,6 @@ $items_result = $items_stmt->get_result();
 
 <div class="container my-5">
     <h2 class="mb-4">Order Details #<?php echo $order['order_id']; ?></h2>
-    
     <div class="row">
         <div class="col-md-8">
             <div class="card mb-4">
