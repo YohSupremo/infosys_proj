@@ -36,7 +36,7 @@ if ($category_id > 0) {
     $types .= "i";
 }
 
-$query .= " ORDER BY p.created_at DESC";
+$query .= " ORDER BY p.created_at DESC LIMIT 8";
 
 $stmt = $conn->prepare($query);
 if (!empty($params)) {
