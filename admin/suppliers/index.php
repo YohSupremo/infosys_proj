@@ -40,10 +40,10 @@ $suppliers = $conn->query("SELECT * FROM suppliers ORDER BY supplier_name");
                                     <td><?php echo htmlspecialchars($supplier['email'] ?: 'N/A'); ?></td>
                                     <td><?php echo htmlspecialchars($supplier['phone'] ?: 'N/A'); ?></td>
                                     <td>
-                                        <?php if ($supplier['is_active']): ?>
-                                            <span class="badge badge-success">Active</span>
+                                        <?php if (intval($supplier['is_active']) == 1): ?>
+                                            <span class="badge bg-success">Active</span>
                                         <?php else: ?>
-                                            <span class="badge badge-danger">Inactive</span>
+                                            <span class="badge bg-danger">Inactive</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
