@@ -1,7 +1,8 @@
 <?php
 $page_title = 'Inventory Dashboard';
-include '../includes/header.php';
 include '../config/config.php';
+include '../includes/header.php';
+
 requireAdminOrInventoryManager();
 
 // Stats for inventory-focused dashboard

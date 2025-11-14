@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Order Placed - NBA Shop';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireLogin();
 
 $order_id = intval($_GET['order_id'] ?? 0);

@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Users - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $users = $conn->query("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id ORDER BY u.created_at DESC");

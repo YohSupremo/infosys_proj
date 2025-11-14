@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Order Details - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $order_id = intval($_GET['id'] ?? 0);
@@ -34,6 +34,7 @@ $items_result = $items_stmt->get_result();
 
 <div class="container my-5">
     <h2 class="mb-4">Order Details #<?php echo $order['order_id']; ?></h2>
+    
     <div class="row">
         <div class="col-md-8">
             <div class="card mb-4">

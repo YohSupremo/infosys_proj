@@ -1,34 +1,10 @@
 <?php
 $page_title = 'Inventory History - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdminOrInventoryManager();
 
-// Get filter parameter
-$filter = $_GET['filter'] ?? 'all';
-
-// Build query based on filter
-$where_clause = "";
-if ($filter !== 'all') {
-    $filter_escaped = $conn->real_escape_string($filter);
-    $where_clause = "WHERE ih.transaction_type = '" . $filter_escaped . "'";
-}
-
-// Query to get history with proper user linking
-// For sales, we need to join with orders to get the customer user_id
-$query = "SELECT ih.*, p.product_name, 
-    COALESCE(u.first_name, ou.first_name) as first_name,
-    COALESCE(u.last_name, ou.last_name) as last_name
-FROM inventory_history ih 
-JOIN products p ON ih.product_id = p.product_id 
-LEFT JOIN users u ON ih.created_by = u.user_id 
-LEFT JOIN orders o ON ih.reference_type = 'order' AND ih.reference_id = o.order_id
-LEFT JOIN users ou ON o.user_id = ou.user_id
-" . $where_clause . " 
-ORDER BY ih.created_at DESC 
-LIMIT 200";
-
-$history = $conn->query($query);
+$history = $conn->query("SELECT ih.*, p.product_name, u.first_name, u.last_name FROM inventory_history ih JOIN products p ON ih.product_id = p.product_id LEFT JOIN users u ON ih.created_by = u.user_id ORDER BY ih.created_at DESC LIMIT 100");
 ?>
 
 <?php
@@ -41,24 +17,6 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 
 <div class="container my-5">
     <h2 class="mb-4">Inventory History</h2>
-    
-    <!-- Filter Buttons -->
-    <div class="mb-3">
-        <div class="btn-group" role="group" aria-label="Filter history">
-            <a href="?filter=all" class="btn btn-sm <?php echo $filter === 'all' ? 'btn-primary' : 'btn-outline-primary'; ?>">
-                Show All
-            </a>
-            <a href="?filter=restock" class="btn btn-sm <?php echo $filter === 'restock' ? 'btn-success' : 'btn-outline-success'; ?>">
-                Restock
-            </a>
-            <a href="?filter=sale" class="btn btn-sm <?php echo $filter === 'sale' ? 'btn-danger' : 'btn-outline-danger'; ?>">
-                Sale
-            </a>
-            <a href="?filter=adjustment" class="btn btn-sm <?php echo $filter === 'adjustment' ? 'btn-warning' : 'btn-outline-warning'; ?>">
-                Adjust
-            </a>
-        </div>
-    </div>
     
     <div class="card">
         <div class="card-body">
@@ -76,7 +34,7 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if ($history && $history->num_rows > 0): ?>
+                        <?php if ($history->num_rows > 0): ?>
                             <?php while ($item = $history->fetch_assoc()): ?>
                                 <tr>
                                     <td><?php echo date('M d, Y h:i A', strtotime($item['created_at'])); ?></td>
@@ -88,7 +46,7 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 										elseif ($item['transaction_type'] === 'restock') $type_class = 'bg-success';
 										elseif ($item['transaction_type'] === 'adjustment') $type_class = 'bg-warning text-dark';
                                         ?>
-										<span class="badge <?php echo $type_class; ?>"><?php echo htmlspecialchars(ucfirst($item['transaction_type'])); ?></span>
+										<span class="badge <?php echo $type_class; ?>"><?php echo htmlspecialchars($item['transaction_type']); ?></span>
                                     </td>
                                     <td>
                                         <strong class="<?php echo $item['quantity_change'] > 0 ? 'text-success' : 'text-danger'; ?>">
@@ -97,17 +55,12 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                                     </td>
                                     <td><?php echo $item['previous_stock']; ?></td>
                                     <td><strong><?php echo $item['new_stock']; ?></strong></td>
-                                    <td>
-                                        <?php 
-                                        $name = trim(($item['first_name'] ?? '') . ' ' . ($item['last_name'] ?? ''));
-                                        echo htmlspecialchars($name ?: 'System'); 
-                                        ?>
-                                    </td>
+                                    <td><?php echo htmlspecialchars($item['first_name'] . ' ' . $item['last_name'] ?: 'System'); ?></td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center">No history found<?php echo $filter !== 'all' ? ' for ' . htmlspecialchars($filter) . ' transactions' : ''; ?>.</td>
+                                <td colspan="7" class="text-center">No history found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

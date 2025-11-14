@@ -1,7 +1,8 @@
 <?php
 $page_title = 'Admin Dashboard - NBA Shop';
-include '../includes/header.php';
 include '../config/config.php';
+include '../includes/header.php';
+
 requireAdmin();
 
 // Get statistics

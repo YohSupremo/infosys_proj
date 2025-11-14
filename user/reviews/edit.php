@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Edit Review - NBA Shop';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireLogin();
 
 $bad_words = [

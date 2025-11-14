@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Add User - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $error = '';

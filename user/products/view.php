@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Product Details - NBA Shop';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 // Allow unauthenticated users to view product details
 
 $product_id = intval($_GET['id'] ?? 0);

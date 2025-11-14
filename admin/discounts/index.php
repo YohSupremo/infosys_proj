@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Discounts - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $discounts = $conn->query("SELECT dc.*, (SELECT COUNT(*) FROM discount_usage du WHERE du.discount_id = dc.discount_id) AS times_used FROM discount_codes dc ORDER BY dc.created_at DESC");

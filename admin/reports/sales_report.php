@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Sales Report - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $start_date = sanitize($_GET['start_date'] ?? date('Y-m-01'));

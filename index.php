@@ -1,7 +1,8 @@
 <?php
 $page_title = 'NBA Shop - Official NBA Apparel';
-include 'includes/header.php';
 include 'config/config.php';
+include 'includes/header.php';
+
 
 // Check for redirect message
 $redirect_message = '';

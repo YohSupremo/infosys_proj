@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Suppliers - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $suppliers = $conn->query("SELECT * FROM suppliers ORDER BY supplier_name");

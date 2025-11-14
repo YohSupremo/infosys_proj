@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Restock Products - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdminOrInventoryManager();
 
 $error = '';
@@ -143,11 +143,11 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Quantity *</label>
-                                        <input type="text" class="form-control" name="quantities[]">
+                                        <input type="number" class="form-control" name="quantities[]" min="1">
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Cost per Unit *</label>
-                                        <input type="text" class="form-control" name="costs[]">
+                                        <input type="number" class="form-control" name="costs[]" step="0.01" min="0">
                                     </div>
                                     <div class="col-md-1 mb-2">
                                         <label class="form-label">&nbsp;</label>

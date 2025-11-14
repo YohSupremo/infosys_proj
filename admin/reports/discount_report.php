@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Discount Report - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $discounts = $conn->query("SELECT dc.*, 

@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Inventory - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdminOrInventoryManager();
 
 $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id WHERE p.is_active = 1 ORDER BY p.stock_quantity ASC, p.product_name");

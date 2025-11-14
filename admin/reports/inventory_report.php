@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Inventory Report - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdminOrInventoryManager();
 
 $products = $conn->query("SELECT p.*, t.team_name, 

@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Roles - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");

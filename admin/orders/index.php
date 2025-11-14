@@ -1,7 +1,8 @@
 <?php
 $page_title = 'Orders - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
+
 requireAdmin();
 
 $orders = $conn->query("SELECT o.*, u.first_name, u.last_name FROM orders o JOIN users u ON o.user_id = u.user_id ORDER BY o.order_date DESC");

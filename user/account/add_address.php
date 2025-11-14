@@ -1,7 +1,8 @@
 <?php
 $page_title = 'Add Address - NBA Shop';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
+
 requireLogin();
 
 $user_id = $_SESSION['user_id'];

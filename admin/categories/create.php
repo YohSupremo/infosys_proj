@@ -1,7 +1,8 @@
 <?php
 $page_title = 'Add Category - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
+
 requireAdmin();
 
 $error = '';

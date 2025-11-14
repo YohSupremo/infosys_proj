@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Edit Supplier - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $supplier_id = intval($_GET['id'] ?? 0);

@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Edit Team - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $team_id = intval($_GET['id'] ?? 0);

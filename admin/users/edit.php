@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Edit User - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $user_id = intval($_GET['id'] ?? 0);

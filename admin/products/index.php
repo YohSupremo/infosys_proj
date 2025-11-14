@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Products - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id ORDER BY p.created_at DESC");

@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Products - NBA Shop';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 // Allow unauthenticated users to view products
 
 $search = sanitize($_GET['search'] ?? '');

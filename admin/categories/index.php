@@ -1,8 +1,8 @@
 <?php
 $page_title = 'Categories - Admin';
 
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 
 
 requireAdmin();

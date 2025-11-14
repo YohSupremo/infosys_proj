@@ -1,7 +1,7 @@
 <?php
 $page_title = 'Net Income Report - Admin';
-include '../../includes/header.php';
 include '../../config/config.php';
+include '../../includes/header.php';
 requireAdmin();
 
 // Date filter (optional - requires both start and end to apply)
