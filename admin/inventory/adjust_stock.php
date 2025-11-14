@@ -129,7 +129,7 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                                 <button type="button" class="btn btn-outline-secondary" onclick="setQuantityChange(-1)">-1</button>
                                 <button type="button" class="btn btn-outline-secondary" onclick="setQuantityChange(-5)">-5</button>
                                 <button type="button" class="btn btn-outline-secondary" onclick="setQuantityChange(-10)">-10</button>
-                                <input type="number" class="form-control text-center" id="quantity_change" name="quantity_change" 
+                                <input type="text" class="form-control text-center" id="quantity_change" name="quantity_change" 
                                        value="<?php echo htmlspecialchars($_POST['quantity_change'] ?? ''); ?>" 
                                        placeholder="Enter quantity change (negative to reduce)">
                                 <button type="button" class="btn btn-outline-secondary" onclick="setQuantityChange(10)">+10</button>

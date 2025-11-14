@@ -143,11 +143,11 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Quantity *</label>
-                                        <input type="number" class="form-control" name="quantities[]" min="1">
+                                        <input type="text" class="form-control" name="quantities[]">
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Cost per Unit *</label>
-                                        <input type="number" class="form-control" name="costs[]" step="0.01" min="0">
+                                        <input type="text" class="form-control" name="costs[]">
                                     </div>
                                     <div class="col-md-1 mb-2">
                                         <label class="form-label">&nbsp;</label>
