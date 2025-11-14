@@ -456,7 +456,15 @@ INSERT INTO nba_teams (team_name, team_code, city, conference, division) VALUES
 ('Chicago Bulls', 'CHI', 'Chicago', 'Eastern', 'Central'),
 ('Brooklyn Nets', 'BKN', 'Brooklyn', 'Eastern', 'Atlantic'),
 ('Phoenix Suns', 'PHX', 'Phoenix', 'Western', 'Pacific'),
-('Milwaukee Bucks', 'MIL', 'Milwaukee', 'Eastern', 'Central');
+('Milwaukee Bucks', 'MIL', 'Milwaukee', 'Eastern', 'Central'),
+('Denver Nuggets', 'DEN', 'Denver', 'Western', 'Northwest'),
+('Dallas Mavericks', 'DAL', 'Dallas', 'Western', 'Southwest'),
+('New York Knicks', 'NYK', 'New York', 'Eastern', 'Atlantic'),
+('Philadelphia 76ers', 'PHI', 'Philadelphia', 'Eastern', 'Atlantic'),
+('Houston Rockets', 'HOU', 'Houston', 'Western', 'Southwest'),
+('San Antonio Spurs', 'SAS', 'San Antonio', 'Western', 'Southwest'),
+('Cleveland Cavaliers', 'CLE', 'Cleveland', 'Eastern', 'Central');
+
 
 -- Insert sample categories with hierarchy
 INSERT INTO categories (category_name, description, parent_category_id) VALUES

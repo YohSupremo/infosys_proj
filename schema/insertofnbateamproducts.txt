@@ -1,0 +1,464 @@
+-- Insert Products for all NBA Teams
+-- Products are numbered sequentially starting from 1
+-- 
+-- IMPORTANT: Make sure all NBA teams are inserted first!
+-- Run this query to verify teams exist:
+-- SELECT team_id, team_name FROM nba_teams ORDER BY team_id;
+--
+-- If teams are missing, insert them first using the team INSERT statements from schema
+
+-- ============================================
+-- BOSTON CELTICS (team_id = 3)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(1, 3, 'New Era Boston Celtics "Old School Sport" T-Shirt', 'A black, short-sleeve cotton t-shirt featuring a retro-style "Boston Celtics" graphic with a basketball hoop, along with "Eastern Conference" and "Atlantic Division" text.', 2355.00, 50, 'assets/images/products/bostonproducts/bos1a.png', 1),
+(2, 3, 'Mitchell & Ness Boston Celtics Retro Logo Snapback', 'A two-tone snapback hat with a white structured crown, a black flat brim, and green retro-style "BOSTON" embroidery with the classic clover logo in the center.', 2473.00, 50, 'assets/images/products/bostonproducts/bos2a.png', 1),
+(3, 3, 'Jordan Brand Boston Celtics Statement T-Shirt', 'A kelly green short-sleeve t-shirt made by Jordan Brand, featuring a gold "BOSTON" wordmark and a gold Jumpman logo on the chest. The Celtics clover logo is on the left sleeve.', 2649.00, 50, 'assets/images/products/bostonproducts/bos3a.png', 1),
+(4, 3, 'Nike Boston Celtics Courtside Premium Club Anorak Jacket', 'A green, hooded pullover windbreaker (anorak) with a quarter-zip neck. It features a front flap pocket with a "CELTICS" and Nike swoosh logo patch.', 5888.00, 50, 'assets/images/products/bostonproducts/bos4a.png', 1),
+(5, 3, 'Nike Boston Celtics "Connected Through Sport" T-Shirt', 'A cream/off-white short-sleeve t-shirt featuring a "Connected Through Sport" graphic, which includes the Earth, planets, and basketballs in a network.', 2355.00, 50, 'assets/images/products/bostonproducts/bos5a.png', 1);
+
+-- Boston Celtics Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(1, 'assets/images/products/bostonproducts/bos1a.png', 1, 0),
+(1, 'assets/images/products/bostonproducts/bos1b.png', 0, 1),
+(2, 'assets/images/products/bostonproducts/bos2a.png', 1, 0),
+(2, 'assets/images/products/bostonproducts/bos2b.png', 0, 1),
+(3, 'assets/images/products/bostonproducts/bos3a.png', 1, 0),
+(3, 'assets/images/products/bostonproducts/bos3b.png', 0, 1),
+(4, 'assets/images/products/bostonproducts/bos4a.png', 1, 0),
+(4, 'assets/images/products/bostonproducts/bos4b.png', 0, 1),
+(5, 'assets/images/products/bostonproducts/bos5a.png', 1, 0),
+(5, 'assets/images/products/bostonproducts/bos5b.png', 0, 1);
+
+-- Boston Celtics Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(1, 2, 1), -- T-Shirts
+(2, 4, 1), -- Caps
+(3, 2, 1), -- T-Shirts
+(4, 3, 1), -- Hoodies
+(5, 2, 1); -- T-Shirts
+
+-- ============================================
+-- MILWAUKEE BUCKS (team_id = 8)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(6, 8, 'Nike Giannis Antetokounmpo Bucks "Name & Number" T-Shirt', 'A hunter green short-sleeve cotton t-shirt. The front features a distressed "BUCKS 34" graphic, while the back displays "ANTETOKOUNMPO" and "34" in the same style.', 2649.00, 50, 'assets/images/products/bucksproducts/bucks1a.png', 1),
+(7, 8, 'Giannis Antetokounmpo Bucks "Bleacher Creature" Plush Doll', 'A 10-inch plush character doll modeled after Giannis Antetokounmpo, wearing the black Bucks Statement Edition jersey with number 34.', 1472.00, 50, 'assets/images/products/bucksproducts/bucks2a.png', 1),
+(8, 8, 'Nike Milwaukee Bucks Swingman Road Shorts', 'Green polyester basketball shorts, featuring the Bucks logo on the right leg, the NBA logo on the left, and blue/white trim around the leg openings.', 3533.00, 50, 'assets/images/products/bucksproducts/bucks3a.png', 1),
+(9, 8, 'New Era Milwaukee Bucks "City Edition" 9TWENTY Adjustable Hat', 'A dark green, unstructured adjustable cap. It features an arched "Milwaukee BUCKS Basketball" script on the front, the Bucks logo on the side, and a cream-colored sandwich brim.', 2002.00, 50, 'assets/images/products/bucksproducts/bucks4a.png', 1),
+(10, 8, 'Nike Giannis Antetokounmpo Bucks 2023-24 "City Edition" Swingman Jersey', 'A sleeveless Swingman jersey with a green-on-green patterned design, cream trim, and "BUCKS 34" on the front. The back features "ANTETOKOUNMPO" and "34".', 7066.00, 50, 'assets/images/products/bucksproducts/bucks5a.png', 1);
+
+-- Milwaukee Bucks Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(6, 'assets/images/products/bucksproducts/bucks1a.png', 1, 0),
+(6, 'assets/images/products/bucksproducts/bucks1b.png', 0, 1),
+(7, 'assets/images/products/bucksproducts/bucks2a.png', 1, 0),
+(7, 'assets/images/products/bucksproducts/bucks2b.png', 0, 1),
+(8, 'assets/images/products/bucksproducts/bucks3a.png', 1, 0),
+(8, 'assets/images/products/bucksproducts/bucks3b.png', 0, 1),
+(9, 'assets/images/products/bucksproducts/bucks4a.png', 1, 0),
+(9, 'assets/images/products/bucksproducts/bucks4b.png', 0, 1),
+(10, 'assets/images/products/bucksproducts/bucks5a.png', 1, 0),
+(10, 'assets/images/products/bucksproducts/bucks5b.png', 0, 1);
+
+-- Milwaukee Bucks Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(6, 2, 1), -- T-Shirts
+(7, 6, 1), -- Accessories
+(8, 5, 1), -- Shorts
+(9, 4, 1), -- Caps
+(10, 1, 1); -- Jerseys
+
+-- ============================================
+-- CHICAGO BULLS (team_id = 5)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(11, 5, 'Chicago Bulls Women\'s Primary Logo T-Shirt', 'A red, short-sleeve women\'s fitted t-shirt featuring the arched "CHICAGO" wordmark and the classic team logo on the front, with a small logo on the back.', 2061.00, 50, 'assets/images/products/bullsproducts/bulls1a.png', 1),
+(12, 5, 'Mitchell & Ness Michael Jordan Bulls Red Swingman Jersey', 'A red, authentic-style Swingman jersey by Mitchell & Ness, featuring "BULLS 23" on the front and "JORDAN 23" on the back. A throwback to the Michael Jordan era.', 7950.00, 50, 'assets/images/products/bullsproducts/bulls2a.png', 1),
+(13, 5, 'Mitchell & Ness Dennis Rodman Bulls Women\'s Mesh Fashion Jersey', 'A women\'s oversized, v-neck mesh fashion jersey in cream and black. It features "91" (Dennis Rodman\'s number) on the front and a small Bulls logo at the collar.', 4711.00, 50, 'assets/images/products/bullsproducts/bulls3a.png', 1),
+(14, 5, 'Mitchell & Ness Chicago Bulls "NBA Jam: On Fire" Snapback Hat', 'A white and red snapback hat with a flame graphic. It features the Bulls logo on the front and "ON FIRE" embroidered on the back, inspired by the classic video game.', 2473.00, 50, 'assets/images/products/bullsproducts/bulls4a.png', 1),
+(15, 5, 'Nike G.T. Cut Academy Basketball Shoe (Sail/Volt/Grey)', 'A low-top basketball shoe from Nike\'s G.T. series. This "G.T. Cut Academy" model features a Sail/cream-colored upper, a grey swoosh, and vibrant Volt green accents.', 5595.00, 50, 'assets/images/products/bullsproducts/bulls5a.png', 1);
+
+-- Chicago Bulls Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(11, 'assets/images/products/bullsproducts/bulls1a.png', 1, 0),
+(11, 'assets/images/products/bullsproducts/bulls1b.png', 0, 1),
+(12, 'assets/images/products/bullsproducts/bulls2a.png', 1, 0),
+(12, 'assets/images/products/bullsproducts/bulls2b.png', 0, 1),
+(13, 'assets/images/products/bullsproducts/bulls3a.png', 1, 0),
+(13, 'assets/images/products/bullsproducts/bulls3b.png', 0, 1),
+(14, 'assets/images/products/bullsproducts/bulls4a.png', 1, 0),
+(14, 'assets/images/products/bullsproducts/bulls4b.png', 0, 1),
+(15, 'assets/images/products/bullsproducts/bulls5a.png', 1, 0),
+(15, 'assets/images/products/bullsproducts/bulls5b.png', 0, 1);
+
+-- Chicago Bulls Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(11, 2, 1), -- T-Shirts
+(12, 1, 1), -- Jerseys
+(12, 7, 0), -- Premium
+(13, 1, 1), -- Jerseys
+(14, 4, 1), -- Caps
+(15, 6, 1); -- Accessories
+
+-- ============================================
+-- CLEVELAND CAVALIERS (team_id = 15)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(16, 15, 'Mitchell & Ness LeBron James Cavaliers 2008-09 Swingman Jersey', 'A navy blue "Hardwood Classics" throwback jersey from the 2008-09 season. It features the "CAVS 23" wordmark on the front and "JAMES 23" on the back in red and gold.', 7950.00, 50, 'assets/images/products/cavsproducts/cavs1a.png', 1),
+(17, 15, 'Mitchell & Ness Cavaliers 2016 NBA Champions "Trophy" T-Shirt', 'A black, short-sleeve vintage-style t-shirt. The front features a large graphic of the 2016 NBA Championship trophy, and the back details the playoff results and a championship ring.', 3239.00, 50, 'assets/images/products/cavsproducts/cavs2a.png', 1),
+(18, 15, 'Mitchell & Ness LeBron James Cavaliers "Career Accomplishments" Hoodie', 'A navy blue pullover hoodie celebrating LeBron James\'s career. It features a 2016 Finals patch on the chest and numerous patches on both sleeves for his MVP, All-Star, and Rookie of the Year awards.', 10600.00, 50, 'assets/images/products/cavsproducts/cavs3a.png', 1),
+(19, 15, 'Mitchell & Ness Cavaliers 2016 NBA Finals Champions Shorts', 'Black athletic mesh shorts with a drawstring waist. They feature "The Finals 2016" logo patch on one leg and a "2016 NBA Champions Cleveland Cavaliers" patch on the other.', 5006.00, 50, 'assets/images/products/cavsproducts/cavs4a.png', 1),
+(20, 15, 'New Era Cleveland Cavaliers "Gold Script" 9TWENTY Adjustable Hat', 'A two-tone adjustable cap with a white crown and a wine-colored brim. It features "Cleveland Cavaliers" embroidered in a gold script font on the front and the \'C\' logo on the side.', 2061.00, 50, 'assets/images/products/cavsproducts/cavs5a.png', 1);
+
+-- Cleveland Cavaliers Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(16, 'assets/images/products/cavsproducts/cavs1a.png', 1, 0),
+(16, 'assets/images/products/cavsproducts/cavs1b.png', 0, 1),
+(17, 'assets/images/products/cavsproducts/cavs2a.png', 1, 0),
+(17, 'assets/images/products/cavsproducts/cavs2b.png', 0, 1),
+(18, 'assets/images/products/cavsproducts/cavs3a.png', 1, 0),
+(18, 'assets/images/products/cavsproducts/cavs3b.png', 0, 1),
+(19, 'assets/images/products/cavsproducts/cavs4a.png', 1, 0),
+(19, 'assets/images/products/cavsproducts/cavs4b.png', 0, 1),
+(20, 'assets/images/products/cavsproducts/cavs5a.png', 1, 0),
+(20, 'assets/images/products/cavsproducts/cavs5b.png', 0, 1);
+
+-- Cleveland Cavaliers Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(16, 1, 1), -- Jerseys
+(16, 7, 0), -- Premium
+(17, 2, 1), -- T-Shirts
+(18, 3, 1), -- Hoodies
+(18, 7, 0), -- Premium
+(19, 5, 1), -- Shorts
+(20, 4, 1); -- Caps
+
+-- ============================================
+-- DALLAS MAVERICKS (team_id = 10)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(21, 10, 'Nike Kyrie Irving Dallas Mavericks "Association" Swingman Jersey', 'The white "Association" edition Swingman jersey for the Dallas Mavericks, featuring "DALLAS 11" on the front and "IRVING 11" on the back.', 7066.00, 50, 'assets/images/products/dallasproducts/dal1a.png', 1),
+(22, 10, 'Nike Dallas Mavericks "Embrace The Grind" Long-Sleeve T-Shirt', 'A black, long-sleeve cotton t-shirt with a small "Calm Your Mind, Embrace The Grind" graphic on the front, and a large "MAVERICKS" logo graphic on the back.', 2650.00, 50, 'assets/images/products/dallasproducts/dal2a.png', 1),
+(23, 10, 'Nike G.T. Cut Academy Basketball Shoe (Washed Teal)', 'A low-top Nike G.T. Cut Academy basketball shoe in a light blue ("Washed Teal") colorway, with a metallic silver swoosh and white midsole.', 5595.00, 50, 'assets/images/products/dallasproducts/dal3a.png', 1),
+(24, 10, 'New Era Dallas Mavericks "Basic Logo" 59FIFTY Fitted Hat', 'A classic, all-black New Era 59FIFTY fitted hat with a flat brim. It features the Mavericks\' horse-head logo embroidered in white on the front.', 2473.00, 50, 'assets/images/products/dallasproducts/dal4a.png', 1),
+(25, 10, 'Nike Cooper Flagg Dallas Mavericks "Icon" Swingman Jersey', 'The royal blue "Icon" edition Swingman jersey for the Dallas Mavericks, customized for Cooper Flagg with "DALLAS 32" on the front and "FLAGG 32" on the back.', 7066.00, 50, 'assets/images/products/dallasproducts/dal5a.png', 1);
+
+-- Dallas Mavericks Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(21, 'assets/images/products/dallasproducts/dal1a.png', 1, 0),
+(21, 'assets/images/products/dallasproducts/dal1b.png', 0, 1),
+(22, 'assets/images/products/dallasproducts/dal2a.png', 1, 0),
+(22, 'assets/images/products/dallasproducts/dal2b.png', 0, 1),
+(23, 'assets/images/products/dallasproducts/dal3a.png', 1, 0),
+(23, 'assets/images/products/dallasproducts/dal3b.png', 0, 1),
+(24, 'assets/images/products/dallasproducts/dal4a.png', 1, 0),
+(24, 'assets/images/products/dallasproducts/dal4b.png', 0, 1),
+(25, 'assets/images/products/dallasproducts/dal5a.png', 1, 0),
+(25, 'assets/images/products/dallasproducts/dal5b.png', 0, 1);
+
+-- Dallas Mavericks Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(21, 1, 1), -- Jerseys
+(22, 2, 1), -- T-Shirts
+(23, 6, 1), -- Accessories
+(24, 4, 1), -- Caps
+(25, 1, 1); -- Jerseys
+
+-- ============================================
+-- DENVER NUGGETS (team_id = 9)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(26, 9, 'New Era Denver Nuggets "Tie-Dye" 9FIFTY Snapback Hat', 'A two-tone 9FIFTY snapback hat with a white crown, navy blue flat brim, and "DENVER" embroidered on the front with a colorful tie-dye fill.', 2355.00, 50, 'assets/images/products/denverproducts/den1a.png', 1),
+(27, 9, 'New Era Denver Nuggets "Script Logo" 9FORTY Adjustable Hat', 'A navy blue adjustable cap with a curved brim, featuring a yellow-trimmed visor. It has "Denver Nuggets Basketball" in a retro script on the front.', 2002.00, 50, 'assets/images/products/denverproducts/den2a.png', 1),
+(28, 9, 'Nike Jamal Murray Denver Nuggets "Icon" Swingman Jersey', 'The navy blue "Icon" edition Swingman jersey for the Denver Nuggets. It features "DENVER 27" on the front and "MURRAY 27" on the back in yellow and white.', 7066.00, 50, 'assets/images/products/denverproducts/den3a.png', 1),
+(29, 9, 'Nikola Jokic Denver Nuggets "Kuricha" Plush Doll', 'A 10-inch "Kuricha" style sitting plush doll resembling Nikola Jokic, wearing the navy blue Nuggets jersey with number 15.', 1472.00, 50, 'assets/images/products/denverproducts/den4a.png', 1),
+(30, 9, 'Jordan Brand Jamal Murray Nuggets "City Edition" Swingman Jersey', 'The royal blue "City Edition" Swingman jersey, made by Jordan Brand. It features the "MILE HIGH CITY 27" graphic on the front and "MURRAY 27" on the back.', 7066.00, 50, 'assets/images/products/denverproducts/den5a.png', 1);
+
+-- Denver Nuggets Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(26, 'assets/images/products/denverproducts/den1a.png', 1, 0),
+(26, 'assets/images/products/denverproducts/den1b.png', 0, 1),
+(27, 'assets/images/products/denverproducts/den2a.png', 1, 0),
+(27, 'assets/images/products/denverproducts/den2b.png', 0, 1),
+(28, 'assets/images/products/denverproducts/den3a.png', 1, 0),
+(28, 'assets/images/products/denverproducts/den3b.png', 0, 1),
+(29, 'assets/images/products/denverproducts/den4a.png', 1, 0),
+(29, 'assets/images/products/denverproducts/den4b.png', 0, 1),
+(30, 'assets/images/products/denverproducts/den5a.png', 1, 0),
+(30, 'assets/images/products/denverproducts/den5b.png', 0, 1);
+
+-- Denver Nuggets Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(26, 4, 1), -- Caps
+(27, 4, 1), -- Caps
+(28, 1, 1), -- Jerseys
+(29, 6, 1), -- Accessories
+(30, 1, 1); -- Jerseys
+
+-- ============================================
+-- GOLDEN STATE WARRIORS (team_id = 2)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(31, 2, 'Nike Stephen Curry Golden State Warriors "Association" Swingman Jersey', 'The white "Association" edition Swingman jersey, a staple for the Warriors. It features the team\'s circular logo with "30" on the front and "CURRY 30" on the back.', 7066.00, 50, 'assets/images/products/Gswproducts/gsw1a.png', 1),
+(32, 2, 'Nike Golden State Warriors "Icon" Swingman Shorts', 'The primary royal blue "Icon" edition basketball shorts. They feature the team logo on the right leg, the NBA logo on the left, and yellow/white trim.', 3533.00, 50, 'assets/images/products/Gswproducts/gsw2a.png', 1),
+(33, 2, 'Golden State Warriors Primary Logo Pullover Hoodie', 'A royal blue pullover fleece hoodie with a yellow-lined hood. It features the team\'s large circular bridge logo on the chest and a kangaroo pocket.', 4711.00, 50, 'assets/images/products/Gswproducts/gsw3a.png', 1),
+(34, 2, 'New Era Golden State Warriors "Script" 9FORTY A-Frame Hat', 'A two-tone adjustable snapback hat with a white A-frame crown and a royal blue brim. It features "Golden State Warriors" in a blue script font on the front.', 2061.00, 50, 'assets/images/products/Gswproducts/gsw4a.png', 1),
+(35, 2, 'Mitchell & Ness Golden State Warriors "Retro Mashup" T-Shirt', 'A vintage-style heather grey t-shirt by Mitchell & Ness. It features a retro "WARRIORS" graphic with a collage of old-school team logos and basketball imagery.', 2944.00, 50, 'assets/images/products/Gswproducts/gsw5a.png', 1);
+
+-- Golden State Warriors Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(31, 'assets/images/products/Gswproducts/gsw1a.png', 1, 0),
+(31, 'assets/images/products/Gswproducts/gsw1b.png', 0, 1),
+(32, 'assets/images/products/Gswproducts/gsw2a.png', 1, 0),
+(32, 'assets/images/products/Gswproducts/gsw2b.png', 0, 1),
+(33, 'assets/images/products/Gswproducts/gsw3a.png', 1, 0),
+(33, 'assets/images/products/Gswproducts/gsw3b.png', 0, 1),
+(34, 'assets/images/products/Gswproducts/gsw4a.png', 1, 0),
+(34, 'assets/images/products/Gswproducts/gsw4b.png', 0, 1),
+(35, 'assets/images/products/Gswproducts/gsw5a.png', 1, 0);
+
+-- Golden State Warriors Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(31, 1, 1), -- Jerseys
+(32, 5, 1), -- Shorts
+(33, 3, 1), -- Hoodies
+(34, 4, 1), -- Caps
+(35, 2, 1); -- T-Shirts
+
+-- ============================================
+-- MIAMI HEAT (team_id = 4)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(36, 4, 'Nike Jaime Jaquez Jr. Heat "Name & Number" T-Shirt', 'A white short-sleeve t-shirt (shirsey) featuring the "HEAT 11" wordmark on the front and "JAQUEZ JR. 11" on the back in the team\'s jersey font.', 2649.00, 50, 'assets/images/products/heatproducts/mia1a.png', 1),
+(37, 4, 'Miami Heat "City Edition" Red T-Shirt', 'A red short-sleeve t-shirt featuring the white "Miami" wordmark in the team\'s "gothic" font over the flaming ball logo. A small logo is also on the back.', 2355.00, 50, 'assets/images/products/heatproducts/mia2a.png', 1),
+(38, 4, 'Miami Heat "City Edition" Vertical Script T-Shirt', 'A black short-sleeve t-shirt with a small, stylized flaming \'M\' logo on the left chest and a large, vertical "Miami" script graphic on the back.', 2355.00, 50, 'assets/images/products/heatproducts/mia3a.png', 1),
+(39, 4, 'New Era Miami Heat "City Edition Gothic Script" 9FIFTY Snapback', 'A black 9FIFTY snapback hat with a flat brim. It features the "Miami" wordmark in the team\'s white and red "gothic" font, layered over the flaming ball logo.', 2473.00, 50, 'assets/images/products/heatproducts/mia4a.png', 1),
+(40, 4, 'Jimmy Butler Miami Heat "Kuricha" Plush Doll', 'A 10-inch "Kuricha" style sitting plush doll resembling Jimmy Butler, wearing the black "MIAMI 22" jersey and a beanie.', 1472.00, 50, 'assets/images/products/heatproducts/mia5a.png', 1);
+
+-- Miami Heat Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(36, 'assets/images/products/heatproducts/mia1a.png', 1, 0),
+(36, 'assets/images/products/heatproducts/mia1b.png', 0, 1),
+(37, 'assets/images/products/heatproducts/mia2a.png', 1, 0),
+(37, 'assets/images/products/heatproducts/mia2b.png', 0, 1),
+(38, 'assets/images/products/heatproducts/mia3a.png', 1, 0),
+(38, 'assets/images/products/heatproducts/mia3b.png', 0, 1),
+(39, 'assets/images/products/heatproducts/mia4a.png', 1, 0),
+(39, 'assets/images/products/heatproducts/mia4b.png', 0, 1),
+(40, 'assets/images/products/heatproducts/mia5a.png', 1, 0);
+
+-- Miami Heat Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(36, 2, 1), -- T-Shirts
+(37, 2, 1), -- T-Shirts
+(38, 2, 1), -- T-Shirts
+(39, 4, 1), -- Caps
+(40, 6, 1); -- Accessories
+
+-- ============================================
+-- NEW YORK KNICKS (team_id = 11)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(41, 11, 'Nike Jordan Clarkson New York Knicks "Icon" Swingman Jersey (Custom)', 'The royal blue "Icon" edition Swingman jersey, customized for "CLARKSON 00". It features the "NEW YORK" wordmark on the front.', 7066.00, 50, 'assets/images/products/knicksproducts/knicks1a.png', 1),
+(42, 11, 'New York Knicks "Courtside" Pullover Hoodie', 'A royal blue performance fleece hoodie with the Knicks logo on the chest, a kangaroo pocket, and a vertical "NEW YORK" graphic on the back.', 5300.00, 50, 'assets/images/products/knicksproducts/knicks2a.png', 1),
+(43, 11, 'New Era New York Knicks "Script Logo" 9FIFTY Snapback Hat', 'A two-tone 9FIFTY snapback hat with a black crown and an orange flat brim. It features "New York KNICKS" script layered over the team\'s primary logo.', 2473.00, 50, 'assets/images/products/knicksproducts/knicks3a.png', 1),
+(44, 11, 'New York Knicks Mesh Button-Up Baseball Jersey', 'A white, short-sleeve mesh fashion jersey in a baseball style. It has a button-down front, "NEW YORK" across the chest, and the Knicks logo.', 4417.00, 50, 'assets/images/products/knicksproducts/knicks4a.png', 1),
+(45, 11, 'Nike Jalen Brunson New York Knicks "Association" Swingman Jersey', 'The white "Association" edition Swingman jersey. It features "NEW YORK 11" on the front and "BRUNSON 11" on the back.', 7066.00, 50, 'assets/images/products/knicksproducts/knicks5a.png', 1);
+
+-- New York Knicks Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(41, 'assets/images/products/knicksproducts/knicks1a.png', 1, 0),
+(41, 'assets/images/products/knicksproducts/knicks1b.png', 0, 1),
+(42, 'assets/images/products/knicksproducts/knicks2a.png', 1, 0),
+(42, 'assets/images/products/knicksproducts/knicks2b.png', 0, 1),
+(43, 'assets/images/products/knicksproducts/knicks3a.png', 1, 0),
+(43, 'assets/images/products/knicksproducts/knicks3b.png', 0, 1),
+(44, 'assets/images/products/knicksproducts/knicks4a.png', 1, 0),
+(44, 'assets/images/products/knicksproducts/knicks4b.png', 0, 1),
+(45, 'assets/images/products/knicksproducts/knicks5a.png', 1, 0),
+(45, 'assets/images/products/knicksproducts/knicks5b.png', 0, 1);
+
+-- New York Knicks Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(41, 1, 1), -- Jerseys
+(42, 3, 1), -- Hoodies
+(43, 4, 1), -- Caps
+(44, 1, 1), -- Jerseys
+(45, 1, 1); -- Jerseys
+
+-- ============================================
+-- LOS ANGELES LAKERS (team_id = 1)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(46, 1, 'Nike LeBron James Los Angeles Lakers "Icon" Swingman Jersey', 'The gold "Icon" edition Swingman jersey, the primary home look for the Lakers. It features "LAKERS 23" on the front and "JAMES 23" on the back.', 7066.00, 50, 'assets/images/products/Lakersproducts/la1a.png', 1),
+(47, 1, 'Nike Luka Dončić Los Angeles Lakers "Icon" Swingman Jersey (Custom)', 'A gold "Icon" edition Swingman jersey customized to feature "LAKERS 77" on the front and "DONČIĆ 77" on the back.', 7066.00, 50, 'assets/images/products/Lakersproducts/la2a.png', 1),
+(48, 1, 'Nike Austin Reaves Los Angeles Lakers "Icon" Swingman Jersey', 'The gold "Icon" edition Swingman jersey for Lakers guard Austin Reaves. It features "LAKERS 15" on the front and "REAVES 15" on the back.', 7066.00, 50, 'assets/images/products/Lakersproducts/la3a.png', 1),
+(49, 1, '\'47 Brand Los Angeles Lakers "Taco Tuesday" Clean Up Hat', 'A black, adjustable "dad hat" style cap featuring the Lakers logo on the front and an all-over embroidered pattern of tacos, famously associated with LeBron James.', 2061.00, 50, 'assets/images/products/Lakersproducts/la4a.png', 1),
+(50, 1, 'Nike G.T. Hustle 2 Basketball Shoe (White/Bright Crimson/Volt)', 'A low-top Nike G.T. Hustle 2 basketball shoe. This colorway features a white and grey upper, volt green accents, and bright crimson laces and heel.', 9885.00, 50, 'assets/images/products/Lakersproducts/la5a.png', 1);
+
+-- Los Angeles Lakers Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(46, 'assets/images/products/Lakersproducts/la1a.png', 1, 0),
+(46, 'assets/images/products/Lakersproducts/la1b.png', 0, 1),
+(47, 'assets/images/products/Lakersproducts/la2a.png', 1, 0),
+(47, 'assets/images/products/Lakersproducts/la2b.png', 0, 1),
+(48, 'assets/images/products/Lakersproducts/la3a.png', 1, 0),
+(48, 'assets/images/products/Lakersproducts/la3b.png', 0, 1),
+(49, 'assets/images/products/Lakersproducts/la4a.png', 1, 0),
+(49, 'assets/images/products/Lakersproducts/la4b.png', 0, 1),
+(50, 'assets/images/products/Lakersproducts/la5a.png', 1, 0),
+(50, 'assets/images/products/Lakersproducts/la5b.png', 0, 1);
+
+-- Los Angeles Lakers Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(46, 1, 1), -- Jerseys
+(47, 1, 1), -- Jerseys
+(48, 1, 1), -- Jerseys
+(49, 4, 1), -- Caps
+(50, 6, 1); -- Accessories
+
+-- ============================================
+-- BROOKLYN NETS (team_id = 6)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(51, 6, 'Brooklyn Nets Women\'s "Graffiti" Crop Top T-Shirt', 'A heather grey, short-sleeve women\'s crop top. It features a stylized "BKLYN" graffiti graphic over the team\'s \'B\' logo on the front and a small logo on the back.', 2237.00, 50, 'assets/images/products/netsproducts/nets1a.png', 1),
+(52, 6, 'New Era Brooklyn Nets "Script" 9TWENTY A-Frame Hat', 'A two-tone adjustable hat with a white A-frame crown and a black brim. It features "Brooklyn Nets" in a grey script font on the front and the \'B\' logo on the side.', 2061.00, 50, 'assets/images/products/netsproducts/nets2a.png', 1),
+(53, 6, 'New Era Brooklyn Nets "City Edition" 9FIFTY Snapback Hat', 'A two-tone 9FIFTY snapback hat with a grey crown and a black flat brim. It features an arched "BROOKLYN" wordmark in a red, white, and blue 3D-style font.', 2473.00, 50, 'assets/images/products/netsproducts/nets3a.png', 1);
+
+-- Brooklyn Nets Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(51, 'assets/images/products/netsproducts/nets1a.png', 1, 0),
+(51, 'assets/images/products/netsproducts/nets1b.png', 0, 1),
+(52, 'assets/images/products/netsproducts/nets2a.png', 1, 0),
+(52, 'assets/images/products/netsproducts/nets2b.png', 0, 1),
+(53, 'assets/images/products/netsproducts/nets3a.png', 1, 0),
+(53, 'assets/images/products/netsproducts/nets3b.png', 0, 1);
+
+-- Brooklyn Nets Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(51, 2, 1), -- T-Shirts
+(52, 4, 1), -- Caps
+(53, 4, 1); -- Caps
+
+-- ============================================
+-- PHILADELPHIA 76ERS (team_id = 12)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(54, 12, 'Mitchell & Ness Allen Iverson 76ers 2001 NBA Finals Swingman Jersey', 'The black "Hardwood Classics" Swingman jersey worn by Allen Iverson during the 2001 NBA Finals. It features the "SIXERS 3" graphic on the front, "IVERSON 3" on the back, and the official NBA Finals patch.', 7950.00, 50, 'assets/images/products/philadelphiaproducts/sixers1a.png', 1),
+(55, 12, 'Mitchell & Ness Allen Iverson 76ers 2002 All-Star Game Swingman Jersey', 'The white "Hardwood Classics" Swingman jersey worn by Allen Iverson for the 2002 NBA All-Star Game in Philadelphia. It features the "SIXERS 3" graphic and the 2002 All-Star patch.', 7950.00, 50, 'assets/images/products/philadelphiaproducts/sixers2a.png', 1),
+(56, 12, 'Tyrese Maxey Philadelphia 76ers "Bleacher Creature" Plush Doll', 'A 10-inch plush character doll modeled after Tyrese Maxey, wearing the blue 76ers "Icon" jersey with "PHILA 0" on the front and "MAXEY 0" on the back.', 1472.00, 50, 'assets/images/products/philadelphiaproducts/sixers3a.png', 1),
+(57, 12, 'Nike Joel Embiid Philadelphia 76ers "Icon" Swingman Jersey', 'The primary blue "Icon" edition Swingman jersey for the 76ers. It features "PHILA 21" on the front, "EMBIID 21" on the back, and the white panel with red stars down the side.', 7066.00, 50, 'assets/images/products/philadelphiaproducts/sixers4a.png', 1),
+(58, 12, 'Mitchell & Ness Philadelphia 76ers "Blackout Logo" Snapback Hat', 'An all-black adjustable snapback hat. It features a tonal, "blackout" version of the 76ers\' circular logo embroidered on the front.', 2355.00, 50, 'assets/images/products/philadelphiaproducts/sixers5a.png', 1);
+
+-- Philadelphia 76ers Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(54, 'assets/images/products/philadelphiaproducts/sixers1a.png', 1, 0),
+(54, 'assets/images/products/philadelphiaproducts/sixers1b.png', 0, 1),
+(55, 'assets/images/products/philadelphiaproducts/sixers2a.png', 1, 0),
+(55, 'assets/images/products/philadelphiaproducts/sixers2b.png', 0, 1),
+(56, 'assets/images/products/philadelphiaproducts/sixers3a.png', 1, 0),
+(56, 'assets/images/products/philadelphiaproducts/sixers3b.png', 0, 1),
+(57, 'assets/images/products/philadelphiaproducts/sixers4a.png', 1, 0),
+(57, 'assets/images/products/philadelphiaproducts/sixers4b.png', 0, 1),
+(58, 'assets/images/products/philadelphiaproducts/sixers5a.png', 1, 0);
+
+-- Philadelphia 76ers Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(54, 1, 1), -- Jerseys
+(54, 7, 0), -- Premium
+(55, 1, 1), -- Jerseys
+(55, 7, 0), -- Premium
+(56, 6, 1), -- Accessories
+(57, 1, 1), -- Jerseys
+(58, 4, 1); -- Caps
+
+-- ============================================
+-- HOUSTON ROCKETS (team_id = 13)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(59, 13, 'Nike Kevin Durant Houston Rockets "Icon" Swingman Jersey (Custom)', 'The primary red "Icon" edition Swingman jersey for the Houston Rockets, customized for "DURANT 7". It features the "ROCKETS 7" wordmark on the front.', 7066.00, 50, 'assets/images/products/rocketsproducts/hou1a.png', 1),
+(60, 13, 'Nike G.T. Hustle 2 Basketball Shoe (Sail/Photon Dust/Barely Volt)', 'A low-top Nike G.T. Hustle 2 basketball shoe. This colorway features a "Sail" (off-white) mesh upper with "Photon Dust" (light grey) overlays and a distinctive cage lacing system.', 9885.00, 50, 'assets/images/products/rocketsproducts/hou2a.png', 1),
+(61, 13, 'New Era Houston Rockets "H-Town" 9FIFTY Snapback Hat', 'A two-tone 9FIFTY snapback hat with a white crown and a red flat brim. It features the "H-TOWN" city nickname embroidered in red and black on the front.', 2473.00, 50, 'assets/images/products/rocketsproducts/hou3a.png', 1),
+(62, 13, 'Nike Houston Rockets "Logo" Dri-FIT T-Shirt', 'A black, short-sleeve athletic t-shirt made with Nike\'s Dri-FIT material. It features the team\'s circular primary logo on the chest.', 2355.00, 50, 'assets/images/products/rocketsproducts/hou4a.png', 1);
+
+-- Houston Rockets Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(59, 'assets/images/products/rocketsproducts/hou1a.png', 1, 0),
+(59, 'assets/images/products/rocketsproducts/hou1b.png', 0, 1),
+(60, 'assets/images/products/rocketsproducts/hou2a.png', 1, 0),
+(60, 'assets/images/products/rocketsproducts/hou2b.png', 0, 1),
+(61, 'assets/images/products/rocketsproducts/hou3a.png', 1, 0),
+(61, 'assets/images/products/rocketsproducts/hou3b.png', 0, 1),
+(62, 'assets/images/products/rocketsproducts/hou4a.png', 1, 0),
+(62, 'assets/images/products/rocketsproducts/hou4b.png', 0, 1);
+
+-- Houston Rockets Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(59, 1, 1), -- Jerseys
+(60, 6, 1), -- Accessories
+(61, 4, 1), -- Caps
+(62, 2, 1); -- T-Shirts
+
+-- ============================================
+-- SAN ANTONIO SPURS (team_id = 14)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(63, 14, 'Nike Harper San Antonio Spurs "Icon" Swingman Jersey (Custom)', 'The black "Icon" edition Swingman jersey for the San Antonio Spurs, customized for "HARPER 2".', 7066.00, 50, 'assets/images/products/spursproducts/spurs1a.png', 1),
+(64, 14, 'New Era San Antonio Spurs "Two Tone Script" 9FIFTY Snapback Hat', 'A two-tone 9FIFTY snapback hat with a black crown and a grey flat brim. It features "San Antonio SPURS" in a custom silver script.', 2595.00, 50, 'assets/images/products/spursproducts/spurs2a.png', 1),
+(65, 14, 'Nike Victor Wembanyama San Antonio Spurs "Association" Swingman Jersey', 'The white "Association" edition Swingman jersey. It features "SPURS 1" on the front and "WEMBANYAMA 1" on the back.', 7066.00, 50, 'assets/images/products/spursproducts/spurs3a.png', 1),
+(66, 14, 'Funko Pop! Basketball: Victor Wembanyama (Spurs) #174', 'A vinyl Funko Pop! figure (#174) depicting Victor Wembanyama in his San Antonio Spurs "Icon" edition uniform, holding a basketball.', 700.00, 50, 'assets/images/products/spursproducts/spurs4a.png', 1),
+(67, 14, 'New Era San Antonio Spurs "Scribble Logo" 9FORTY Adjustable Hat', 'An all-white/cream 9FORTY adjustable cap with a curved brim. It features a stylized "scribble" or "sketch" version of the Spurs logo embroidered in navy.', 2095.00, 50, 'assets/images/products/spursproducts/spurs5a.png', 1);
+
+-- San Antonio Spurs Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(63, 'assets/images/products/spursproducts/spurs1a.png', 1, 0),
+(63, 'assets/images/products/spursproducts/spurs1b.png', 0, 1),
+(64, 'assets/images/products/spursproducts/spurs2a.png', 1, 0),
+(64, 'assets/images/products/spursproducts/spurs2b.png', 0, 1),
+(65, 'assets/images/products/spursproducts/spurs3a.png', 1, 0),
+(65, 'assets/images/products/spursproducts/spurs3b.png', 0, 1),
+(66, 'assets/images/products/spursproducts/spurs4a.png', 1, 0),
+(66, 'assets/images/products/spursproducts/spurs4b.png', 0, 1),
+(67, 'assets/images/products/spursproducts/spurs5a.png', 1, 0),
+(67, 'assets/images/products/spursproducts/spurs5b.png', 0, 1);
+
+-- San Antonio Spurs Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(63, 1, 1), -- Jerseys
+(64, 4, 1), -- Caps
+(65, 1, 1), -- Jerseys
+(66, 6, 1), -- Accessories
+(67, 4, 1); -- Caps
+
+-- ============================================
+-- PHOENIX SUNS (team_id = 7)
+-- ============================================
+INSERT INTO products (product_id, team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES
+(68, 7, 'Sportiqe Phoenix Suns "Genuine Issue" Classic Logo T-Shirt', 'A sand-colored (cream) short-sleeve t-shirt. The front features the Suns\' classic streaking ball logo, and the back has a "SUNS" wordmark at the bottom.', 2649.00, 50, 'assets/images/products/sunsproducts/suns1a.png', 1),
+(69, 7, 'Nike Phoenix Suns "City Star" Pullover Hoodie', 'A purple fleece pullover hoodie with a kangaroo pocket. It features the team\'s alternate logo, an orange star with a green saguaro cactus, on the chest.', 5300.00, 50, 'assets/images/products/sunsproducts/suns2a.png', 1),
+(70, 7, 'Nike Devin Booker Phoenix Suns "Association" Swingman Jersey', 'The white "Association" edition Swingman jersey. It features the "SUNS 1" wordmark on the front and "BOOKER 1" on the back.', 7066.00, 50, 'assets/images/products/sunsproducts/suns3a.png', 1),
+(71, 7, 'New Era Phoenix Suns "The Valley" City Edition 9FIFTY Snapback', 'A two-tone 9FIFTY snapback hat with a purple crown and an orange flat brim. It features "THE VALLEY" embroidered in a Western-style font.', 2000.00, 50, 'assets/images/products/sunsproducts/suns4a.png', 1),
+(72, 7, 'Nike Phoenix Suns "The Valley" City Edition Swingman Shorts', 'Purple "City Edition" basketball shorts. They feature "PHOENIX" on the leg and orange gradient stripes inspired by the "Valley" theme.', 4711.00, 50, 'assets/images/products/sunsproducts/suns5a.png', 1);
+
+-- Phoenix Suns Product Images
+INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
+(68, 'assets/images/products/sunsproducts/suns1a.png', 1, 0),
+(68, 'assets/images/products/sunsproducts/suns1b.png', 0, 1),
+(69, 'assets/images/products/sunsproducts/suns2a.png', 1, 0),
+(69, 'assets/images/products/sunsproducts/suns2b.png', 0, 1),
+(70, 'assets/images/products/sunsproducts/suns3a.png', 1, 0),
+(70, 'assets/images/products/sunsproducts/suns3b.png', 0, 1),
+(71, 'assets/images/products/sunsproducts/suns4a.png', 1, 0),
+(71, 'assets/images/products/sunsproducts/suns4b.png', 0, 1),
+(72, 'assets/images/products/sunsproducts/suns5a.png', 1, 0),
+(72, 'assets/images/products/sunsproducts/suns5b.png', 0, 1);
+
+-- Phoenix Suns Product Categories
+INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
+(68, 2, 1), -- T-Shirts
+(69, 3, 1), -- Hoodies
+(70, 1, 1), -- Jerseys
+(71, 4, 1), -- Caps
+(72, 5, 1); -- Shorts
+
