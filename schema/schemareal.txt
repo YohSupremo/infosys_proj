@@ -273,21 +273,7 @@ CREATE TABLE suppliers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Supplier-Product Junction Table (Many-to-Many)
--- Tracks which suppliers provide which products
-CREATE TABLE supplier_products (
-    supplier_id INT NOT NULL,
-    product_id INT NOT NULL,
-    cost_per_unit DECIMAL(10, 2) NOT NULL,
-    is_preferred BOOLEAN DEFAULT FALSE,
-    last_supplied_date TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (supplier_id, product_id),
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
-    CHECK (cost_per_unit >= 0)
-);
+
 
 -- Restocking Transactions Table
 CREATE TABLE restocking_transactions (
@@ -445,12 +431,6 @@ CREATE INDEX idx_discount_categories_category ON discount_categories(category_id
 CREATE INDEX idx_inventory_product ON inventory_history(product_id);
 CREATE INDEX idx_inventory_type ON inventory_history(transaction_type);
 CREATE INDEX idx_inventory_date ON inventory_history(created_at);
-
--- Supplier-Product indexes
-CREATE INDEX idx_supplier_products_supplier ON supplier_products(supplier_id);
-CREATE INDEX idx_supplier_products_product ON supplier_products(product_id);
-CREATE INDEX idx_supplier_products_preferred ON supplier_products(is_preferred);
-
 
 
 -- Product Images indexes
