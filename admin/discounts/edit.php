@@ -46,77 +46,8 @@ while ($c = $cat_result->fetch_assoc()) {
 }
 $cat_stmt->close();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $code = sanitize($_POST['code'] ?? '');
-    $description = sanitize($_POST['description'] ?? '');
-    $discount_type = sanitize($_POST['discount_type'] ?? '');
-    $discount_value = floatval($_POST['discount_value'] ?? 0);
-    $min_purchase_amount = floatval($_POST['min_purchase_amount'] ?? 0);
-    $max_discount_amount = floatval($_POST['max_discount_amount'] ?? 0);
-    $max_discount_amount = $max_discount_amount > 0 ? $max_discount_amount : null;
-    $usage_limit = intval($_POST['usage_limit'] ?? 0);
-    $usage_limit = $usage_limit > 0 ? $usage_limit : null;
-    $applies_to = sanitize($_POST['applies_to'] ?? 'all');
-    $start_date = sanitize($_POST['start_date'] ?? '');
-    $expiration_date = sanitize($_POST['expiration_date'] ?? '');
-    $expiration_date = !empty($expiration_date) ? $expiration_date : null;
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
-    $products = $_POST['products'] ?? [];
-    $categories = $_POST['categories'] ?? [];
-    
-    if (empty($code) || empty($discount_type) || $discount_value <= 0) {
-        $error = 'Code, discount type, and value are required.';
-    } else {
-        $check_stmt = $conn->prepare("SELECT discount_id FROM discount_codes WHERE code = ? AND discount_id != ?");
-        $check_stmt->bind_param("si", $code, $discount_id);
-        $check_stmt->execute();
-        if ($check_stmt->get_result()->num_rows > 0) {
-            $error = 'Discount code already exists.';
-        } else {
-            $update_stmt = $conn->prepare("UPDATE discount_codes SET code = ?, description = ?, discount_type = ?, discount_value = ?, min_purchase_amount = ?, max_discount_amount = ?, usage_limit = ?, applies_to = ?, start_date = ?, expiration_date = ?, is_active = ? WHERE discount_id = ?");
-            $update_stmt->bind_param("sssdddisssii", $code, $description, $discount_type, $discount_value, $min_purchase_amount, $max_discount_amount, $usage_limit, $applies_to, $start_date, $expiration_date, $is_active, $discount_id);
-            
-            if ($update_stmt->execute()) {
-                // Update products
-                $del_prod = $conn->prepare("DELETE FROM discount_products WHERE discount_id = ?");
-                $del_prod->bind_param("i", $discount_id);
-                $del_prod->execute();
-                $del_prod->close();
-                
-                if ($applies_to === 'specific_products' && !empty($products)) {
-                    $prod_stmt = $conn->prepare("INSERT INTO discount_products (discount_id, product_id) VALUES (?, ?)");
-                    foreach ($products as $product_id) {
-                        $prod_stmt->bind_param("ii", $discount_id, $product_id);
-                        $prod_stmt->execute();
-                    }
-                    $prod_stmt->close();
-                }
-                
-                // Update categories
-                $del_cat = $conn->prepare("DELETE FROM discount_categories WHERE discount_id = ?");
-                $del_cat->bind_param("i", $discount_id);
-                $del_cat->execute();
-                $del_cat->close();
-                
-                if ($applies_to === 'specific_categories' && !empty($categories)) {
-                    $cat_stmt = $conn->prepare("INSERT INTO discount_categories (discount_id, category_id) VALUES (?, ?)");
-                    foreach ($categories as $category_id) {
-                        $cat_stmt->bind_param("ii", $discount_id, $category_id);
-                        $cat_stmt->execute();
-                    }
-                    $cat_stmt->close();
-                }
-                
-                header('Location: index.php?success=1');
-                exit();
-            } else {
-                $error = 'Failed to update discount.';
-            }
-            $update_stmt->close();
-        }
-        $check_stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 
 $products_list = $conn->query("SELECT * FROM products WHERE is_active = 1 ORDER BY product_name");
 $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY category_name");
@@ -138,7 +69,8 @@ $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 OR
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="update.php">
+                        <input type="hidden" name="discount_id" value="<?php echo $discount_id; ?>">
                         <div class="mb-3">
                             <label for="code" class="form-label">Discount Code *</label>
                             <input type="text" class="form-control" id="code" name="code" value="<?php echo htmlspecialchars($discount['code']); ?>" required>

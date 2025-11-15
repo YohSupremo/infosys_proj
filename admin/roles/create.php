@@ -4,27 +4,8 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
 
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $role_name = sanitize($_POST['role_name'] ?? '');
-    $description = sanitize($_POST['description'] ?? '');
-    
-    if (empty($role_name)) {
-        $error = 'Role name is required.';
-    } else {
-        $stmt = $conn->prepare("INSERT INTO roles (role_name, description) VALUES (?, ?)");
-        $stmt->bind_param("ss", $role_name, $description);
-        
-        if ($stmt->execute()) {
-            header('Location: index.php?success=1');
-            exit();
-        } else {
-            $error = 'Failed to add role.';
-        }
-        $stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -43,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="role_name" class="form-label">Role Name *</label>
                             <input type="text" class="form-control" id="role_name" name="role_name" required>

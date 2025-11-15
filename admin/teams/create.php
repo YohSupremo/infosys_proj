@@ -4,30 +4,8 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
 
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $team_name = sanitize($_POST['team_name'] ?? '');
-    $team_code = sanitize($_POST['team_code'] ?? '');
-    $city = sanitize($_POST['city'] ?? '');
-    $conference = sanitize($_POST['conference'] ?? '');
-    $division = sanitize($_POST['division'] ?? '');
-    
-    if (empty($team_name) || empty($team_code)) {
-        $error = 'Team name and code are required.';
-    } else {
-        $stmt = $conn->prepare("INSERT INTO nba_teams (team_name, team_code, city, conference, division) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $team_name, $team_code, $city, $conference, $division);
-        
-        if ($stmt->execute()) {
-            header('Location: index.php?success=1');
-            exit();
-        } else {
-            $error = 'Failed to add team.';
-        }
-        $stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -46,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="team_name" class="form-label">Team Name *</label>
                             <input type="text" class="form-control" id="team_name" name="team_name" required>

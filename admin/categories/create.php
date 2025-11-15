@@ -5,32 +5,8 @@ include '../../includes/header.php';
 
 requireAdmin();
 
-$error = '';
-$success = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $category_name = sanitize($_POST['category_name'] ?? '');
-    $description = sanitize($_POST['description'] ?? '');
-    $parent_category_id = intval($_POST['parent_category_id'] ?? 0);
-    $parent_category_id = $parent_category_id > 0 ? $parent_category_id : null;
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
-    
-    if (empty($category_name)) {
-        $error = 'Category name is required.';
-    } else {
-        $stmt = $conn->prepare("INSERT INTO categories (category_name, description, parent_category_id, is_active) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssii", $category_name, $description, $parent_category_id, $is_active);
-        
-        if ($stmt->execute()) {
-            $success = 'Category added successfully!';
-            header('Location: index.php?success=1');
-            exit();
-        } else {
-            $error = 'Failed to add category.';
-        }
-        $stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 
 $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY category_name");
 ?>
@@ -51,7 +27,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="category_name" class="form-label">Category Name *</label>
                             <input type="text" class="form-control" id="category_name" name="category_name" required>

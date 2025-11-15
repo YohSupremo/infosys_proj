@@ -25,29 +25,8 @@ if ($result->num_rows === 0) {
 $supplier = $result->fetch_assoc();
 $stmt->close();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $supplier_name = sanitize($_POST['supplier_name'] ?? '');
-    $contact_person = sanitize($_POST['contact_person'] ?? '');
-    $email = sanitize($_POST['email'] ?? '');
-    $phone = sanitize($_POST['phone'] ?? '');
-    $address = sanitize($_POST['address'] ?? '');
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
-    
-    if (empty($supplier_name)) {
-        $error = 'Supplier name is required.';
-    } else {
-        $update_stmt = $conn->prepare("UPDATE suppliers SET supplier_name = ?, contact_person = ?, email = ?, phone = ?, address = ?, is_active = ? WHERE supplier_id = ?");
-        $update_stmt->bind_param("sssssii", $supplier_name, $contact_person, $email, $phone, $address, $is_active, $supplier_id);
-        
-        if ($update_stmt->execute()) {
-            header('Location: index.php?success=1');
-            exit();
-        } else {
-            $error = 'Failed to update supplier.';
-        }
-        $update_stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -66,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="update.php">
+                        <input type="hidden" name="supplier_id" value="<?php echo $supplier_id; ?>">
                         <div class="mb-3">
                             <label for="supplier_name" class="form-label">Supplier Name *</label>
                             <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="<?php echo htmlspecialchars($supplier['supplier_name']); ?>" required>

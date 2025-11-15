@@ -25,28 +25,8 @@ if ($result->num_rows === 0) {
 $team = $result->fetch_assoc();
 $stmt->close();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $team_name = sanitize($_POST['team_name'] ?? '');
-    $team_code = sanitize($_POST['team_code'] ?? '');
-    $city = sanitize($_POST['city'] ?? '');
-    $conference = sanitize($_POST['conference'] ?? '');
-    $division = sanitize($_POST['division'] ?? '');
-    
-    if (empty($team_name) || empty($team_code)) {
-        $error = 'Team name and code are required.';
-    } else {
-        $update_stmt = $conn->prepare("UPDATE nba_teams SET team_name = ?, team_code = ?, city = ?, conference = ?, division = ? WHERE team_id = ?");
-        $update_stmt->bind_param("sssssi", $team_name, $team_code, $city, $conference, $division, $team_id);
-        
-        if ($update_stmt->execute()) {
-            header('Location: index.php?success=1');
-            exit();
-        } else {
-            $error = 'Failed to update team.';
-        }
-        $update_stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -65,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="update.php">
+                        <input type="hidden" name="team_id" value="<?php echo $team_id; ?>">
                         <div class="mb-3">
                             <label for="team_name" class="form-label">Team Name *</label>
                             <input type="text" class="form-control" id="team_name" name="team_name" value="<?php echo htmlspecialchars($team['team_name']); ?>" required>

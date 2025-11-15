@@ -75,34 +75,8 @@ if ($review_result->num_rows === 0) {
 $review = $review_result->fetch_assoc();
 $review_stmt->close();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $rating = intval($_POST['rating'] ?? 0);
-    $review_text = sanitize($_POST['review_text'] ?? '');
-    
-    // Server-side validation
-    if ($rating < 1 || $rating > 5) {
-        $error = 'Please select a valid rating (1-5 stars).';
-    } elseif (empty($review_text)) {
-        $error = 'Please write a review.';
-    } elseif (strlen($review_text) < 10) {
-        $error = 'Review must be at least 10 characters long.';
-    } else {
-        // Apply regex filter for bad words (MP4 Requirement)
-        $filtered_text = censorText($review_text, $bad_words);
-        
-        $update_stmt = $conn->prepare("UPDATE product_reviews SET rating = ?, review_text = ? WHERE review_id = ? AND user_id = ?");
-        $update_stmt->bind_param("isii", $rating, $filtered_text, $review_id, $user_id);
-        
-        if ($update_stmt->execute()) {
-            $success = 'Review updated successfully!';
-            header('Location: ' . BASE_URL . '/user/products/view.php?id=' . $review['product_id'] . '&success=1');
-            exit();
-        } else {
-            $error = 'Failed to update review.';
-        }
-        $update_stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 ?>
 
 <?php include '../../includes/navbar.php'; ?>
@@ -118,13 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php if ($error): ?>
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
-                    <?php if ($success): ?>
-                        <div class="alert alert-success"><?php echo $success; ?></div>
-                    <?php endif; ?>
                     
                     <p><strong>Product:</strong> <?php echo htmlspecialchars($review['product_name']); ?></p>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="update.php">
+                        <input type="hidden" name="review_id" value="<?php echo $review_id; ?>">
                         <div class="mb-3">
                             <label for="rating" class="form-label">Rating *</label>
                             <select class="form-select" id="rating" name="rating">

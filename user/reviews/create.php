@@ -89,44 +89,18 @@ if ($order_result->num_rows === 0) {
         exit();
     }
     $existing_review->close();
-    
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $rating = intval($_POST['rating'] ?? 0);
-        $review_text = sanitize($_POST['review_text'] ?? '');
-        
-        // Server-side validation
-        if ($rating < 1 || $rating > 5) {
-            $error = 'Please select a valid rating (1-5 stars).';
-        } elseif (empty($review_text)) {
-            $error = 'Please write a review.';
-        } elseif (strlen($review_text) < 10) {
-            $error = 'Review must be at least 10 characters long.';
-        } else {
-            // Apply regex filter for bad words (MP4 Requirement)
-            $filtered_text = censorText($review_text, $bad_words);
-
-            $insert_stmt = $conn->prepare("INSERT INTO product_reviews (product_id, user_id, order_id, rating, review_text) VALUES (?, ?, ?, ?, ?)");
-            $insert_stmt->bind_param("iiiis", $product_id, $user_id, $order_id, $rating, $filtered_text);
-
-            if ($insert_stmt->execute()) {
-                $success = 'Review submitted successfully!';
-                header('Location: ' . BASE_URL . '/user/products/view.php?id=' . $product_id . '&success=1');
-                exit();
-            } else {
-                $error = 'Failed to submit review.';
-            }
-            $insert_stmt->close();
-        }
-    }
-    
-    // Get product info
-    $product_stmt = $conn->prepare("SELECT product_name FROM products WHERE product_id = ?");
-    $product_stmt->bind_param("i", $product_id);
-    $product_stmt->execute();
-    $product_result = $product_stmt->get_result();
-    $product = $product_result->fetch_assoc();
-    $product_stmt->close();
 }
+
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
+
+// Get product info
+$product_stmt = $conn->prepare("SELECT product_name FROM products WHERE product_id = ?");
+$product_stmt->bind_param("i", $product_id);
+$product_stmt->execute();
+$product_result = $product_stmt->get_result();
+$product = $product_result->fetch_assoc();
+$product_stmt->close();
 ?>
 
 <?php include '../../includes/navbar.php'; ?>
@@ -142,15 +116,14 @@ if ($order_result->num_rows === 0) {
                     <?php if ($error): ?>
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
-                    <?php if ($success): ?>
-                        <div class="alert alert-success"><?php echo $success; ?></div>
-                    <?php endif; ?>
                     
                     <?php if (isset($product)): ?>
                         <p><strong>Product:</strong> <?php echo htmlspecialchars($product['product_name']); ?></p>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="store.php">
+                        <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+                        <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
                         <div class="mb-3">
                             <label for="rating" class="form-label">Rating *</label>
                             <select class="form-select" id="rating" name="rating">

@@ -25,25 +25,8 @@ if ($result->num_rows === 0) {
 $role = $result->fetch_assoc();
 $stmt->close();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $role_name = sanitize($_POST['role_name'] ?? '');
-    $description = sanitize($_POST['description'] ?? '');
-    
-    if (empty($role_name)) {
-        $error = 'Role name is required.';
-    } else {
-        $update_stmt = $conn->prepare("UPDATE roles SET role_name = ?, description = ? WHERE role_id = ?");
-        $update_stmt->bind_param("ssi", $role_name, $description, $role_id);
-        
-        if ($update_stmt->execute()) {
-            header('Location: index.php?success=1');
-            exit();
-        } else {
-            $error = 'Failed to update role.';
-        }
-        $update_stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -62,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="update.php">
+                        <input type="hidden" name="role_id" value="<?php echo $role_id; ?>">
                         <div class="mb-3">
                             <label for="role_name" class="form-label">Role Name *</label>
                             <input type="text" class="form-control" id="role_name" name="role_name" value="<?php echo htmlspecialchars($role['role_name']); ?>" required>

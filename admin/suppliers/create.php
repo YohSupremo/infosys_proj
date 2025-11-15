@@ -4,31 +4,8 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
 
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $supplier_name = sanitize($_POST['supplier_name'] ?? '');
-    $contact_person = sanitize($_POST['contact_person'] ?? '');
-    $email = sanitize($_POST['email'] ?? '');
-    $phone = sanitize($_POST['phone'] ?? '');
-    $address = sanitize($_POST['address'] ?? '');
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
-    
-    if (empty($supplier_name)) {
-        $error = 'Supplier name is required.';
-    } else {
-        $stmt = $conn->prepare("INSERT INTO suppliers (supplier_name, contact_person, email, phone, address, is_active) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssssi", $supplier_name, $contact_person, $email, $phone, $address, $is_active);
-        
-        if ($stmt->execute()) {
-            header('Location: index.php?success=1');
-            exit();
-        } else {
-            $error = 'Failed to add supplier.';
-        }
-        $stmt->close();
-    }
-}
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -47,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-danger"><?php echo $error; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="">
+                    <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="supplier_name" class="form-label">Supplier Name *</label>
                             <input type="text" class="form-control" id="supplier_name" name="supplier_name" required>

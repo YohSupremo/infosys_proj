@@ -36,7 +36,7 @@ if ($category_id > 0) {
     $types .= "i";
 }
 
-$query .= " ORDER BY p.created_at DESC LIMIT 8";
+$query .= " ORDER BY p.created_at DESC";
 
 $stmt = $conn->prepare($query);
 if (!empty($params)) {
@@ -123,6 +123,22 @@ $categories_result = $conn->query("SELECT * FROM categories WHERE is_active = 1 
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Scroll to Top Button -->
+<button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 50px; height: 50px; border-radius: 50%; background-color: #007bff; color: white; border: none; cursor: pointer; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+    ↑
+</button>
+
+<script>
+window.addEventListener('scroll', function() {
+    var btn = document.getElementById('scrollToTopBtn');
+    if (window.pageYOffset > 300) {
+        btn.style.display = 'block';
+    } else {
+        btn.style.display = 'none';
+    }
+});
+</script>
 
 <?php include '../../includes/foot.php'; ?>
 
