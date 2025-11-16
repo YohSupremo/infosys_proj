@@ -146,6 +146,7 @@ if ($has_filter) {
 									<td><?php echo date('M d, Y h:i A', strtotime($row['restock_date'])); ?></td>
 									<td><?php echo htmlspecialchars($row['notes'] ?: ''); ?></td>
 								</tr>
+								
 							<?php endwhile; ?>
 						<?php else: ?>
 							<tr>

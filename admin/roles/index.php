@@ -5,6 +5,7 @@ include '../../includes/header.php';
 requireAdmin();
 
 $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
+
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
@@ -25,7 +26,7 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                             <th>Role Name</th>
                             <th>Description</th>
                             <th>Actions</th>
-                        </tr>
+                        </tr> 
                     </thead>
                     <tbody>
                         <?php if ($roles->num_rows > 0): ?>
@@ -42,6 +43,7 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                                         </form>
                                     </td>
                                 </tr>
+                                
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>

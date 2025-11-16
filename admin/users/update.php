@@ -49,10 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         if ($uploaded_photo_path) {
             $update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ?, password_hash = ?, profile_photo = ? WHERE user_id = ?");
-            $update_stmt->bind_param("sssisssi", $first_name, $last_name, $contact_number, $role_id, $is_active, $password_hash, $uploaded_photo_path, $user_id);
+            $update_stmt->bind_param("sssiissi", $first_name, $last_name, $contact_number, $role_id, $is_active, $password_hash, $uploaded_photo_path, $user_id);
         } else {
             $update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, role_id = ?, is_active = ?, password_hash = ? WHERE user_id = ?");
-            $update_stmt->bind_param("sssissi", $first_name, $last_name, $contact_number, $role_id, $is_active, $password_hash, $user_id);
+            $update_stmt->bind_param("sssiisi", $first_name, $last_name, $contact_number, $role_id, $is_active, $password_hash, $user_id);
         }
     } else {
         if ($uploaded_photo_path) {
