@@ -11,6 +11,7 @@ if (!$product_id) {
     exit();
 }
 
+
 $stmt = $conn->prepare("SELECT p.*, t.team_name, t.team_code FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id WHERE p.product_id = ? AND p.is_active = 1");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
@@ -97,7 +98,9 @@ if ($user_id) {
     $user_has_review = $user_review_result->num_rows > 0;
     $user_review_id = $user_has_review ? $user_review_result->fetch_assoc()['review_id'] : null;
     $user_review_check->close();
+ 
 }
+
 ?>
 
 <?php include '../../includes/navbar.php'; ?>
@@ -106,6 +109,12 @@ if ($user_id) {
     <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 1): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             Review deleted successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($_GET['error']) && $_GET['error'] == 'invalid_quantity'): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            Quantity must be a valid number greater than 0.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
@@ -168,7 +177,8 @@ if ($user_id) {
                         <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                         <div class="mb-3">
                             <label for="quantity" class="form-label">Quantity</label>
-                            <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="<?php echo $product['stock_quantity']; ?>">
+                            <input type="text" class="form-control" id="quantity" name="quantity" value="1" placeholder="Enter quantity">
+                            <small class="text-muted">Enter a number (max: <?php echo $product['stock_quantity']; ?>)</small>
                         </div>
                         <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
                     </form>

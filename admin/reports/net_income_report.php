@@ -5,9 +5,29 @@ include '../../includes/header.php';
 requireAdmin();
 
 // Date filter (optional - requires both start and end to apply)
+$error = '';
 $start_date = isset($_GET['start_date']) ? trim($_GET['start_date']) : '';
 $end_date = isset($_GET['end_date']) ? trim($_GET['end_date']) : '';
 $has_filter = (!empty($start_date) && !empty($end_date));
+
+// Validate date formats if provided
+if (!empty($start_date)) {
+    $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
+    if (!preg_match($datePattern, $start_date)) {
+        $error = 'Start date must be in format: YYYY-MM-DD (e.g. 2025-01-01)';
+        $start_date = '';
+        $has_filter = false;
+    }
+}
+
+if (!empty($end_date)) {
+    $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
+    if (!preg_match($datePattern, $end_date)) {
+        $error = 'End date must be in format: YYYY-MM-DD (e.g. 2025-01-31)';
+        $end_date = '';
+        $has_filter = false;
+    }
+}
 
 // Revenue: orders not Cancelled (optionally filtered by order_date)
 $total_revenue = 0;
@@ -62,17 +82,23 @@ $exp30_stmt->close();
 <div class="container my-5">
 	<h2 class="mb-4">Net Income Report</h2>
 
+	<?php if ($error): ?>
+		<div class="alert alert-danger"><?php echo $error; ?></div>
+	<?php endif; ?>
+
 	<div class="card mb-4">
 		<div class="card-body">
 			<form method="GET" action="">
 				<div class="row g-3 align-items-end">
 					<div class="col-md-3">
 						<label for="start_date" class="form-label">Start Date</label>
-						<input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+						<input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" placeholder="YYYY-MM-DD">
+						<small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-01)</small>
 					</div>
 					<div class="col-md-3">
 						<label for="end_date" class="form-label">End Date</label>
-						<input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">
+						<input type="text" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" placeholder="YYYY-MM-DD">
+						<small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-31)</small>
 					</div>
 					<div class="col-md-3">
 						<button type="submit" class="btn btn-primary">Apply Filter</button>

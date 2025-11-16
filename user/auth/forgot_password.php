@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (empty($email)) {
         $error = 'Please enter your email address.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address (e.g. example@email.com)';
     } else {
         $stmt = $conn->prepare("SELECT user_id, first_name FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -83,7 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" action="">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="text" class="form-control" id="email" name="email" placeholder="example@email.com">
+                            <small class="text-muted">Enter your registered email address</small>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Send Verification Code</button>
                     </form>

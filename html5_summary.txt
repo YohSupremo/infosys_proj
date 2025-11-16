@@ -1,0 +1,423 @@
+HTML5 VALIDATION REMOVAL SUMMARY
+==================================
+
+This document summarizes all changes made to remove HTML5 validation attributes and input types from the codebase, and the addition of manual validation with user guidance.
+
+CHANGES MADE:
+-------------
+
+1. REMOVED 'required' ATTRIBUTE
+   - Removed from all input fields and select elements
+   - Validation is now handled server-side only
+
+2. REPLACED HTML5 INPUT TYPES WITH 'text'
+   - type="email" → type="text"
+   - type="number" → type="text"
+   - type="datetime-local" → type="text"
+   - type="date" → type="text"
+
+3. REMOVED HTML5 VALIDATION ATTRIBUTES
+   - Removed 'min' attribute
+   - Removed 'max' attribute
+   - Removed 'step' attribute
+
+DETAILED FILE CHANGES:
+----------------------
+
+FILE: user/cart/index.php
+- Line 82: Changed type="number" to type="text", removed min, max, and required attributes
+  OLD: <input type="number" class="form-control" name="quantity" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock_quantity']; ?>" required>
+  NEW: <input type="text" class="form-control" name="quantity" value="<?php echo $item['quantity']; ?>">
+
+FILE: admin/discounts/create.php
+- Line 34: Removed required attribute
+  OLD: <input type="text" class="form-control" id="code" name="code" required>
+  NEW: <input type="text" class="form-control" id="code" name="code">
+- Line 43: Removed required attribute from select
+  OLD: <select class="form-select" id="discount_type" name="discount_type" required>
+  NEW: <select class="form-select" id="discount_type" name="discount_type">
+- Line 50: Changed type="number" to type="text", removed step, min, and required
+  OLD: <input type="number" class="form-control" id="discount_value" name="discount_value" step="0.01" min="0" required>
+  NEW: <input type="text" class="form-control" id="discount_value" name="discount_value">
+- Line 56: Changed type="number" to type="text", removed step and min
+  OLD: <input type="number" class="form-control" id="min_purchase_amount" name="min_purchase_amount" step="0.01" min="0" value="0">
+  NEW: <input type="text" class="form-control" id="min_purchase_amount" name="min_purchase_amount" value="0">
+- Line 60: Changed type="number" to type="text", removed step and min
+  OLD: <input type="number" class="form-control" id="max_discount_amount" name="max_discount_amount" step="0.01" min="0">
+  NEW: <input type="text" class="form-control" id="max_discount_amount" name="max_discount_amount">
+- Line 65: Changed type="number" to type="text", removed min
+  OLD: <input type="number" class="form-control" id="usage_limit" name="usage_limit" min="0" value="0">
+  NEW: <input type="text" class="form-control" id="usage_limit" name="usage_limit" value="0">
+- Line 69: Removed required attribute from select
+  OLD: <select class="form-select" id="applies_to" name="applies_to" required>
+  NEW: <select class="form-select" id="applies_to" name="applies_to">
+- Line 94: Changed type="datetime-local" to type="text", removed required
+  OLD: <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+  NEW: <input type="text" class="form-control" id="start_date" name="start_date">
+- Line 98: Changed type="datetime-local" to type="text"
+  OLD: <input type="datetime-local" class="form-control" id="expiration_date" name="expiration_date">
+  NEW: <input type="text" class="form-control" id="expiration_date" name="expiration_date">
+
+FILE: admin/discounts/edit.php
+- Line 76: Removed required attribute
+  OLD: <input type="text" class="form-control" id="code" name="code" value="<?php echo htmlspecialchars($discount['code']); ?>" required>
+  NEW: <input type="text" class="form-control" id="code" name="code" value="<?php echo htmlspecialchars($discount['code']); ?>">
+- Line 85: Removed required attribute from select
+  OLD: <select class="form-select" id="discount_type" name="discount_type" required>
+  NEW: <select class="form-select" id="discount_type" name="discount_type">
+- Line 92: Changed type="number" to type="text", removed step, min, and required
+  OLD: <input type="number" class="form-control" id="discount_value" name="discount_value" step="0.01" min="0" value="<?php echo $discount['discount_value']; ?>" required>
+  NEW: <input type="text" class="form-control" id="discount_value" name="discount_value" value="<?php echo $discount['discount_value']; ?>">
+- Line 98: Changed type="number" to type="text", removed step and min
+  OLD: <input type="number" class="form-control" id="min_purchase_amount" name="min_purchase_amount" step="0.01" min="0" value="<?php echo $discount['min_purchase_amount']; ?>">
+  NEW: <input type="text" class="form-control" id="min_purchase_amount" name="min_purchase_amount" value="<?php echo $discount['min_purchase_amount']; ?>">
+- Line 102: Changed type="number" to type="text", removed step and min
+  OLD: <input type="number" class="form-control" id="max_discount_amount" name="max_discount_amount" step="0.01" min="0" value="<?php echo $discount['max_discount_amount'] ?: ''; ?>">
+  NEW: <input type="text" class="form-control" id="max_discount_amount" name="max_discount_amount" value="<?php echo $discount['max_discount_amount'] ?: ''; ?>">
+- Line 107: Changed type="number" to type="text", removed min
+  OLD: <input type="number" class="form-control" id="usage_limit" name="usage_limit" min="0" value="<?php echo $discount['usage_limit'] ?: 0; ?>">
+  NEW: <input type="text" class="form-control" id="usage_limit" name="usage_limit" value="<?php echo $discount['usage_limit'] ?: 0; ?>">
+- Line 111: Removed required attribute from select
+  OLD: <select class="form-select" id="applies_to" name="applies_to" required>
+  NEW: <select class="form-select" id="applies_to" name="applies_to">
+- Line 146: Changed type="datetime-local" to type="text", removed required, changed date format
+  OLD: <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="<?php echo date('Y-m-d\TH:i', strtotime($discount['start_date'])); ?>" required>
+  NEW: <input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo date('Y-m-d H:i', strtotime($discount['start_date'])); ?>">
+- Line 150: Changed type="datetime-local" to type="text", changed date format
+  OLD: <input type="datetime-local" class="form-control" id="expiration_date" name="expiration_date" value="<?php echo $discount['expiration_date'] ? date('Y-m-d\TH:i', strtotime($discount['expiration_date'])) : ''; ?>">
+  NEW: <input type="text" class="form-control" id="expiration_date" name="expiration_date" value="<?php echo $discount['expiration_date'] ? date('Y-m-d H:i', strtotime($discount['expiration_date'])) : ''; ?>">
+
+FILE: admin/categories/create.php
+- Line 33: Removed required attribute
+  OLD: <input type="text" class="form-control" id="category_name" name="category_name" required>
+  NEW: <input type="text" class="form-control" id="category_name" name="category_name">
+
+FILE: admin/categories/edit.php
+- Line 54: Removed required attribute
+  OLD: <input type="text" class="form-control" id="category_name" name="category_name" value="<?php echo htmlspecialchars($category['category_name']); ?>" required>
+  NEW: <input type="text" class="form-control" id="category_name" name="category_name" value="<?php echo htmlspecialchars($category['category_name']); ?>">
+
+FILE: admin/products/create.php
+- Line 45: Changed type="number" to type="text", removed step and min
+  OLD: <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="<?php echo htmlspecialchars($_POST['price'] ?? ''); ?>">
+  NEW: <input type="text" class="form-control" id="price" name="price" value="<?php echo htmlspecialchars($_POST['price'] ?? ''); ?>">
+- Line 49: Changed type="number" to type="text", removed min
+  OLD: <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" min="0" value="<?php echo htmlspecialchars($_POST['stock_quantity'] ?? ''); ?>">
+  NEW: <input type="text" class="form-control" id="stock_quantity" name="stock_quantity" value="<?php echo htmlspecialchars($_POST['stock_quantity'] ?? ''); ?>">
+
+FILE: admin/products/edit.php
+- Line 91: Changed type="number" to type="text", removed step and min
+  OLD: <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" value="<?php echo $product['price']; ?>">
+  NEW: <input type="text" class="form-control" id="price" name="price" value="<?php echo $product['price']; ?>">
+- Line 95: Changed type="number" to type="text", removed min
+  OLD: <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" min="0" value="<?php echo $product['stock_quantity']; ?>">
+  NEW: <input type="text" class="form-control" id="stock_quantity" name="stock_quantity" value="<?php echo $product['stock_quantity']; ?>">
+
+FILE: admin/teams/create.php
+- Line 30: Removed required attribute
+  OLD: <input type="text" class="form-control" id="team_name" name="team_name" required>
+  NEW: <input type="text" class="form-control" id="team_name" name="team_name">
+- Line 34: Removed required attribute
+  OLD: <input type="text" class="form-control" id="team_code" name="team_code" maxlength="10" required>
+  NEW: <input type="text" class="form-control" id="team_code" name="team_code" maxlength="10">
+
+FILE: admin/teams/edit.php
+- Line 52: Removed required attribute
+  OLD: <input type="text" class="form-control" id="team_name" name="team_name" value="<?php echo htmlspecialchars($team['team_name']); ?>" required>
+  NEW: <input type="text" class="form-control" id="team_name" name="team_name" value="<?php echo htmlspecialchars($team['team_name']); ?>">
+- Line 56: Removed required attribute
+  OLD: <input type="text" class="form-control" id="team_code" name="team_code" value="<?php echo htmlspecialchars($team['team_code']); ?>" maxlength="10" required>
+  NEW: <input type="text" class="form-control" id="team_code" name="team_code" value="<?php echo htmlspecialchars($team['team_code']); ?>" maxlength="10">
+
+FILE: admin/suppliers/create.php
+- Line 30: Removed required attribute
+  OLD: <input type="text" class="form-control" id="supplier_name" name="supplier_name" required>
+  NEW: <input type="text" class="form-control" id="supplier_name" name="supplier_name">
+- Line 38: Changed type="email" to type="text"
+  OLD: <input type="email" class="form-control" id="email" name="email">
+  NEW: <input type="text" class="form-control" id="email" name="email">
+
+FILE: admin/suppliers/edit.php
+- Line 52: Removed required attribute
+  OLD: <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="<?php echo htmlspecialchars($supplier['supplier_name']); ?>" required>
+  NEW: <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="<?php echo htmlspecialchars($supplier['supplier_name']); ?>">
+- Line 60: Changed type="email" to type="text"
+  OLD: <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($supplier['email']); ?>">
+  NEW: <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($supplier['email']); ?>">
+
+FILE: admin/roles/create.php
+- Line 30: Removed required attribute
+  OLD: <input type="text" class="form-control" id="role_name" name="role_name" required>
+  NEW: <input type="text" class="form-control" id="role_name" name="role_name">
+
+FILE: admin/roles/edit.php
+- Line 52: Removed required attribute
+  OLD: <input type="text" class="form-control" id="role_name" name="role_name" value="<?php echo htmlspecialchars($role['role_name']); ?>" required>
+  NEW: <input type="text" class="form-control" id="role_name" name="role_name" value="<?php echo htmlspecialchars($role['role_name']); ?>">
+
+FILE: admin/users/create.php
+- Line 33: Removed required attribute
+  OLD: <input type="text" class="form-control" id="first_name" name="first_name" required>
+  NEW: <input type="text" class="form-control" id="first_name" name="first_name">
+- Line 37: Removed required attribute
+  OLD: <input type="text" class="form-control" id="last_name" name="last_name" required>
+  NEW: <input type="text" class="form-control" id="last_name" name="last_name">
+- Line 42: Changed type="email" to type="text", removed required
+  OLD: <input type="email" class="form-control" id="email" name="email" required>
+  NEW: <input type="text" class="form-control" id="email" name="email">
+- Line 46: Removed required attribute
+  OLD: <input type="password" class="form-control" id="password" name="password" required>
+  NEW: <input type="password" class="form-control" id="password" name="password">
+- Line 54: Removed required attribute from select
+  OLD: <select class="form-select" id="role_id" name="role_id" required>
+  NEW: <select class="form-select" id="role_id" name="role_id">
+
+FILE: admin/users/edit.php
+- Line 55: Removed required attribute
+  OLD: <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+  NEW: <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>">
+- Line 59: Removed required attribute
+  OLD: <input type="text" class="form-control" id="last_name" name="last_name" value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+  NEW: <input type="text" class="form-control" id="last_name" name="last_name" value="<?php echo htmlspecialchars($user['last_name']); ?>">
+- Line 64: Changed type="email" to type="text"
+  OLD: <input type="email" class="form-control" id="email" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
+  NEW: <input type="text" class="form-control" id="email" value="<?php echo htmlspecialchars($user['email']); ?>" disabled>
+- Line 87: Removed required attribute from select
+  OLD: <select class="form-select" id="role_id" name="role_id" required>
+  NEW: <select class="form-select" id="role_id" name="role_id">
+
+FILE: admin/inventory/restock.php
+- Line 146: Changed type="number" to type="text", removed min
+  OLD: <input type="number" class="form-control" name="quantities[]" min="1">
+  NEW: <input type="text" class="form-control" name="quantities[]">
+- Line 150: Changed type="number" to type="text", removed step and min
+  OLD: <input type="number" class="form-control" name="costs[]" step="0.01" min="0">
+  NEW: <input type="text" class="form-control" name="costs[]">
+
+FILE: user/auth/login.php
+- Line 117: Changed type="email" to type="text"
+  OLD: <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+  NEW: <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+
+FILE: user/auth/register.php
+- Line 127: Changed type="email" to type="text"
+  OLD: <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+  NEW: <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+
+FILE: user/auth/forgot_password.php
+- Line 86: Changed type="email" to type="text", removed required
+  OLD: <input type="email" class="form-control" id="email" name="email" required>
+  NEW: <input type="text" class="form-control" id="email" name="email">
+
+FILE: user/auth/reset_password.php
+- Line 90: Changed type="email" to type="text"
+  OLD: <input type="email" class="form-control" value="<?php echo htmlspecialchars($reset_email); ?>" readonly>
+  NEW: <input type="text" class="form-control" value="<?php echo htmlspecialchars($reset_email); ?>" readonly>
+- Line 94: Removed required attribute
+  OLD: <input type="text" class="form-control" id="verification_code" name="verification_code" required>
+  NEW: <input type="text" class="form-control" id="verification_code" name="verification_code">
+- Line 98: Removed required attribute
+  OLD: <input type="password" class="form-control" id="password" name="password" required>
+  NEW: <input type="password" class="form-control" id="password" name="password">
+- Line 102: Removed required attribute
+  OLD: <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+  NEW: <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+
+FILE: user/account/add_address.php
+- Line 69: Removed required attribute
+  OLD: <input type="text" class="form-control" id="address_line1" name="address_line1" required>
+  NEW: <input type="text" class="form-control" id="address_line1" name="address_line1">
+- Line 77: Removed required attribute
+  OLD: <input type="text" class="form-control" id="city" name="city" required>
+  NEW: <input type="text" class="form-control" id="city" name="city">
+- Line 81: Removed required attribute
+  OLD: <input type="text" class="form-control" id="state" name="state" required>
+  NEW: <input type="text" class="form-control" id="state" name="state">
+- Line 85: Removed required attribute
+  OLD: <input type="text" class="form-control" id="postal_code" name="postal_code" required>
+  NEW: <input type="text" class="form-control" id="postal_code" name="postal_code">
+
+FILE: user/account/edit_address.php
+- Line 88: Removed required attribute
+  OLD: <input type="text" class="form-control" id="address_line1" name="address_line1" value="<?php echo htmlspecialchars($address['address_line1']); ?>" required>
+  NEW: <input type="text" class="form-control" id="address_line1" name="address_line1" value="<?php echo htmlspecialchars($address['address_line1']); ?>">
+- Line 96: Removed required attribute
+  OLD: <input type="text" class="form-control" id="city" name="city" value="<?php echo htmlspecialchars($address['city']); ?>" required>
+  NEW: <input type="text" class="form-control" id="city" name="city" value="<?php echo htmlspecialchars($address['city']); ?>">
+- Line 100: Removed required attribute
+  OLD: <input type="text" class="form-control" id="state" name="state" value="<?php echo htmlspecialchars($address['state']); ?>" required>
+  NEW: <input type="text" class="form-control" id="state" name="state" value="<?php echo htmlspecialchars($address['state']); ?>">
+- Line 104: Removed required attribute
+  OLD: <input type="text" class="form-control" id="postal_code" name="postal_code" value="<?php echo htmlspecialchars($address['postal_code']); ?>" required>
+  NEW: <input type="text" class="form-control" id="postal_code" name="postal_code" value="<?php echo htmlspecialchars($address['postal_code']); ?>">
+
+FILE: user/products/view.php
+- Line 174: Changed type="number" to type="text", removed min and max
+  OLD: <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" max="<?php echo $product['stock_quantity']; ?>">
+  NEW: <input type="text" class="form-control" id="quantity" name="quantity" value="1">
+
+FILE: admin/reports/sales_report.php
+- Line 36: Changed type="date" to type="text"
+  OLD: <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo $start_date; ?>">
+  NEW: <input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo $start_date; ?>">
+- Line 40: Changed type="date" to type="text"
+  OLD: <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo $end_date; ?>">
+  NEW: <input type="text" class="form-control" id="end_date" name="end_date" value="<?php echo $end_date; ?>">
+
+FILE: admin/reports/net_income_report.php
+- Line 71: Changed type="date" to type="text"
+  OLD: <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+  NEW: <input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+- Line 75: Changed type="date" to type="text"
+  OLD: <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">
+  NEW: <input type="text" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">
+
+FILE: admin/reports/expenses_report.php
+- Line 69: Changed type="date" to type="text"
+  OLD: <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+  NEW: <input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+- Line 73: Changed type="date" to type="text"
+  OLD: <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">
+  NEW: <input type="text" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">
+
+TOTAL FILES MODIFIED: 25
+TOTAL CHANGES: 72
+
+NOTES:
+------
+- All HTML5 validation is now removed from the frontend
+- Server-side validation should handle all input validation
+- Date inputs now use text type - users will need to enter dates manually in the format expected by the backend
+- Numeric inputs now use text type - server-side validation should ensure numeric values
+- Email inputs now use text type - server-side validation should ensure valid email format
+
+ADDITIONAL CHANGES - USER GUIDANCE (NO CLIENT-SIDE VALIDATION):
+---------------------------------------------------------------
+
+1. Added placeholder text to guide users on expected input format
+2. Added help text (small text-muted) below inputs showing format examples
+3. Date fields show format: YYYY-MM-DD or YYYY-MM-DD HH:MM
+4. Email fields show format: example@email.com
+5. Numeric fields show examples: e.g. 99.99 or e.g. 100
+
+USER GUIDANCE ADDED:
+--------------------
+
+- Discount forms: Format guidance for dates, numeric fields
+- Report date filters: Date format guidance (YYYY-MM-DD)
+- Registration form: Email format guidance
+- Product forms: Placeholder guidance for price and stock quantity
+- Cart quantity: Shows max quantity guidance
+- Email fields: All show format guidance
+
+NOTE: All validation is handled server-side using PHP. The placeholders and help text
+are provided only as user guidance. Server-side PHP validation in store.php, update.php,
+and other processing files will handle actual validation and error messages.
+
+PHP VALIDATION ADDED:
+---------------------
+
+FILE: admin/discounts/store.php
+- Validates discount code (required)
+- Validates discount value format (must be numeric >= 0)
+- Validates start date format (YYYY-MM-DD HH:MM)
+- Validates expiration date format (YYYY-MM-DD HH:MM) if provided
+- Validates min purchase amount format (numeric >= 0)
+- Validates max discount amount format (numeric >= 0)
+- Validates usage limit format (whole number >= 0)
+- Error messages show expected format
+
+FILE: admin/discounts/update.php
+- Same validations as store.php
+- Error messages show expected format
+
+FILE: admin/products/store.php
+- Validates price format (must be numeric >= 0)
+- Validates stock quantity format (must be whole number >= 0)
+- Error messages: "Price must be a valid number greater than or equal to 0."
+- Error messages: "Stock quantity must be a valid whole number greater than or equal to 0."
+
+FILE: admin/products/update.php
+- Same validations as store.php
+
+FILE: admin/reports/sales_report.php
+- Validates start date format (YYYY-MM-DD)
+- Validates end date format (YYYY-MM-DD)
+- Error message: "Start date must be in format: YYYY-MM-DD (e.g. 2025-01-01)"
+- Error message: "End date must be in format: YYYY-MM-DD (e.g. 2025-01-31)"
+- Displays error alert on page
+
+FILE: admin/reports/net_income_report.php
+- Validates start date format (YYYY-MM-DD)
+- Validates end date format (YYYY-MM-DD)
+- Error message: "Start date must be in format: YYYY-MM-DD (e.g. 2025-01-01)"
+- Error message: "End date must be in format: YYYY-MM-DD (e.g. 2025-01-31)"
+- Displays error alert on page
+
+FILE: admin/reports/expenses_report.php
+- Validates start date format (YYYY-MM-DD)
+- Validates end date format (YYYY-MM-DD)
+- Error message: "Start date must be in format: YYYY-MM-DD (e.g. 2025-01-01)"
+- Error message: "End date must be in format: YYYY-MM-DD (e.g. 2025-01-31)"
+- Displays error alert on page
+
+FILE: admin/inventory/restock.php
+- Validates quantity format (must be whole number > 0)
+- Validates cost per unit format (must be numeric >= 0)
+- Error message: "Quantity must be a valid whole number greater than 0."
+- Error message: "Cost per unit must be a valid number greater than or equal to 0."
+
+FILE: admin/suppliers/store.php
+- Validates email format if provided
+- Error message: "Please enter a valid email address (e.g. example@email.com)"
+
+FILE: admin/suppliers/update.php
+- Validates email format if provided
+- Error message: "Please enter a valid email address (e.g. example@email.com)"
+
+FILE: admin/users/store.php
+- Validates email format
+- Error message: "Please enter a valid email address (e.g. example@email.com)"
+
+FILE: user/auth/login.php
+- Validates email format
+- Error message: "Please enter a valid email address (e.g. example@email.com)"
+
+FILE: user/auth/register.php
+- Already had email validation, message improved
+- Error message: "Please enter a valid email address (e.g. example@email.com)"
+
+FILE: user/auth/forgot_password.php
+- Validates email format
+- Error message: "Please enter a valid email address (e.g. example@email.com)"
+
+FILE: user/auth/reset_password.php
+- Validates verification code format (6-digit number)
+- Error message: "Verification code must be a 6-digit number."
+
+FILE: user/cart/add.php
+- Validates quantity format (must be numeric > 0)
+- Redirects with error parameter: invalid_quantity
+
+FILE: user/cart/update.php
+- Validates quantity format (must be numeric > 0)
+- Redirects with error parameter: invalid_quantity
+
+FILE: user/cart/index.php
+- Displays error message for invalid_quantity
+- Error message: "Quantity must be a valid number greater than 0."
+
+FILE: user/products/view.php
+- Displays error message for invalid_quantity
+- Error message: "Quantity must be a valid number greater than 0."
+
+VALIDATION PATTERNS USED:
+-------------------------
+- Date (YYYY-MM-DD): /^\d{4}-\d{2}-\d{2}$/
+- DateTime (YYYY-MM-DD HH:MM): /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/
+- Email: filter_var($email, FILTER_VALIDATE_EMAIL)
+- Numeric: is_numeric() and floatval() or intval()
+- Verification code: strlen() == 6 && is_numeric()
+
+All error messages include format examples to guide users.
+

@@ -30,6 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Verification code has expired. Please request a new one.';
     } elseif (time() > $_SESSION['reset_code_expires']) {
         $error = 'Verification code has expired. Please request a new one.';
+    } elseif (strlen($verification_code) != 6 || !is_numeric($verification_code)) {
+        $error = 'Verification code must be a 6-digit number.';
     } elseif ($password !== $confirm_password) {
         $error = 'Passwords do not match.';
     } elseif (strlen($password) < 6) {
@@ -87,19 +89,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" action="">
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" value="<?php echo htmlspecialchars($reset_email); ?>" readonly>
+                            <input type="text" class="form-control" value="<?php echo htmlspecialchars($reset_email); ?>" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="verification_code" class="form-label">Verification Code</label>
-                            <input type="text" class="form-control" id="verification_code" name="verification_code" required>
+                            <input type="text" class="form-control" id="verification_code" name="verification_code">
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password">
                         </div>
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Reset Password</button>
                     </form>

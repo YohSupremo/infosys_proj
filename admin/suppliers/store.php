@@ -16,6 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
+    // Validate email format if provided
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = 'Please enter a valid email address (e.g. example@email.com)';
+        header('Location: create.php');
+        exit();
+    }
+    
     $stmt = $conn->prepare("INSERT INTO suppliers (supplier_name, contact_person, email, phone, address, is_active) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssi", $supplier_name, $contact_person, $email, $phone, $address, $is_active);
     

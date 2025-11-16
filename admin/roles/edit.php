@@ -49,7 +49,7 @@ unset($_SESSION['error']);
                         <input type="hidden" name="role_id" value="<?php echo $role_id; ?>">
                         <div class="mb-3">
                             <label for="role_name" class="form-label">Role Name *</label>
-                            <input type="text" class="form-control" id="role_name" name="role_name" value="<?php echo htmlspecialchars($role['role_name']); ?>" required>
+                            <input type="text" class="form-control" id="role_name" name="role_name" value="<?php echo htmlspecialchars($role['role_name']); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>

@@ -30,7 +30,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                     <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="category_name" class="form-label">Category Name *</label>
-                            <input type="text" class="form-control" id="category_name" name="category_name" required>
+                            <input type="text" class="form-control" id="category_name" name="category_name">
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>

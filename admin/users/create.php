@@ -30,20 +30,21 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="first_name" class="form-label">First Name *</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                <input type="text" class="form-control" id="first_name" name="first_name">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="last_name" class="form-label">Last Name *</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                <input type="text" class="form-control" id="last_name" name="last_name">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email *</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="text" class="form-control" id="email" name="email" placeholder="example@email.com">
+                            <small class="text-muted">Enter a valid email address (e.g. example@email.com)</small>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password *</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password">
                         </div>
                         <div class="mb-3">
                             <label for="contact_number" class="form-label">Contact Number</label>
@@ -51,7 +52,7 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                         </div>
                         <div class="mb-3">
                             <label for="role_id" class="form-label">Role *</label>
-                            <select class="form-select" id="role_id" name="role_id" required>
+                            <select class="form-select" id="role_id" name="role_id">
                                 <option value="0">Select Role</option>
                                 <?php while ($role = $roles->fetch_assoc()): ?>
                                     <option value="<?php echo $role['role_id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>

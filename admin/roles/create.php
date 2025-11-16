@@ -27,7 +27,7 @@ unset($_SESSION['error']);
                     <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="role_name" class="form-label">Role Name *</label>
-                            <input type="text" class="form-control" id="role_name" name="role_name" required>
+                            <input type="text" class="form-control" id="role_name" name="role_name">
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>

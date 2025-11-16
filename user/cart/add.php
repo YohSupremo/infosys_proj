@@ -17,6 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity = intval($_POST['quantity'] ?? 1);
     $user_id = $_SESSION['user_id'];
     
+    // Validate quantity format
+    if (empty($_POST['quantity']) || !is_numeric($_POST['quantity']) || intval($_POST['quantity']) < 1) {
+        header('Location: ../products/view.php?id=' . $product_id . '&error=invalid_quantity');
+        exit();
+    }
+    
     if ($product_id > 0 && $quantity > 0) {
         // Check product stock
         $product_stmt = $conn->prepare("SELECT stock_quantity FROM products WHERE product_id = ? AND is_active = 1");

@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" action="">
                         <div class="mb-3">
                             <label for="address_line1" class="form-label">Address Line 1 *</label>
-                            <input type="text" class="form-control" id="address_line1" name="address_line1" required>
+                            <input type="text" class="form-control" id="address_line1" name="address_line1">
                         </div>
                         <div class="mb-3">
                             <label for="address_line2" class="form-label">Address Line 2</label>
@@ -74,15 +74,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="mb-3">
                             <label for="city" class="form-label">City *</label>
-                            <input type="text" class="form-control" id="city" name="city" required>
+                            <input type="text" class="form-control" id="city" name="city">
                         </div>
                         <div class="mb-3">
                             <label for="state" class="form-label">State/Province *</label>
-                            <input type="text" class="form-control" id="state" name="state" required>
+                            <input type="text" class="form-control" id="state" name="state">
                         </div>
                         <div class="mb-3">
                             <label for="postal_code" class="form-label">Postal Code *</label>
-                            <input type="text" class="form-control" id="postal_code" name="postal_code" required>
+                            <input type="text" class="form-control" id="postal_code" name="postal_code">
                         </div>
                         <div class="mb-3">
                             <label for="country" class="form-label">Country</label>

@@ -7,6 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity = intval($_POST['quantity'] ?? 1);
     $user_id = $_SESSION['user_id'];
     
+    // Validate quantity format
+    if (empty($_POST['quantity']) || !is_numeric($_POST['quantity']) || intval($_POST['quantity']) < 1) {
+        header('Location: index.php?error=invalid_quantity');
+        exit();
+    }
+    
     if ($cart_item_id > 0 && $quantity > 0) {
         // Verify cart ownership and check stock
         $check_stmt = $conn->prepare("SELECT ci.cart_item_id, p.stock_quantity FROM cart_items ci JOIN shopping_cart sc ON ci.cart_id = sc.cart_id JOIN products p ON ci.product_id = p.product_id WHERE ci.cart_item_id = ? AND sc.user_id = ?");

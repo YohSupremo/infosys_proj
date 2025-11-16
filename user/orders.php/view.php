@@ -55,6 +55,7 @@ if ($order['order_status'] === 'Delivered') {
     }
     // Reset result pointer
     $items_result->data_seek(0);
+    
 }
 ?>
 

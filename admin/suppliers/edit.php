@@ -49,7 +49,7 @@ unset($_SESSION['error']);
                         <input type="hidden" name="supplier_id" value="<?php echo $supplier_id; ?>">
                         <div class="mb-3">
                             <label for="supplier_name" class="form-label">Supplier Name *</label>
-                            <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="<?php echo htmlspecialchars($supplier['supplier_name']); ?>" required>
+                            <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="<?php echo htmlspecialchars($supplier['supplier_name']); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="contact_person" class="form-label">Contact Person</label>
@@ -57,7 +57,8 @@ unset($_SESSION['error']);
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($supplier['email']); ?>">
+                            <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($supplier['email']); ?>" placeholder="example@email.com">
+                            <small class="text-muted">Enter a valid email address (e.g. example@email.com)</small>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone</label>

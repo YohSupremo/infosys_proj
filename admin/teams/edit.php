@@ -49,11 +49,11 @@ unset($_SESSION['error']);
                         <input type="hidden" name="team_id" value="<?php echo $team_id; ?>">
                         <div class="mb-3">
                             <label for="team_name" class="form-label">Team Name *</label>
-                            <input type="text" class="form-control" id="team_name" name="team_name" value="<?php echo htmlspecialchars($team['team_name']); ?>" required>
+                            <input type="text" class="form-control" id="team_name" name="team_name" value="<?php echo htmlspecialchars($team['team_name']); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="team_code" class="form-label">Team Code *</label>
-                            <input type="text" class="form-control" id="team_code" name="team_code" value="<?php echo htmlspecialchars($team['team_code']); ?>" maxlength="10" required>
+                            <input type="text" class="form-control" id="team_code" name="team_code" value="<?php echo htmlspecialchars($team['team_code']); ?>" maxlength="10">
                         </div>
                         <div class="mb-3">
                             <label for="city" class="form-label">City</label>

@@ -22,6 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
+    // Validate email format if provided
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = 'Please enter a valid email address (e.g. example@email.com)';
+        header('Location: edit.php?id=' . $supplier_id);
+        exit();
+    }
+    
     $update_stmt = $conn->prepare("UPDATE suppliers SET supplier_name = ?, contact_person = ?, email = ?, phone = ?, address = ?, is_active = ? WHERE supplier_id = ?");
     $update_stmt->bind_param("sssssii", $supplier_name, $contact_person, $email, $phone, $address, $is_active, $supplier_id);
     

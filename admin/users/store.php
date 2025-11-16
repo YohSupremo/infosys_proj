@@ -15,6 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = 'Please fill in all required fields.';
         header('Location: create.php');
         exit();
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = 'Please enter a valid email address (e.g. example@email.com)';
+        header('Location: create.php');
+        exit();
     } elseif (strlen($password) < 6) {
         $_SESSION['error'] = 'Password must be at least 6 characters long.';
         header('Location: create.php');

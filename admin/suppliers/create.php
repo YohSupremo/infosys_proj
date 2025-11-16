@@ -27,7 +27,7 @@ unset($_SESSION['error']);
                     <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="supplier_name" class="form-label">Supplier Name *</label>
-                            <input type="text" class="form-control" id="supplier_name" name="supplier_name" required>
+                            <input type="text" class="form-control" id="supplier_name" name="supplier_name">
                         </div>
                         <div class="mb-3">
                             <label for="contact_person" class="form-label">Contact Person</label>
@@ -35,7 +35,8 @@ unset($_SESSION['error']);
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email">
+                            <input type="text" class="form-control" id="email" name="email" placeholder="example@email.com">
+                            <small class="text-muted">Enter a valid email address (e.g. example@email.com)</small>
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone</label>

@@ -23,6 +23,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         foreach ($products as $index => $product_id) {
             if (!empty($quantities[$index]) && !empty($costs[$index])) {
+                // Validate quantity format
+                if (!is_numeric($quantities[$index]) || intval($quantities[$index]) < 1) {
+                    $error = 'Quantity must be a valid whole number greater than 0.';
+                    break;
+                }
+                
+                // Validate cost format
+                if (!is_numeric($costs[$index]) || floatval($costs[$index]) < 0) {
+                    $error = 'Cost per unit must be a valid number greater than or equal to 0.';
+                    break;
+                }
+                
                 $quantity = intval($quantities[$index]);
                 $cost = floatval($costs[$index]);
                 $subtotal = $quantity * $cost;
@@ -143,11 +155,13 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Quantity *</label>
-                                        <input type="number" class="form-control" name="quantities[]" min="1">
+                                        <input type="text" class="form-control" name="quantities[]" placeholder="e.g. 50">
+                                        <small class="text-muted">Enter a whole number</small>
                                     </div>
                                     <div class="col-md-3 mb-2">
                                         <label class="form-label">Cost per Unit *</label>
-                                        <input type="number" class="form-control" name="costs[]" step="0.01" min="0">
+                                        <input type="text" class="form-control" name="costs[]" placeholder="e.g. 25.50">
+                                        <small class="text-muted">Enter a number (e.g. 25.50)</small>
                                     </div>
                                     <div class="col-md-1 mb-2">
                                         <label class="form-label">&nbsp;</label>

@@ -51,7 +51,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE category_id != $categ
                         <input type="hidden" name="category_id" value="<?php echo $category_id; ?>">
                         <div class="mb-3">
                             <label for="category_name" class="form-label">Category Name *</label>
-                            <input type="text" class="form-control" id="category_name" name="category_name" value="<?php echo htmlspecialchars($category['category_name']); ?>" required>
+                            <input type="text" class="form-control" id="category_name" name="category_name" value="<?php echo htmlspecialchars($category['category_name']); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>

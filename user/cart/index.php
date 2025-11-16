@@ -47,6 +47,7 @@ $cart_stmt->close();
             <?php 
             if ($error === 'insufficient_stock') echo 'Insufficient stock available.';
             elseif ($error === 'product_not_found') echo 'Product not found.';
+            elseif ($error === 'invalid_quantity') echo 'Quantity must be a valid number greater than 0.';
             else echo 'An error occurred.';
             ?>
         </div>
@@ -78,9 +79,12 @@ $cart_stmt->close();
                                     <div class="col-md-3">
                                         <form method="POST" action="update.php" class="d-inline">
                                             <input type="hidden" name="cart_item_id" value="<?php echo $item['cart_item_id']; ?>">
-                                            <div class="input-group">
-                                                <input type="number" class="form-control" name="quantity" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['stock_quantity']; ?>" required>
-                                                <button type="submit" class="btn btn-outline-primary">Update</button>
+                                            <div>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" name="quantity" value="<?php echo $item['quantity']; ?>" placeholder="Enter quantity">
+                                                    <button type="submit" class="btn btn-outline-primary">Update</button>
+                                                </div>
+                                                <small class="text-muted">Enter a number (max: <?php echo $item['stock_quantity']; ?>)</small>
                                             </div>
                                         </form>
                                     </div>

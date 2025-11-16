@@ -12,8 +12,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $categories = $_POST['categories'] ?? [];
     
-    if (empty($product_name) || $price <= 0) {
-        $_SESSION['error'] = 'Product name and price are required.';
+    // Validation
+    if (empty($product_name)) {
+        $_SESSION['error'] = 'Product name is required.';
+        header('Location: create.php');
+        exit();
+    }
+    
+    // Validate price format
+    if (empty($_POST['price']) || !is_numeric($_POST['price']) || floatval($_POST['price']) < 0) {
+        $_SESSION['error'] = 'Price must be a valid number greater than or equal to 0.';
+        header('Location: create.php');
+        exit();
+    }
+    
+    if ($price <= 0) {
+        $_SESSION['error'] = 'Price must be greater than 0.';
+        header('Location: create.php');
+        exit();
+    }
+    
+    // Validate stock quantity format
+    if (empty($_POST['stock_quantity']) || !is_numeric($_POST['stock_quantity']) || intval($_POST['stock_quantity']) < 0) {
+        $_SESSION['error'] = 'Stock quantity must be a valid whole number greater than or equal to 0.';
         header('Location: create.php');
         exit();
     }

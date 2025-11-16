@@ -31,8 +31,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_product = $product_result->fetch_assoc();
     $get_product->close();
     
-    if (empty($product_name) || $price <= 0) {
-        $_SESSION['error'] = 'Product name and price are required.';
+    // Validation
+    if (empty($product_name)) {
+        $_SESSION['error'] = 'Product name is required.';
+        header('Location: edit.php?id=' . $product_id);
+        exit();
+    }
+    
+    // Validate price format
+    if (empty($_POST['price']) || !is_numeric($_POST['price']) || floatval($_POST['price']) < 0) {
+        $_SESSION['error'] = 'Price must be a valid number greater than or equal to 0.';
+        header('Location: edit.php?id=' . $product_id);
+        exit();
+    }
+    
+    if ($price <= 0) {
+        $_SESSION['error'] = 'Price must be greater than 0.';
+        header('Location: edit.php?id=' . $product_id);
+        exit();
+    }
+    
+    // Validate stock quantity format
+    if (empty($_POST['stock_quantity']) || !is_numeric($_POST['stock_quantity']) || intval($_POST['stock_quantity']) < 0) {
+        $_SESSION['error'] = 'Stock quantity must be a valid whole number greater than or equal to 0.';
         header('Location: edit.php?id=' . $product_id);
         exit();
     }

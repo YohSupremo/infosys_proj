@@ -6,8 +6,8 @@ requireAdmin();
 
 $discounts = $conn->query("SELECT dc.*, (SELECT COUNT(*) FROM discount_usage du WHERE du.discount_id = dc.discount_id) AS times_used FROM discount_codes dc ORDER BY dc.created_at DESC");
 ?>
-
-<?php include '../../includes/admin_navbar.php'; ?>
+ 
+<?php include '../../includes/admin_navbar.php';?>
 
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">

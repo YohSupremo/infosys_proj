@@ -4,8 +4,26 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
 
+$error = '';
 $start_date = sanitize($_GET['start_date'] ?? date('Y-m-01'));
 $end_date = sanitize($_GET['end_date'] ?? date('Y-m-d'));
+
+// Validate date formats if provided
+if (!empty($_GET['start_date'])) {
+    $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
+    if (!preg_match($datePattern, $start_date)) {
+        $error = 'Start date must be in format: YYYY-MM-DD (e.g. 2025-01-01)';
+        $start_date = date('Y-m-01');
+    }
+}
+
+if (!empty($_GET['end_date'])) {
+    $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
+    if (!preg_match($datePattern, $end_date)) {
+        $error = 'End date must be in format: YYYY-MM-DD (e.g. 2025-01-31)';
+        $end_date = date('Y-m-d');
+    }
+}
 
 $sales_query = "SELECT o.*, u.first_name, u.last_name FROM orders o JOIN users u ON o.user_id = u.user_id WHERE o.order_status != 'Cancelled' AND DATE(o.order_date) BETWEEN ? AND ? ORDER BY o.order_date DESC";
 $stmt = $conn->prepare($sales_query);
@@ -27,17 +45,23 @@ $sales_result->data_seek(0);
 <div class="container my-5">
     <h2 class="mb-4">Sales Report</h2>
     
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?php echo $error; ?></div>
+    <?php endif; ?>
+    
     <div class="card mb-4">
         <div class="card-body">
             <form method="GET" action="">
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="start_date" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="start_date" name="start_date" value="<?php echo $start_date; ?>">
+                        <input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo $start_date; ?>" placeholder="YYYY-MM-DD">
+                        <small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-01)</small>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="end_date" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="end_date" name="end_date" value="<?php echo $end_date; ?>">
+                        <input type="text" class="form-control" id="end_date" name="end_date" value="<?php echo $end_date; ?>" placeholder="YYYY-MM-DD">
+                        <small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-31)</small>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">&nbsp;</label>

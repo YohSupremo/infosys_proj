@@ -11,7 +11,8 @@ $products_list = $conn->query("SELECT * FROM products WHERE is_active = 1 ORDER 
 $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY category_name");
 ?>
 
-<?php include '../../includes/admin_navbar.php'; ?>
+<?php include '../../includes/admin_navbar.php'; 
+  ?>
 
 <div class="container my-5">
     <h2 class="mb-4">Add New Discount</h2>
@@ -30,7 +31,8 @@ $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 OR
                     <form method="POST" action="store.php">
                         <div class="mb-3">
                             <label for="code" class="form-label">Discount Code *</label>
-                            <input type="text" class="form-control" id="code" name="code" required>
+                            <input type="text" class="form-control" id="code" name="code" placeholder="Enter discount code">
+                            <small class="text-muted">Required field</small>
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
@@ -39,33 +41,37 @@ $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 OR
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="discount_type" class="form-label">Discount Type *</label>
-                                <select class="form-select" id="discount_type" name="discount_type" required>
+                                <select class="form-select" id="discount_type" name="discount_type">
                                     <option value="percentage">Percentage</option>
                                     <option value="fixed_amount">Fixed Amount</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="discount_value" class="form-label">Discount Value *</label>
-                                <input type="number" class="form-control" id="discount_value" name="discount_value" step="0.01" min="0" required>
+                                <input type="text" class="form-control" id="discount_value" name="discount_value" placeholder="e.g. 10 or 10.50">
+                                <small class="text-muted">Enter a number (e.g. 10 for 10% or ₱10.50)</small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="min_purchase_amount" class="form-label">Min Purchase Amount</label>
-                                <input type="number" class="form-control" id="min_purchase_amount" name="min_purchase_amount" step="0.01" min="0" value="0">
+                                <input type="text" class="form-control" id="min_purchase_amount" name="min_purchase_amount" value="0" placeholder="e.g. 100.00">
+                                <small class="text-muted">Enter a number (e.g. 100.00)</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="max_discount_amount" class="form-label">Max Discount Amount</label>
-                                <input type="number" class="form-control" id="max_discount_amount" name="max_discount_amount" step="0.01" min="0">
+                                <input type="text" class="form-control" id="max_discount_amount" name="max_discount_amount" placeholder="e.g. 50.00">
+                                <small class="text-muted">Enter a number (e.g. 50.00)</small>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="usage_limit" class="form-label">Usage Limit (0 for unlimited)</label>
-                            <input type="number" class="form-control" id="usage_limit" name="usage_limit" min="0" value="0">
+                            <input type="text" class="form-control" id="usage_limit" name="usage_limit" value="0" placeholder="e.g. 100">
+                            <small class="text-muted">Enter a whole number (0 = unlimited)</small>
                         </div>
                         <div class="mb-3">
                             <label for="applies_to" class="form-label">Applies To *</label>
-                            <select class="form-select" id="applies_to" name="applies_to" required>
+                            <select class="form-select" id="applies_to" name="applies_to">
                                 <option value="all">All Products</option>
                                 <option value="specific_products">Specific Products</option>
                                 <option value="specific_categories">Specific Categories</option>
@@ -90,11 +96,13 @@ $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 OR
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="start_date" class="form-label">Start Date *</label>
-                                <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+                                <input type="text" class="form-control" id="start_date" name="start_date" placeholder="YYYY-MM-DD HH:MM">
+                                <small class="text-muted">Format: YYYY-MM-DD HH:MM (e.g. 2025-01-15 10:30)</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="expiration_date" class="form-label">Expiration Date</label>
-                                <input type="datetime-local" class="form-control" id="expiration_date" name="expiration_date">
+                                <input type="text" class="form-control" id="expiration_date" name="expiration_date" placeholder="YYYY-MM-DD HH:MM">
+                                <small class="text-muted">Format: YYYY-MM-DD HH:MM (e.g. 2025-12-31 23:59)</small>
                             </div>
                         </div>
                         <div class="mb-3 form-check">
