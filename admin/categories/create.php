@@ -14,7 +14,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
 <?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Add New Category</h2>
+    <h2 class="mb-4">Add New CAtegory</h2>
     
     <div class="row">
         <div class="col-md-6">
