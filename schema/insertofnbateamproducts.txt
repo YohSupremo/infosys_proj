@@ -20,7 +20,6 @@ INSERT INTO products (product_id, team_id, product_name, description, price, sto
 -- Boston Celtics Product Images
 INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES
 (1, 'assets/images/products/bostonproducts/bos1a.png', 1, 0),
-(1, 'assets/images/products/bostonproducts/bos1b.png', 0, 1),
 (2, 'assets/images/products/bostonproducts/bos2a.png', 1, 0),
 (2, 'assets/images/products/bostonproducts/bos2b.png', 0, 1),
 (3, 'assets/images/products/bostonproducts/bos3a.png', 1, 0),

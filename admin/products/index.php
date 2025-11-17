@@ -43,7 +43,7 @@ $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_
                                             <span class="text-muted">No image</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?php echo htmlspecialchars($product['product_name']); ?></td>
+                                    <td><?php echo ($product['product_name']); ?></td>
                                     <td><?php echo htmlspecialchars($product['team_name'] ?: 'N/A'); ?></td>
                                     <td>₱<?php echo number_format($product['price'], 2); ?></td>
                                     <td><?php echo $product['stock_quantity']; ?></td>

@@ -79,11 +79,11 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                         <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
                         <div class="mb-3">
                             <label for="product_name" class="form-label">Product Name *</label>
-                            <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo htmlspecialchars($product['product_name']); ?>">
+                            <input type="text" class="form-control" id="product_name" name="product_name" value="<?php echo ($product['product_name']); ?>">
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4"><?php echo htmlspecialchars($product['description']); ?></textarea>
+                            <textarea class="form-control" id="description" name="description" rows="4"><?php echo ($product['description']); ?></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">

@@ -99,7 +99,7 @@ $recent_restocks = $conn->query("SELECT ih.*, p.product_name FROM inventory_hist
 		</div>
 	</div>
 </div>
-
+`
 <?php include '../includes/foot.php'; ?>
 
 
