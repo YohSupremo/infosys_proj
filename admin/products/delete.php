@@ -6,51 +6,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_id = intval($_POST['product_id'] ?? 0);
     
     if ($product_id > 0) {
-        // HARD DELETE: remove dependent rows first to satisfy foreign keys
-
-        // Delete inventory history for this product
-        $history_stmt = $conn->prepare("DELETE FROM inventory_history WHERE product_id = ?");
+        // First check if product is referenced in inventory_history
+        $history_stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM inventory_history WHERE product_id = ?");
         $history_stmt->bind_param("i", $product_id);
         $history_stmt->execute();
+        $history_result = $history_stmt->get_result();
+        $history_row = $history_result->fetch_assoc();
+        $history_count = $history_row ? intval($history_row['cnt']) : 0;
         $history_stmt->close();
 
-        // Delete restocking items that reference this product
-        $restock_items_stmt = $conn->prepare("DELETE FROM restocking_items WHERE product_id = ?");
-        $restock_items_stmt->bind_param("i", $product_id);
-        $restock_items_stmt->execute();
-        $restock_items_stmt->close();
-
-        // Delete order items that reference this product
-        $orders_stmt = $conn->prepare("DELETE FROM order_items WHERE product_id = ?");
+        // Also check if product is referenced in order_items
+        $orders_stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM order_items WHERE product_id = ?");
         $orders_stmt->bind_param("i", $product_id);
         $orders_stmt->execute();
+        $orders_result = $orders_stmt->get_result();
+        $orders_row = $orders_result->fetch_assoc();
+        $orders_count = $orders_row ? intval($orders_row['cnt']) : 0;
         $orders_stmt->close();
 
-        // Delete cart items that reference this product
-        $cart_stmt = $conn->prepare("DELETE FROM cart_items WHERE product_id = ?");
-        $cart_stmt->bind_param("i", $product_id);
-        $cart_stmt->execute();
-        $cart_stmt->close();
-
-        // Get image URL before deleting product row
-        $stmt = $conn->prepare("SELECT image_url FROM products WHERE product_id = ?");
-        $stmt->bind_param("i", $product_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $product = $result->fetch_assoc();
-            // Delete image file if exists
-            if ($product['image_url'] && file_exists('../../' . $product['image_url'])) {
-                unlink('../../' . $product['image_url']);
+        if ($history_count > 0 || $orders_count > 0) {
+            // Do not delete if there is related history or orders
+            $_SESSION['error'] = 'Cannot delete this product because it has related inventory history or order records. You may set it to Inactive instead.';
+        } else {
+            // Get image URL before deleting
+            $stmt = $conn->prepare("SELECT image_url FROM products WHERE product_id = ?");
+            $stmt->bind_param("i", $product_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $product = $result->fetch_assoc();
+                // Delete image file if exists
+                if ($product['image_url'] && file_exists('../../' . $product['image_url'])) {
+                    unlink('../../' . $product['image_url']);
+                }
             }
+            $stmt->close();
+            
+            // Safe to delete product
+            $delete_stmt = $conn->prepare("DELETE FROM products WHERE product_id = ?");
+            $delete_stmt->bind_param("i", $product_id);
+            $delete_stmt->execute();
+            $delete_stmt->close();
         }
-        $stmt->close();
-        
-        // Now delete the product itself (other related tables use ON DELETE CASCADE)
-        $delete_stmt = $conn->prepare("DELETE FROM products WHERE product_id = ?");
-        $delete_stmt->bind_param("i", $product_id);
-        $delete_stmt->execute();
-        $delete_stmt->close();
     }
 }
 
