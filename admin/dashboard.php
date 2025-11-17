@@ -35,6 +35,7 @@ $stats['low_stock'] = $result->fetch_assoc()['count'];
 
 // Recent orders
 $recent_orders = $conn->query("SELECT o.*, u.first_name, u.last_name FROM orders o JOIN users u ON o.user_id = u.user_id ORDER BY o.order_date DESC LIMIT 5");
+
 ?>
 
 <?php include '../includes/admin_navbar.php'; ?>
@@ -135,7 +136,10 @@ $recent_orders = $conn->query("SELECT o.*, u.first_name, u.last_name FROM orders
                                         <a href="orders/view.php?id=<?php echo $order['order_id']; ?>" class="btn btn-sm btn-primary">View</a>
                                     </td>
                                 </tr>
+
+                           
                             <?php endwhile; ?>
+                             
                         </tbody>
                     </table>
                 </div>

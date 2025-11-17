@@ -4,52 +4,7 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireLogin();
 
-$bad_words = [
-    "fuck", "shit", "bitch", "asshole",
-    "putangina", "gago", "punyeta", "tarantado",
-    "hayop", "leche", "walang hiya", "pakshet"
-];
 
-function censorText($text, $bad_words) {
-    // Map common character substitutions for obfuscation (e.g., "sh1t", "f*ck")
-    $sub_map = [
-        'a' => '[a@4]',
-        'i' => '[i1!|]',
-        'o' => '[o0]',
-        'e' => '[e3]',
-        's' => '[s5$z]',
-        'u' => '[uüv]',
-        't' => '[t7+]',
-    ];
-
-    foreach ($bad_words as $word) {
-        // Escape regex special characters based on delimiter '/'
-        $escaped = preg_quote($word, '/');
-
-        // Allow flexible spaces in multi-word phrases (e.g., "walang hiya")
-        $escaped = str_replace('\ ', '\s+', $escaped);
-
-        // Add fuzzy matching for character substitutions
-        $pattern_chars = '';
-        foreach (str_split($escaped) as $ch) {
-            $lower = strtolower($ch);
-            if (isset($sub_map[$lower])) {
-                $pattern_chars .= $sub_map[$lower];
-            } else {
-                $pattern_chars .= $ch;
-            }
-        }
-
-        // Build full regex pattern
-        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
-
-        // Replace matches with asterisks (same length as original word)
-        $replacement = str_repeat('*', mb_strlen($word));
-        $text = preg_replace($pattern, $replacement, $text);
-    }
-
-    return $text;
-}
 
 $product_id = intval($_GET['product_id'] ?? 0);
 $order_id = intval($_GET['order_id'] ?? 0);
