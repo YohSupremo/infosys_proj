@@ -111,7 +111,7 @@ if ($has_filter) {
 	</div>
 
 	<div class="row mb-4">
-		<div class="col-md-3">
+		<div class="col-md-6">
 			<div class="card stats-card">
 				<div class="card-body">
 					<div class="number">₱<?php echo number_format($total_expenses, 2); ?></div>
