@@ -38,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please select a status.';
     } elseif (!in_array($new_status, ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'])) {
         $error = 'Invalid status selected.';
+    } elseif ($order['order_status'] === 'Delivered' && $new_status !== 'Delivered') {
+        // Once delivered, status should no longer be changed
+        $error = 'Delivered orders can no longer be updated.';
     } else {
         $old_status = $order['order_status'];
         $update_stmt = $conn->prepare("UPDATE orders SET order_status = ? WHERE order_id = ?");

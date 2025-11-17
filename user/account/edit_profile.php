@@ -5,8 +5,9 @@ include '../../includes/header.php';
 requireLogin();
 
 $user_id = $_SESSION['user_id'];
-$error = '';
-$success = '';
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+$success = isset($_SESSION['success']) ? $_SESSION['success'] : '';
+unset($_SESSION['error'], $_SESSION['success']);
 
 $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
@@ -14,71 +15,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $stmt->close();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $first_name = sanitize($_POST['first_name'] ?? '');
-    $last_name = sanitize($_POST['last_name'] ?? '');
-    $contact_number = sanitize($_POST['contact_number'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-    
-    // Server-side validation
-    if (empty($first_name) || empty($last_name)) {
-        $error = 'First name and last name are required.';
-    } elseif (!empty($password) && $password !== $confirm_password) {
-        $error = 'Passwords do not match.';
-    } elseif (!empty($password) && strlen($password) < 6) {
-        $error = 'Password must be at least 6 characters long.';
-    } else {
-        // Handle profile photo upload
-        $profile_photo = $user['profile_photo'];
-        if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = '../../assets/images/profiles/';
-            if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-            
-            $file_ext = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
-            $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
-            
-            if (in_array($file_ext, $allowed_exts)) {
-                $new_filename = uniqid() . '.' . $file_ext;
-                $upload_path = $upload_dir . $new_filename;
-                
-                if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $upload_path)) {
-                    // Delete old photo if exists
-                    if ($profile_photo && file_exists('../../' . $profile_photo)) {
-                        unlink('../../' . $profile_photo);
-                    }
-                    $profile_photo = 'assets/images/profiles/' . $new_filename;
-                }
-            }
-        }
-        
-        // Update query - include password if provided
-        if (!empty($password)) {
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, profile_photo = ?, password_hash = ? WHERE user_id = ?");
-            $update_stmt->bind_param("sssssi", $first_name, $last_name, $contact_number, $profile_photo, $password_hash, $user_id);
-        } else {
-            $update_stmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, contact_number = ?, profile_photo = ? WHERE user_id = ?");
-            $update_stmt->bind_param("ssssi", $first_name, $last_name, $contact_number, $profile_photo, $user_id);
-        }
-        
-        if ($update_stmt->execute()) {
-            $_SESSION['first_name'] = $first_name;
-            $_SESSION['last_name'] = $last_name;
-            $success = 'Profile updated successfully!';
-            $user['first_name'] = $first_name;
-            $user['last_name'] = $last_name;
-            $user['contact_number'] = $contact_number;
-            $user['profile_photo'] = $profile_photo;
-        } else {
-            $error = 'Failed to update profile.';
-        }
-        $update_stmt->close();
-    }
-}
 ?>
 
 <?php include '../../includes/navbar.php'; ?>
@@ -100,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="alert alert-success"><?php echo $success; ?></div>
                     <?php endif; ?>
                     
-                    <form method="POST" action="" enctype="multipart/form-data">
+                    <form method="POST" action="update_profile.php" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="first_name" class="form-label">First Name *</label>
                             <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>">

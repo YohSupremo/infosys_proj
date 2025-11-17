@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_name = sanitize($_POST['product_name'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
     $price = floatval($_POST['price'] ?? 0);
-    $stock_quantity = intval($_POST['stock_quantity'] ?? 0);
     $team_id = intval($_POST['team_id'] ?? 0);
     $team_id = $team_id > 0 ? $team_id : null;
     $is_active = isset($_POST['is_active']) ? 1 : 0;
@@ -51,13 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Validate stock quantity format
-    if (empty($_POST['stock_quantity']) || !is_numeric($_POST['stock_quantity']) || intval($_POST['stock_quantity']) < 0) {
-        $_SESSION['error'] = 'Stock quantity must be a valid whole number greater than or equal to 0.';
-        header('Location: edit.php?id=' . $product_id);
-        exit();
-    }
-    
     $image_url = $current_product['image_url'];
     
     // Handle image upload
@@ -84,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    $update_stmt = $conn->prepare("UPDATE products SET team_id = ?, product_name = ?, description = ?, price = ?, stock_quantity = ?, image_url = ?, is_active = ? WHERE product_id = ?");
-    $update_stmt->bind_param("issdissi", $team_id, $product_name, $description, $price, $stock_quantity, $image_url, $is_active, $product_id);
+    $update_stmt = $conn->prepare("UPDATE products SET team_id = ?, product_name = ?, description = ?, price = ?, image_url = ?, is_active = ? WHERE product_id = ?");
+    $update_stmt->bind_param("issdssi", $team_id, $product_name, $description, $price, $image_url, $is_active, $product_id);
     
     if ($update_stmt->execute()) {
         $update_stmt->close();

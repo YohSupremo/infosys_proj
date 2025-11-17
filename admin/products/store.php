@@ -6,7 +6,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_name = sanitize($_POST['product_name'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
     $price = floatval($_POST['price'] ?? 0);
-    $stock_quantity = intval($_POST['stock_quantity'] ?? 0);
     $team_id = intval($_POST['team_id'] ?? 0);
     $team_id = $team_id > 0 ? $team_id : null;
     $is_active = isset($_POST['is_active']) ? 1 : 0;
@@ -32,13 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Validate stock quantity format
-    if (empty($_POST['stock_quantity']) || !is_numeric($_POST['stock_quantity']) || intval($_POST['stock_quantity']) < 0) {
-        $_SESSION['error'] = 'Stock quantity must be a valid whole number greater than or equal to 0.';
-        header('Location: create.php');
-        exit();
-    }
-    
     // Handle single image upload (for backward compatibility)
     $image_url = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -60,8 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    $stmt = $conn->prepare("INSERT INTO products (team_id, product_name, description, price, stock_quantity, image_url, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issdiss", $team_id, $product_name, $description, $price, $stock_quantity, $image_url, $is_active);
+    // New products will start with zero stock. Stock will be managed through Inventory and Restock screens.
+    $stmt = $conn->prepare("INSERT INTO products (team_id, product_name, description, price, image_url, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issdsi", $team_id, $product_name, $description, $price, $image_url, $is_active);
     
     if ($stmt->execute()) {
         $product_id = $conn->insert_id;

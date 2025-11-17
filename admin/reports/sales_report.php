@@ -25,7 +25,17 @@ if (!empty($_GET['end_date'])) {
     }
 }
 
-$sales_query = "SELECT o.*, u.first_name, u.last_name FROM orders o JOIN users u ON o.user_id = u.user_id WHERE o.order_status != 'Cancelled' AND DATE(o.order_date) BETWEEN ? AND ? ORDER BY o.order_date DESC";
+$sales_query = "SELECT o.*, u.first_name, u.last_name 
+                FROM orders o 
+                JOIN users u ON o.user_id = u.user_id 
+                WHERE 
+                    (
+                        (o.payment_method LIKE 'Cash%' AND o.order_status = 'Delivered')
+                        OR
+                        (o.payment_method NOT LIKE 'Cash%' AND o.order_status != 'Cancelled')
+                    )
+                    AND DATE(o.order_date) BETWEEN ? AND ?
+                ORDER BY o.order_date DESC";
 $stmt = $conn->prepare($sales_query);
 $stmt->bind_param("ss", $start_date, $end_date);
 $stmt->execute();

@@ -6,7 +6,11 @@ requireLogin();
 
 $user_id = $_SESSION['user_id'];
 
-$orders_stmt = $conn->prepare("SELECT o.*, ua.address_line1, ua.city, ua.state FROM orders o JOIN user_addresses ua ON o.address_id = ua.address_id WHERE o.user_id = ? ORDER BY o.order_date DESC");
+$orders_stmt = $conn->prepare("SELECT order_id, order_date, order_status, total_amount, address_line1, city, state 
+    FROM v_order_details 
+    WHERE user_id = ? 
+    GROUP BY order_id 
+    ORDER BY order_date DESC");
 $orders_stmt->bind_param("i", $user_id);
 $orders_stmt->execute();
 $orders_result = $orders_stmt->get_result();
@@ -22,7 +26,6 @@ $orders_result = $orders_stmt->get_result();
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Order ID</th>
                         <th>Date</th>
                         <th>Shipping Address</th>
                         <th>Total Amount</th>
@@ -33,7 +36,6 @@ $orders_result = $orders_stmt->get_result();
                 <tbody>
                     <?php while ($order = $orders_result->fetch_assoc()): ?>
                         <tr>
-                            <td>#<?php echo $order['order_id']; ?></td>
                             <td><?php echo date('M d, Y', strtotime($order['order_date'])); ?></td>
                             <td><?php echo htmlspecialchars($order['address_line1'] . ', ' . $order['city'] . ', ' . $order['state']); ?></td>
                             <td>₱<?php echo number_format($order['total_amount'], 2); ?></td>

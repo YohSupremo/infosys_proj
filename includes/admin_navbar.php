@@ -97,7 +97,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                     <ul class="dropdown-menu">
 						<?php if ($is_admin): ?>
 						<li><a class="dropdown-item" href="<?= $base_url ?>/admin/reports/sales_report.php"><i class="bi bi-cash-stack"></i> Sales</a></li>
-						<li><a class="dropdown-item" href="<?= $base_url ?>/admin/reports/order_details_report.php"><i class="bi bi-receipt-cutoff"></i> Order Details</a></li>
 						<?php endif; ?>
                         <li><a class="dropdown-item" href="<?= $base_url ?>/admin/reports/inventory_report.php"><i class="bi bi-box-seam"></i> Inventory</a></li>
 						<?php if ($is_admin): ?>

@@ -12,30 +12,41 @@ if (!$order_id) {
     exit();
 }
 
-// Get order
-$order_stmt = $conn->prepare("SELECT o.*, ua.* FROM orders o JOIN user_addresses ua ON o.address_id = ua.address_id WHERE o.order_id = ? AND o.user_id = ?");
-$order_stmt->bind_param("ii", $order_id, $user_id);
-$order_stmt->execute();
-$order_result = $order_stmt->get_result();
+// Fetch order and item details using view plus product image
+$details_stmt = $conn->prepare("SELECT v.*, p.image_url 
+    FROM v_order_details v 
+    LEFT JOIN products p ON v.product_id = p.product_id 
+    WHERE v.order_id = ? AND v.user_id = ?");
+$details_stmt->bind_param("ii", $order_id, $user_id);
+$details_stmt->execute();
+$details_result = $details_stmt->get_result();
 
-if ($order_result->num_rows === 0) {
+if ($details_result->num_rows === 0) {
     header('Location: index.php');
     exit();
 }
 
-$order = $order_result->fetch_assoc();
-$order_stmt->close();
+// First row holds order-level info
+$rows = [];
+while ($row = $details_result->fetch_assoc()) {
+    $rows[] = $row;
+}
+$details_stmt->close();
 
-// Get order items
-$items_stmt = $conn->prepare("SELECT oi.*, p.image_url FROM order_items oi LEFT JOIN products p ON oi.product_id = p.product_id WHERE oi.order_id = ?");
-$items_stmt->bind_param("i", $order_id);
-$items_stmt->execute();
-$items_result = $items_stmt->get_result();
+$order = $rows[0];
+
+// Items come from rows that have order_item_id
+$items = [];
+foreach ($rows as $row) {
+    if (!empty($row['order_item_id'])) {
+        $items[] = $row;
+    }
+}
 
 // Check which products can be reviewed (only if order is Delivered)
 $can_review_products = [];
 if ($order['order_status'] === 'Delivered') {
-    while ($item = $items_result->fetch_assoc()) {
+    foreach ($items as $item) {
         // Check if review already exists for this product and order
         $review_check = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? AND order_id = ?");
         $review_check->bind_param("iii", $user_id, $item['product_id'], $order_id);
@@ -53,9 +64,6 @@ if ($order['order_status'] === 'Delivered') {
         
         $review_check->close();
     }
-    // Reset result pointer
-    $items_result->data_seek(0);
-    
 }
 ?>
 
@@ -82,7 +90,7 @@ if ($order['order_status'] === 'Delivered') {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while ($item = $items_result->fetch_assoc()): ?>
+                            <?php foreach ($items as $item): ?>
                                 <tr>
 									<td style="width:60px">
 										<?php
@@ -114,7 +122,7 @@ if ($order['order_status'] === 'Delivered') {
                                         <?php endif; ?>
                                     </td>
                                 </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>

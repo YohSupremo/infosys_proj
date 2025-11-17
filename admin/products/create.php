@@ -45,11 +45,6 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                                 <input type="text" class="form-control" id="price" name="price" value="<?php echo htmlspecialchars($_POST['price'] ?? ''); ?>" placeholder="e.g. 99.99">
                                 <small class="text-muted">Enter a number (e.g. 99.99)</small>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="stock_quantity" class="form-label">Stock Quantity *</label>
-                                <input type="text" class="form-control" id="stock_quantity" name="stock_quantity" value="<?php echo htmlspecialchars($_POST['stock_quantity'] ?? ''); ?>" placeholder="e.g. 100">
-                                <small class="text-muted">Enter a whole number (e.g. 100)</small>
-                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="team_id" class="form-label">Team</label>

@@ -34,10 +34,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
         $check_stmt->close();
-        
+
+        // Handle optional profile photo upload
+        $profile_photo = null;
+        if (isset($_FILES['profile_photo']) && isset($_FILES['profile_photo']['tmp_name']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = '../../assets/images/profiles/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            $file_ext = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
+            $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
+            if (in_array($file_ext, $allowed_exts)) {
+                $new_filename = uniqid() . '.' . $file_ext;
+                $upload_path_fs = $upload_dir . $new_filename;
+                if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $upload_path_fs)) {
+                    $profile_photo = 'assets/images/profiles/' . $new_filename;
+                }
+            }
+        }
+
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO users (role_id, email, password_hash, first_name, last_name, contact_number, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssssi", $role_id, $email, $password_hash, $first_name, $last_name, $contact_number, $is_active);
+        if ($profile_photo) {
+            $stmt = $conn->prepare("INSERT INTO users (role_id, email, password_hash, first_name, last_name, contact_number, profile_photo, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("issssssi", $role_id, $email, $password_hash, $first_name, $last_name, $contact_number, $profile_photo, $is_active);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO users (role_id, email, password_hash, first_name, last_name, contact_number, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("isssssi", $role_id, $email, $password_hash, $first_name, $last_name, $contact_number, $is_active);
+        }
         
         if ($stmt->execute()) {
             $stmt->close();

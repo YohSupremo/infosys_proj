@@ -7,6 +7,9 @@ requireAdminOrInventoryManager();
 $error = '';
 $success = '';
 $product_id = intval($_GET['product_id'] ?? 0);
+if (isset($_GET['success']) && $_GET['success'] == 1) {
+    $success = 'Stock adjusted successfully!';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_id = intval($_POST['product_id'] ?? 0);
@@ -49,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $inv_stmt->close();
                 
                 $success = 'Stock adjusted successfully!';
-                header('Location: ' . BASE_URL . '/admin/inventory/index.php?success=1');
+                header('Location: ' . BASE_URL . '/admin/inventory/adjust_stock.php?product_id=' . $product_id . '&success=1');
                 exit();
             }
         }
@@ -144,20 +147,6 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                             <textarea class="form-control" id="adjustment_notes" name="adjustment_notes" rows="3" placeholder="Reason for adjustment (e.g., damaged items, found stock, etc.)"><?php echo htmlspecialchars($_POST['adjustment_notes'] ?? ''); ?></textarea>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label">New Stock (Preview)</label>
-                            <div class="form-control" id="newStockDisplay">
-                                <?php 
-                                if ($product && isset($_POST['quantity_change'])) {
-                                    $preview = $product['stock_quantity'] + intval($_POST['quantity_change']);
-                                    echo $preview >= 0 ? $preview : 'Invalid (would be negative)';
-                                } else {
-                                    echo 'Enter quantity change';
-                                }
-                                ?>
-                            </div>
-                        </div>
-                        
                         <button type="submit" class="btn btn-primary">Apply Adjustment</button>
                         <a href="<?php echo BASE_URL; ?>/admin/inventory/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
@@ -173,36 +162,15 @@ function updateStockInfo() {
     const selectedOption = select.options[select.selectedIndex];
     const currentStock = selectedOption.getAttribute('data-stock') || '0';
     document.getElementById('currentStockDisplay').textContent = currentStock;
-    updateNewStockPreview();
 }
 
 function setQuantityChange(value) {
     const input = document.getElementById('quantity_change');
     const current = parseInt(input.value) || 0;
     input.value = current + value;
-    updateNewStockPreview();
 }
 
-function updateNewStockPreview() {
-    const select = document.getElementById('product_id');
-    const quantityInput = document.getElementById('quantity_change');
-    const selectedOption = select.options[select.selectedIndex];
-    const currentStock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
-    const quantityChange = parseInt(quantityInput.value) || 0;
-    const newStock = currentStock + quantityChange;
-    
-    const preview = document.getElementById('newStockDisplay');
-    if (newStock < 0) {
-        preview.textContent = 'Invalid (would be negative)';
-        preview.style.color = 'red';
-    } else {
-        preview.textContent = newStock;
-        preview.style.color = '';
-    }
-}
-
-// Update preview when quantity changes
-document.getElementById('quantity_change').addEventListener('input', updateNewStockPreview);
+// Update when product changes
 document.getElementById('product_id').addEventListener('change', updateStockInfo);
 
 // Initialize on page load

@@ -51,6 +51,11 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                             <input type="text" class="form-control" id="contact_number" name="contact_number">
                         </div>
                         <div class="mb-3">
+                            <label class="form-label d-block">Profile Photo</label>
+                            <input type="file" class="form-control" name="profile_photo" accept="image/*">
+                            <small class="text-muted">Upload a JPG/PNG/GIF image. Max ~2MB.</small>
+                        </div>
+                        <div class="mb-3">
                             <label for="role_id" class="form-label">Role *</label>
                             <select class="form-select" id="role_id" name="role_id">
                                 <option value="0">Select Role</option>

@@ -5,7 +5,6 @@ include '../../includes/header.php';
 
 $error = '';
 $success = '';
-$reactivate = '';
 $redirect_message = '';
 
 // Check for redirect message
@@ -14,76 +13,59 @@ if (isset($_SESSION['redirect_message'])) {
     unset($_SESSION['redirect_message']);
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    if(isset($_POST['login'])){
-    $email = sanitize($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    
-    // Server-side validation
-    if (empty($email) || empty($password)) {
-        $error = 'Please fill in all fields.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Please enter a valid email address (e.g. example@email.com)';
-    } else {
-        $stmt = $conn->prepare("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.email = ? AND (u.is_active = 1 OR u.is_active = 0)");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    if (isset($_POST['login'])) {
+        $email = sanitize($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
         
-        if ($result->num_rows === 1) {
-            $user = $result->fetch_assoc();
-            if (password_verify($password, $user['password_hash'])) {
-
-                if($user['is_active'] == 1){
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['first_name'] = $user['first_name'];
-                $_SESSION['last_name'] = $user['last_name'];
-                $_SESSION['role_name'] = $user['role_name'];
-                $_SESSION['role_id'] = $user['role_id'];
-                
-                // Check if there's a redirect after login (e.g., from add to cart)
-                if (isset($_SESSION['redirect_after_login'])) {
-                    $redirect_url = $_SESSION['redirect_after_login'];
-                    unset($_SESSION['redirect_after_login']);
-                    header('Location: ' . $redirect_url);
-                } elseif ($user['role_id'] === 1) {
-                    header('Location: ' . BASE_URL . '/admin/dashboard.php');
-                } else if($user['role_id'] == 2) {
-                    header('Location: ' . BASE_URL . '/admin/inventory_dashboard.php');
+        // Server-side validation
+        if (empty($email) || empty($password)) {
+            $error = 'Please fill in all fields.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Please enter a valid email address (e.g. example@email.com)';
+        } else {
+            $stmt = $conn->prepare("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+                if (password_verify($password, $user['password_hash'])) {
+                    if ($user['is_active'] == 1) {
+                        $_SESSION['user_id'] = $user['user_id'];
+                        $_SESSION['email'] = $user['email'];
+                        $_SESSION['first_name'] = $user['first_name'];
+                        $_SESSION['last_name'] = $user['last_name'];
+                        $_SESSION['role_name'] = $user['role_name'];
+                        $_SESSION['role_id'] = $user['role_id'];
+                        
+                        // Check if there's a redirect after login (e.g., from add to cart)
+                        if (isset($_SESSION['redirect_after_login'])) {
+                            $redirect_url = $_SESSION['redirect_after_login'];
+                            unset($_SESSION['redirect_after_login']);
+                            header('Location: ' . $redirect_url);
+                        } elseif ($user['role_id'] === 1) {
+                            header('Location: ' . BASE_URL . '/admin/dashboard.php');
+                        } else if ($user['role_id'] == 2) {
+                            header('Location: ' . BASE_URL . '/admin/inventory_dashboard.php');
+                        } else {
+                             header('Location: ' . BASE_URL . '/index.php');
+                        }
+                        exit();
+                    } else {
+                        $error = 'Your account is deactivated. Please contact the administrator to reactivate your account.';
+                    }
                 } else {
-                     header('Location: ' . BASE_URL . '/index.php');
+                    $error = 'Invalid email or password.';
                 }
-                exit();
-                } else{
-                    $reactivate = 'Are you sure do you want to reactivate your account?';
-                    $_SESSION['reactivate_user_id'] = $user['user_id'];
-                }
-             
             } else {
                 $error = 'Invalid email or password.';
             }
-        } else {
-            $error = 'Invalid email or password.';
+            $stmt->close();
         }
-        $stmt->close();
-    }
-} else if (isset($_POST['reactivate'])){
-
-    $user_id =(int)($_SESSION['reactivate_user_id']);
-    
-    if($user_id > 0){
-        $stmt = $conn -> prepare("UPDATE users SET is_active = 1 WHERE user_id = ?");
-        $stmt -> bind_param("i", $user_id);
-        $stmt -> execute();
-    }
-}  elseif(isset($_POST['cancel'])){
-        unset($_SESSION['reactivate_user_id']);
-        $reactivate = '';
     }
 }
 ?>
-
 <?php include '../../includes/navbar.php'; ?>
 
 <div class="container my-5">
@@ -106,12 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php if ($success): ?>
                         <div class="alert alert-success"><?php echo $success; ?></div>
                     <?php endif; ?>
-                    <?php if ($reactivate) :?>
-                        <div class="alert alert-success"><?php echo $reactivate; ?> </div>
-                    <?php endif; ?>
                     
                     <form method="POST" action="">
-                        <?php if(empty($reactivate)) {?>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="text" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" placeholder="example@email.com">
@@ -127,15 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="mt-2 text-center">
                         <p>Don't have an account? <a href="<?php echo BASE_URL; ?>/user/auth/register.php">Register here</a></p>
-                    </div class="mt-3 text-center">
-                        <?php } else { ?>
-                    <div class="d-grid gap-2">
-                     
-                           <button class="btn btn-primary" type="submit" name="reactivate"> Reactivate </button>
-                           <button class="btn btn-secondary" type="submit"> Cancel </button>
                     </div>
-
-                    <?php } ?>
                     </form>
                     
                   

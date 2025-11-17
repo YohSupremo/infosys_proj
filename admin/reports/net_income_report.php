@@ -29,13 +29,28 @@ if (!empty($end_date)) {
     }
 }
 
-// Revenue: orders not Cancelled (optionally filtered by order_date)
+// Revenue: 
+// - Cash payments are counted only when the order is Delivered.
+// - Non-cash (e.g., GCash, online) payments are counted immediately unless Cancelled.
 $total_revenue = 0;
 if ($has_filter) {
-	$rev_stmt = $conn->prepare("SELECT SUM(total_amount) AS total_revenue FROM orders WHERE order_status != 'Cancelled' AND order_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)");
+	$rev_stmt = $conn->prepare("SELECT SUM(total_amount) AS total_revenue 
+        FROM orders 
+        WHERE 
+            (
+                (payment_method LIKE 'Cash%' AND order_status = 'Delivered')
+                OR
+                (payment_method NOT LIKE 'Cash%' AND order_status != 'Cancelled')
+            )
+            AND order_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)");
 	$rev_stmt->bind_param("ss", $start_date, $end_date);
 } else {
-	$rev_stmt = $conn->prepare("SELECT SUM(total_amount) AS total_revenue FROM orders WHERE order_status != 'Cancelled'");
+	$rev_stmt = $conn->prepare("SELECT SUM(total_amount) AS total_revenue 
+        FROM orders 
+        WHERE 
+            (payment_method LIKE 'Cash%' AND order_status = 'Delivered')
+            OR
+            (payment_method NOT LIKE 'Cash%' AND order_status != 'Cancelled')");
 }
 $rev_stmt->execute();
 $rev_res = $rev_stmt->get_result();
@@ -64,7 +79,15 @@ $exp_stmt->close();
 $net_income = $total_revenue - $total_expenses;
 
 // Recent period summaries (last 30 days)
-$rev30_stmt = $conn->prepare("SELECT SUM(total_amount) AS revenue_30 FROM orders WHERE order_status != 'Cancelled' AND order_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+$rev30_stmt = $conn->prepare("SELECT SUM(total_amount) AS revenue_30 
+    FROM orders 
+    WHERE 
+        (
+            (payment_method LIKE 'Cash%' AND order_status = 'Delivered')
+            OR
+            (payment_method NOT LIKE 'Cash%' AND order_status != 'Cancelled')
+        )
+        AND order_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
 $rev30_stmt->execute();
 $rev30 = $rev30_stmt->get_result()->fetch_assoc();
 $revenue_30 = $rev30 && $rev30['revenue_30'] ? floatval($rev30['revenue_30']) : 0;

@@ -4,6 +4,10 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
 
+// Read any error message from previous actions (e.g., delete failures)
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+unset($_SESSION['error']);
+
 $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id ORDER BY p.created_at DESC");
 ?>
 
@@ -15,6 +19,10 @@ $products = $conn->query("SELECT p.*, t.team_name FROM products p LEFT JOIN nba_
         <a href="create.php" class="btn btn-primary">Add New Product</a>
     </div>
     
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?php echo $error; ?></div>
+    <?php endif; ?>
+
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">

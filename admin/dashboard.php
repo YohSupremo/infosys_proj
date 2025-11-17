@@ -21,9 +21,19 @@ $result = $conn->query("SELECT COUNT(*) as count FROM users");
 $stats['users'] = $result->fetch_assoc()['count'];
 
 // Total revenue
-$result = $conn->query("SELECT SUM(total_amount) as total FROM orders WHERE order_status != 'Cancelled'");
-$revenue = $result->fetch_assoc()['total'];
-$stats['revenue'] = $revenue ? $revenue : 0;
+// Cash payments are counted only when Delivered.
+// Non-cash payments are counted when not Cancelled.
+$result = $conn->query("
+    SELECT SUM(total_amount) AS total 
+    FROM orders 
+    WHERE 
+        (payment_method LIKE 'Cash%' AND order_status = 'Delivered')
+        OR
+        (payment_method NOT LIKE 'Cash%' AND order_status != 'Cancelled')
+");
+$row = $result->fetch_assoc();
+$revenue = $row && $row['total'] ? $row['total'] : 0;
+$stats['revenue'] = $revenue;
 
 // Pending orders
 $result = $conn->query("SELECT COUNT(*) as count FROM orders WHERE order_status = 'Pending'");
