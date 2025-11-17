@@ -10,7 +10,7 @@ $bad_words = [
 
 function censorText($text, $bad_words) {
     $sub_map = [
-        'a' => '[a@4]',
+        'a' => '[a@4á]',
         'i' => '[i1!|]',
         'o' => '[o0]',
         'e' => '[e3]',
@@ -19,24 +19,25 @@ function censorText($text, $bad_words) {
         't' => '[t7+]',
     ];
 
-    foreach ($bad_words as $word) {
-        $escaped = preg_quote($word, '/');
-        $escaped = str_replace('\ ', '\s+', $escaped);
-
-        $pattern_chars = '';
-        foreach (str_split($escaped) as $ch) {
-            $lower = strtolower($ch);
-            if (isset($sub_map[$lower])) {
-                $pattern_chars .= $sub_map[$lower];
-            } else {
-                $pattern_chars .= $ch;
+        foreach ($bad_words as $word) {
+            $escaped = preg_quote($word, '/');
+          
+    //w a l a n g \ s + h i y a
+            $pattern_chars = '';
+            foreach (str_split($escaped) as $ch) {
+                $lower = strtolower($ch);
+                if (isset($sub_map[$lower])) {
+                    $pattern_chars .= $sub_map[$lower];
+                } else {
+                    $pattern_chars .= $ch;
+                }
             }
-        }
+                 $pattern_chars = preg_replace('/\s+/', '\\s+', $pattern_chars);    
 
-        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
-        $replacement = str_repeat('*', mb_strlen($word));
-        $text = preg_replace($pattern, $replacement, $text);
-    }
+            $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
+            $replacement = str_repeat('*', mb_strlen($word));
+            $text = preg_replace($pattern, $replacement, $text);
+        }
 
     return $text;
 }

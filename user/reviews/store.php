@@ -10,18 +10,18 @@ $bad_words = [
 
 function censorText($text, $bad_words) {
     $sub_map = [
-        'a' => '[a@4]',
-        'i' => '[i1!|]',
-        'o' => '[o0]',
-        'e' => '[e3]',
-        's' => '[s5$z]',
-        'u' => '[uüv]',
-        't' => '[t7+]',
+      'a' => '[a@4áàâäãåā]',  
+    'i' => '[i1!|íìîïī]',   
+    'o' => '[o0óòôöõō]',   
+    'e' => '[e3éèêëē]',    
+    'u' => '[uüúùûū]',      
+    's' => '[s5$z]',
+    't' => '[t7+]',
     ];
 
     foreach ($bad_words as $word) {
         $escaped = preg_quote($word, '/');
-        $escaped = str_replace('\ ', '\s+', $escaped);
+      
 
         $pattern_chars = '';
         foreach (str_split($escaped) as $ch) {
@@ -32,7 +32,7 @@ function censorText($text, $bad_words) {
                 $pattern_chars .= $ch;
             }
         }
-
+       $pattern_chars = preg_replace('/\s+/', '\\s+', $pattern_chars);    
         $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
         $replacement = str_repeat('*', mb_strlen($word));
         $text = preg_replace($pattern, $replacement, $text);
