@@ -83,7 +83,7 @@ $recent_restocks = $conn->query("SELECT ih.*, p.product_name FROM inventory_hist
 						<tbody>
 							<?php while ($row = $recent_restocks->fetch_assoc()): ?>
 								<tr>
-									<td><?php echo htmlspecialchars($row['product_name']); ?></td>
+									<td><?php echo ($row['product_name']); ?></td>
 									<td><span class="badge bg-success"><?php echo intval($row['quantity_change']); ?></span></td>
 									<td><?php echo intval($row['previous_stock']); ?></td>
 									<td><?php echo intval($row['new_stock']); ?></td>

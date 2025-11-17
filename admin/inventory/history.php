@@ -73,7 +73,7 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                             <?php while ($item = $history->fetch_assoc()): ?>
                                 <tr>
                                     <td><?php echo date('M d, Y h:i A', strtotime($item['created_at'])); ?></td>
-                                    <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                                    <td><?php echo ($item['product_name']); ?></td>
                                     <td>
                                         <?php
                                         $type_class = 'bg-info text-dark';
