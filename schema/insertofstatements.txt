@@ -1,508 +1,241 @@
--- NBA Apparel E-Commerce Database Schema
--- Normalized database design with proper relationships including M:N
+-- ============================================
+-- STEP 1: SUPPLIERS
+-- Uses 'INSERT IGNORE' to skip if IDs 201-203 already exist
+-- ============================================
+INSERT IGNORE INTO suppliers (supplier_id, supplier_name, contact_person, email, phone, address, is_active, created_at, updated_at) VALUES
+(201, 'NBA Official Supply Co.', 'Mara Lopez', 'ops@nbaofficialsupply.com', '+63-2-555-1001', '120 Aurora Blvd, Quezon City', 1, '2025-08-20', '2025-08-20'),
+(202, 'CourtSide Merch Distributors', 'Liam Santos', 'sales@courtsidedistributors.com', '+63-2-555-1002', '45 Pioneer St, Mandaluyong', 1, '2025-08-20', '2025-08-20'),
+(203, 'Premium Hardwood Logistics', 'Ivy Dizon', 'hello@hardwoodlogistics.com', '+63-2-555-1003', '88 Commerce Ave, Makati', 1, '2025-08-20', '2025-08-20');
 
 -- ============================================
--- USER MANAGEMENT
+-- STEP 2: RESTOCKING TRANSACTIONS (The Invoices)
+-- Important: This assumes you have a User ID 1 (Manager) in your database.
 -- ============================================
-
--- User Roles Table
-
-create database infosys;
-use infosys;
-
-CREATE TABLE roles (
-    role_id INT PRIMARY KEY AUTO_INCREMENT,
-    role_name VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Users Table
-CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    role_id INT NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    contact_number VARCHAR(20),
-    profile_photo VARCHAR(500) DEFAULT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (role_id) REFERENCES roles(role_id)
-);
-
--- User Addresses Table (supports multiple addresses per user)
-CREATE TABLE user_addresses (
-    address_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    address_line1 VARCHAR(255) NOT NULL,
-    address_line2 VARCHAR(255),
-    city VARCHAR(100) NOT NULL,
-    state VARCHAR(100) NOT NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    country VARCHAR(100) NOT NULL DEFAULT 'Philippines',
-    is_default BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-
--- ============================================
--- PRODUCT MANAGEMENT
--- ============================================
-
--- NBA Teams Table
-CREATE TABLE nba_teams (
-    team_id INT PRIMARY KEY AUTO_INCREMENT,
-    team_name VARCHAR(100) NOT NULL UNIQUE,
-    team_code VARCHAR(10) NOT NULL UNIQUE,
-    city VARCHAR(100),
-    conference VARCHAR(20),
-    division VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Product Categories Table
-CREATE TABLE categories (
-    category_id INT PRIMARY KEY AUTO_INCREMENT,
-    category_name VARCHAR(100) NOT NULL UNIQUE,
-    description TEXT,
-    parent_category_id INT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (parent_category_id) REFERENCES categories(category_id)
-);
-
--- Products Table
-CREATE TABLE products (
-    product_id INT PRIMARY KEY AUTO_INCREMENT,
-    team_id INT,
-    product_name VARCHAR(255) NOT NULL,
-    description TEXT,
-    price DECIMAL(10, 2) NOT NULL,
-    stock_quantity INT NOT NULL DEFAULT 0,
-    image_url VARCHAR(500),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (team_id) REFERENCES nba_teams(team_id),
-    CHECK (price >= 0),
-    CHECK (stock_quantity >= 0)
-);
-
--- Product-Category Junction Table (Many-to-Many)
--- Allows products to belong to multiple categories
-CREATE TABLE product_categories (
-    product_id INT NOT NULL,
-    category_id INT NOT NULL,
-    is_primary BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (product_id, category_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
-);
-
--- Product Images Table (Multiple Photos - MP1)
-CREATE TABLE product_images (
-    image_id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id INT NOT NULL,
-    image_url VARCHAR(500) NOT NULL,
-    is_primary BOOLEAN DEFAULT FALSE,
-    display_order INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
-);
+INSERT IGNORE INTO restocking_transactions (restock_id, supplier_id, manager_id, total_cost, restock_date, notes) VALUES
+(5001, 201, 1, 70650.00, '2025-09-10 09:00:00', 'Initial Inventory - Bos T-Shirts'),
+(5002, 201, 1, 74190.00, '2025-09-10 09:05:00', 'Initial Inventory - Bos Hats'),
+(5003, 201, 1, 79470.00, '2025-09-10 09:10:00', 'Initial Inventory - Bos Statement'),
+(5004, 201, 1, 176640.00, '2025-09-10 09:15:00', 'Initial Inventory - Bos Jacket'),
+(5005, 201, 1, 70650.00, '2025-09-10 09:20:00', 'Initial Inventory - Bos Connected'),
+(5006, 202, 1, 79470.00, '2025-09-11 09:00:00', 'Initial Inventory - Bucks Tee'),
+(5007, 202, 1, 44160.00, '2025-09-11 09:05:00', 'Initial Inventory - Bucks Plush'),
+(5008, 202, 1, 105990.00, '2025-09-11 09:10:00', 'Initial Inventory - Bucks Shorts'),
+(5009, 202, 1, 60060.00, '2025-09-11 09:15:00', 'Initial Inventory - Bucks Hat'),
+(5010, 202, 1, 211980.00, '2025-09-11 09:20:00', 'Initial Inventory - Giannis City'),
+(5011, 202, 1, 61830.00, '2025-09-12 09:00:00', 'Initial Inventory - Bulls Women Tee'),
+(5012, 202, 1, 238500.00, '2025-09-12 09:05:00', 'Initial Inventory - Jordan Retro'),
+(5013, 202, 1, 141330.00, '2025-09-12 09:10:00', 'Initial Inventory - Rodman Mesh'),
+(5014, 202, 1, 74190.00, '2025-09-12 09:15:00', 'Initial Inventory - Bulls Jam Hat'),
+(5015, 202, 1, 167850.00, '2025-09-12 09:20:00', 'Initial Inventory - GT Cut Shoe'),
+(5016, 202, 1, 238500.00, '2025-09-13 09:00:00', 'Initial Inventory - Lebron 08 Jersey'),
+(5017, 202, 1, 97170.00, '2025-09-13 09:05:00', 'Initial Inventory - Cavs 2016 Tee'),
+(5018, 202, 1, 318000.00, '2025-09-13 09:10:00', 'Initial Inventory - Lebron Hoodie'),
+(5019, 202, 1, 150180.00, '2025-09-13 09:15:00', 'Initial Inventory - Cavs Shorts'),
+(5020, 202, 1, 61830.00, '2025-09-13 09:20:00', 'Initial Inventory - Cavs Gold Hat'),
+(5021, 203, 1, 211980.00, '2025-09-14 09:00:00', 'Initial Inventory - Kyrie Mavs'),
+(5022, 203, 1, 79500.00, '2025-09-14 09:05:00', 'Initial Inventory - Mavs LS Tee'),
+(5023, 203, 1, 167850.00, '2025-09-14 09:10:00', 'Initial Inventory - GT Cut Teal'),
+(5024, 203, 1, 74190.00, '2025-09-14 09:15:00', 'Initial Inventory - Mavs Fitted'),
+(5025, 203, 1, 211980.00, '2025-09-14 09:20:00', 'Initial Inventory - Flagg Custom'),
+(5026, 203, 1, 70650.00, '2025-09-15 09:00:00', 'Initial Inventory - Nuggets TieDye'),
+(5027, 203, 1, 60060.00, '2025-09-15 09:05:00', 'Initial Inventory - Nuggets Script'),
+(5028, 203, 1, 211980.00, '2025-09-15 09:10:00', 'Initial Inventory - Jamal Murray'),
+(5029, 203, 1, 44160.00, '2025-09-15 09:15:00', 'Initial Inventory - Jokic Plush'),
+(5030, 203, 1, 211980.00, '2025-09-15 09:20:00', 'Initial Inventory - Murray City'),
+(5031, 203, 1, 211980.00, '2025-09-16 09:00:00', 'Initial Inventory - Curry Assoc'),
+(5032, 203, 1, 105990.00, '2025-09-16 09:05:00', 'Initial Inventory - GSW Shorts'),
+(5033, 203, 1, 141330.00, '2025-09-16 09:10:00', 'Initial Inventory - GSW Hoodie'),
+(5034, 203, 1, 61830.00, '2025-09-16 09:15:00', 'Initial Inventory - GSW A-Frame'),
+(5035, 203, 1, 88320.00, '2025-09-16 09:20:00', 'Initial Inventory - GSW Retro Tee'),
+(5036, 202, 1, 79470.00, '2025-09-17 09:00:00', 'Initial Inventory - Jaquez Tee'),
+(5037, 202, 1, 70650.00, '2025-09-17 09:05:00', 'Initial Inventory - Heat Red Tee'),
+(5038, 202, 1, 70650.00, '2025-09-17 09:10:00', 'Initial Inventory - Heat Script Tee'),
+(5039, 202, 1, 74190.00, '2025-09-17 09:15:00', 'Initial Inventory - Heat Gothic Hat'),
+(5040, 202, 1, 44160.00, '2025-09-17 09:20:00', 'Initial Inventory - Butler Plush'),
+(5041, 201, 1, 211980.00, '2025-09-18 09:00:00', 'Initial Inventory - Clarkson Custom'),
+(5042, 201, 1, 159000.00, '2025-09-18 09:05:00', 'Initial Inventory - Knicks Hoodie'),
+(5043, 201, 1, 74190.00, '2025-09-18 09:10:00', 'Initial Inventory - Knicks Script Hat'),
+(5044, 201, 1, 132510.00, '2025-09-18 09:15:00', 'Initial Inventory - Knicks Baseball'),
+(5045, 201, 1, 211980.00, '2025-09-18 09:20:00', 'Initial Inventory - Brunson Jersey'),
+(5046, 203, 1, 211980.00, '2025-09-19 09:00:00', 'Initial Inventory - Lebron Icon'),
+(5047, 203, 1, 211980.00, '2025-09-19 09:05:00', 'Initial Inventory - Doncic Custom'),
+(5048, 203, 1, 211980.00, '2025-09-19 09:10:00', 'Initial Inventory - Reaves Jersey'),
+(5049, 203, 1, 61830.00, '2025-09-19 09:15:00', 'Initial Inventory - Taco Hat'),
+(5050, 203, 1, 296550.00, '2025-09-19 09:20:00', 'Initial Inventory - GT Hustle Volt'),
+(5051, 201, 1, 67110.00, '2025-09-20 09:00:00', 'Initial Inventory - Nets Crop'),
+(5052, 201, 1, 61830.00, '2025-09-20 09:05:00', 'Initial Inventory - Nets Script Hat'),
+(5053, 201, 1, 74190.00, '2025-09-20 09:10:00', 'Initial Inventory - Nets City Hat'),
+(5054, 201, 1, 238500.00, '2025-09-21 09:00:00', 'Initial Inventory - Iverson 01'),
+(5055, 201, 1, 238500.00, '2025-09-21 09:05:00', 'Initial Inventory - Iverson 02'),
+(5056, 201, 1, 44160.00, '2025-09-21 09:10:00', 'Initial Inventory - Maxey Plush'),
+(5057, 201, 1, 211980.00, '2025-09-21 09:15:00', 'Initial Inventory - Embiid Jersey'),
+(5058, 201, 1, 70650.00, '2025-09-21 09:20:00', 'Initial Inventory - 76ers Blackout'),
+(5059, 202, 1, 211980.00, '2025-09-22 09:00:00', 'Initial Inventory - Durant Custom'),
+(5060, 202, 1, 296550.00, '2025-09-22 09:05:00', 'Initial Inventory - GT Hustle Sail'),
+(5061, 202, 1, 74190.00, '2025-09-22 09:10:00', 'Initial Inventory - H-Town Hat'),
+(5062, 202, 1, 70650.00, '2025-09-22 09:15:00', 'Initial Inventory - Rockets DriFit'),
+(5063, 203, 1, 211980.00, '2025-09-23 09:00:00', 'Initial Inventory - Harper Custom'),
+(5064, 203, 1, 77850.00, '2025-09-23 09:05:00', 'Initial Inventory - Spurs Script Hat'),
+(5065, 203, 1, 211980.00, '2025-09-23 09:10:00', 'Initial Inventory - Wemby Assoc'),
+(5066, 203, 1, 21000.00, '2025-09-23 09:15:00', 'Initial Inventory - Wemby Funko'),
+(5067, 203, 1, 62850.00, '2025-09-23 09:20:00', 'Initial Inventory - Spurs Scribble'),
+(5068, 203, 1, 79470.00, '2025-09-24 09:00:00', 'Initial Inventory - Suns Cream Tee'),
+(5069, 203, 1, 159000.00, '2025-09-24 09:05:00', 'Initial Inventory - Suns Hoodie'),
+(5070, 203, 1, 211980.00, '2025-09-24 09:10:00', 'Initial Inventory - Booker Jersey'),
+(5071, 203, 1, 60000.00, '2025-09-24 09:15:00', 'Initial Inventory - The Valley Hat'),
+(5072, 203, 1, 141330.00, '2025-09-24 09:20:00', 'Initial Inventory - Suns Shorts');
 
 -- ============================================
--- DISCOUNT MANAGEMENT
+-- STEP 3: RESTOCKING ITEMS (Line Items)
 -- ============================================
+INSERT IGNORE INTO restocking_items (restock_item_id, restock_id, product_id, quantity, cost_per_unit, subtotal) VALUES
+(6001, 5001, 1, 50, 1413.00, 70650.00),
+(6002, 5002, 2, 50, 1483.80, 74190.00),
+(6003, 5003, 3, 50, 1589.40, 79470.00),
+(6004, 5004, 4, 50, 3532.80, 176640.00),
+(6005, 5005, 5, 50, 1413.00, 70650.00),
+(6006, 5006, 6, 50, 1589.40, 79470.00),
+(6007, 5007, 7, 50, 883.20, 44160.00),
+(6008, 5008, 8, 50, 2119.80, 105990.00),
+(6009, 5009, 9, 50, 1201.20, 60060.00),
+(6010, 5010, 10, 50, 4239.60, 211980.00),
+(6011, 5011, 11, 50, 1236.60, 61830.00),
+(6012, 5012, 12, 50, 4770.00, 238500.00),
+(6013, 5013, 13, 50, 2826.60, 141330.00),
+(6014, 5014, 14, 50, 1483.80, 74190.00),
+(6015, 5015, 15, 50, 3357.00, 167850.00),
+(6016, 5016, 16, 50, 4770.00, 238500.00),
+(6017, 5017, 17, 50, 1943.40, 97170.00),
+(6018, 5018, 18, 50, 6360.00, 318000.00),
+(6019, 5019, 19, 50, 3003.60, 150180.00),
+(6020, 5020, 20, 50, 1236.60, 61830.00),
+(6021, 5021, 21, 50, 4239.60, 211980.00),
+(6022, 5022, 22, 50, 1590.00, 79500.00),
+(6023, 5023, 23, 50, 3357.00, 167850.00),
+(6024, 5024, 24, 50, 1483.80, 74190.00),
+(6025, 5025, 25, 50, 4239.60, 211980.00),
+(6026, 5026, 26, 50, 1413.00, 70650.00),
+(6027, 5027, 27, 50, 1201.20, 60060.00),
+(6028, 5028, 28, 50, 4239.60, 211980.00),
+(6029, 5029, 29, 50, 883.20, 44160.00),
+(6030, 5030, 30, 50, 4239.60, 211980.00),
+(6031, 5031, 31, 50, 4239.60, 211980.00),
+(6032, 5032, 32, 50, 2119.80, 105990.00),
+(6033, 5033, 33, 50, 2826.60, 141330.00),
+(6034, 5034, 34, 50, 1236.60, 61830.00),
+(6035, 5035, 35, 50, 1766.40, 88320.00),
+(6036, 5036, 36, 50, 1589.40, 79470.00),
+(6037, 5037, 37, 50, 1413.00, 70650.00),
+(6038, 5038, 38, 50, 1413.00, 70650.00),
+(6039, 5039, 39, 50, 1483.80, 74190.00),
+(6040, 5040, 40, 50, 883.20, 44160.00),
+(6041, 5041, 41, 50, 4239.60, 211980.00),
+(6042, 5042, 42, 50, 3180.00, 159000.00),
+(6043, 5043, 43, 50, 1483.80, 74190.00),
+(6044, 5044, 44, 50, 2650.20, 132510.00),
+(6045, 5045, 45, 50, 4239.60, 211980.00),
+(6046, 5046, 46, 50, 4239.60, 211980.00),
+(6047, 5047, 47, 50, 4239.60, 211980.00),
+(6048, 5048, 48, 50, 4239.60, 211980.00),
+(6049, 5049, 49, 50, 1236.60, 61830.00),
+(6050, 5050, 50, 50, 5931.00, 296550.00),
+(6051, 5051, 51, 50, 1342.20, 67110.00),
+(6052, 5052, 52, 50, 1236.60, 61830.00),
+(6053, 5053, 53, 50, 1483.80, 74190.00),
+(6054, 5054, 54, 50, 4770.00, 238500.00),
+(6055, 5055, 55, 50, 4770.00, 238500.00),
+(6056, 5056, 56, 50, 883.20, 44160.00),
+(6057, 5057, 57, 50, 4239.60, 211980.00),
+(6058, 5058, 58, 50, 1413.00, 70650.00),
+(6059, 5059, 59, 50, 4239.60, 211980.00),
+(6060, 5060, 60, 50, 5931.00, 296550.00),
+(6061, 5061, 61, 50, 1483.80, 74190.00),
+(6062, 5062, 62, 50, 1413.00, 70650.00),
+(6063, 5063, 63, 50, 4239.60, 211980.00),
+(6064, 5064, 64, 50, 1557.00, 77850.00),
+(6065, 5065, 65, 50, 4239.60, 211980.00),
+(6066, 5066, 66, 50, 420.00, 21000.00),
+(6067, 5067, 67, 50, 1257.00, 62850.00),
+(6068, 5068, 68, 50, 1589.40, 79470.00),
+(6069, 5069, 69, 50, 3180.00, 159000.00),
+(6070, 5070, 70, 50, 4239.60, 211980.00),
+(6071, 5071, 71, 50, 1200.00, 60000.00),
+(6072, 5072, 72, 50, 2826.60, 141330.00);
 
--- Discount Codes Table
-CREATE TABLE discount_codes (
-    discount_id INT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    discount_type ENUM('percentage', 'fixed_amount') NOT NULL,
-    discount_value DECIMAL(10, 2) NOT NULL,
-    min_purchase_amount DECIMAL(10, 2) DEFAULT 0,
-    max_discount_amount DECIMAL(10, 2),
-    usage_limit INT,
-    times_used INT DEFAULT 0,
-    applies_to ENUM('all', 'specific_products', 'specific_categories') DEFAULT 'all',
-    start_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    expiration_date TIMESTAMP NULL DEFAULT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CHECK (discount_value > 0),
-    CHECK (usage_limit IS NULL OR usage_limit > 0)
-);
-
--- Discount-Product Junction Table (Many-to-Many)
--- Defines which products a discount applies to
-CREATE TABLE discount_products (
-    discount_id INT NOT NULL,
-    product_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (discount_id, product_id),
-    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
-);
-
--- Discount-Category Junction Table (Many-to-Many)
--- Defines which categories a discount applies to
-CREATE TABLE discount_categories (
-    discount_id INT NOT NULL,
-    category_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (discount_id, category_id),
-    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
-);
-
--- ============================================
--- SHOPPING CART
--- ============================================
-
--- Shopping Cart Table
-CREATE TABLE shopping_cart (
-    cart_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_cart (user_id)
-);
-
--- Cart Items Table
-CREATE TABLE cart_items (
-    cart_item_id INT PRIMARY KEY AUTO_INCREMENT,
-    cart_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cart_id) REFERENCES shopping_cart(cart_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id),
-    CHECK (quantity > 0),
-    UNIQUE KEY unique_cart_product (cart_id, product_id)
-);
-
--- ============================================
--- ORDER MANAGEMENT
--- ============================================
-
--- Orders Table
-CREATE TABLE orders (
-    order_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    address_id INT NOT NULL,
-    discount_id INT,
-    order_status ENUM('Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled') DEFAULT 'Pending',
-    payment_method VARCHAR(50) DEFAULT 'Cash on Delivery',
-    subtotal DECIMAL(10, 2) NOT NULL,
-    discount_amount DECIMAL(10, 2) DEFAULT 0,
-    total_amount DECIMAL(10, 2) NOT NULL,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (address_id) REFERENCES user_addresses(address_id),
-    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id),
-    CHECK (subtotal >= 0),
-    CHECK (discount_amount >= 0),
-    CHECK (total_amount >= 0)
-);
-
--- Order Items Table
-CREATE TABLE order_items (
-    order_item_id INT PRIMARY KEY AUTO_INCREMENT,
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    product_name VARCHAR(255) NOT NULL,
-    quantity INT NOT NULL,
-    unit_price DECIMAL(10, 2) NOT NULL,
-    subtotal DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id),
-    CHECK (quantity > 0),
-    CHECK (unit_price >= 0),
-    CHECK (subtotal >= 0)
-);
-
--- Order Status History Table
-CREATE TABLE order_status_history (
-    history_id INT PRIMARY KEY AUTO_INCREMENT,
-    order_id INT NOT NULL,
-    old_status VARCHAR(50),
-    new_status VARCHAR(50) NOT NULL,
-    changed_by INT,
-    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    notes TEXT,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (changed_by) REFERENCES users(user_id)
-);
-
--- Discount Usage Tracking
-CREATE TABLE discount_usage (
-    usage_id INT PRIMARY KEY AUTO_INCREMENT,
-    discount_id INT NOT NULL,
-    user_id INT NOT NULL,
-    order_id INT NOT NULL,
-    discount_amount DECIMAL(10, 2) NOT NULL,
-    used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (discount_id) REFERENCES discount_codes(discount_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
-);
 
 -- ============================================
--- INVENTORY & SUPPLIER MANAGEMENT
+-- STEP 4: INVENTORY HISTORY (The Ledger)
 -- ============================================
-
--- Suppliers Table
-CREATE TABLE suppliers (
-    supplier_id INT PRIMARY KEY AUTO_INCREMENT,
-    supplier_name VARCHAR(255) NOT NULL,
-    contact_person VARCHAR(255),
-    email VARCHAR(255),
-    phone VARCHAR(20),
-    address TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Supplier-Product Junction Table (Many-to-Many)
--- Tracks which suppliers provide which products
-CREATE TABLE supplier_products (
-    supplier_id INT NOT NULL,
-    product_id INT NOT NULL,
-    cost_per_unit DECIMAL(10, 2) NOT NULL,
-    is_preferred BOOLEAN DEFAULT FALSE,
-    last_supplied_date TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (supplier_id, product_id),
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
-    CHECK (cost_per_unit >= 0)
-);
-
--- Restocking Transactions Table
-CREATE TABLE restocking_transactions (
-    restock_id INT PRIMARY KEY AUTO_INCREMENT,
-    supplier_id INT NOT NULL,
-    manager_id INT NOT NULL,
-    total_cost DECIMAL(10, 2) NOT NULL,
-    restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    notes TEXT,
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id),
-    FOREIGN KEY (manager_id) REFERENCES users(user_id),
-    CHECK (total_cost >= 0)
-);
-
--- Restocking Items Table
-CREATE TABLE restocking_items (
-    restock_item_id INT PRIMARY KEY AUTO_INCREMENT,
-    restock_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    cost_per_unit DECIMAL(10, 2) NOT NULL,
-    subtotal DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (restock_id) REFERENCES restocking_transactions(restock_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id),
-    CHECK (quantity > 0),
-    CHECK (cost_per_unit >= 0),
-    CHECK (subtotal >= 0)
-);
-
--- Inventory History Table
-CREATE TABLE inventory_history (
-    history_id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id INT NOT NULL,
-    transaction_type ENUM('restock', 'sale', 'adjustment') NOT NULL,
-    quantity_change INT NOT NULL,
-    previous_stock INT NOT NULL,
-    new_stock INT NOT NULL,
-    reference_id INT,
-    reference_type VARCHAR(50),
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    notes TEXT,
-    FOREIGN KEY (product_id) REFERENCES products(product_id),
-    FOREIGN KEY (created_by) REFERENCES users(user_id)
-);
-
--- ============================================
--- PRODUCT REVIEWS (MP4)
--- ============================================
-
--- Product Reviews Table
-CREATE TABLE product_reviews (
-    review_id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id INT NOT NULL,
-    user_id INT NOT NULL,
-    order_id INT NOT NULL,
-    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    review_text TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_product_order (user_id, product_id, order_id)
-);
-
--- ============================================
--- MYSQL VIEWS
--- ============================================
-
--- Order Details View (ITIM211 Requirement)
-CREATE OR REPLACE VIEW v_order_details AS
-SELECT 
-    o.order_id,
-    o.user_id,
-    u.first_name,
-    u.last_name,
-    u.email,
-    o.address_id,
-    ua.address_line1,
-    ua.address_line2,
-    ua.city,
-    ua.state,
-    ua.postal_code,
-    ua.country,
-    o.discount_id,
-    dc.code AS discount_code,
-    o.order_status,
-    o.payment_method,
-    o.subtotal,
-    o.discount_amount,
-    o.total_amount,
-    o.order_date,
-    o.updated_at,
-    oi.order_item_id,
-    oi.product_id,
-    oi.product_name,
-    oi.quantity,
-    oi.unit_price,
-    oi.subtotal AS item_subtotal
-FROM orders o
-JOIN users u ON o.user_id = u.user_id
-JOIN user_addresses ua ON o.address_id = ua.address_id
-LEFT JOIN discount_codes dc ON o.discount_id = dc.discount_id
-LEFT JOIN order_items oi ON o.order_id = oi.order_id;
-
--- ============================================
--- INDEXES FOR PERFORMANCE
--- ============================================
-
--- User indexes
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role_id);
-CREATE INDEX idx_users_active ON users(is_active);
-
--- Product indexes
-CREATE INDEX idx_products_team ON products(team_id);
-CREATE INDEX idx_products_active ON products(is_active);
-CREATE INDEX idx_products_name ON products(product_name);
-
--- Product-Category indexes
-CREATE INDEX idx_product_categories_product ON product_categories(product_id);
-CREATE INDEX idx_product_categories_category ON product_categories(category_id);
-CREATE INDEX idx_product_categories_primary ON product_categories(is_primary);
-
--- Order indexes
-CREATE INDEX idx_orders_user ON orders(user_id);
-CREATE INDEX idx_orders_status ON orders(order_status);
-CREATE INDEX idx_orders_date ON orders(order_date);
-
--- Discount indexes
-CREATE INDEX idx_discount_code ON discount_codes(code);
-CREATE INDEX idx_discount_active ON discount_codes(is_active);
-CREATE INDEX idx_discount_dates ON discount_codes(start_date, expiration_date);
-CREATE INDEX idx_discount_applies ON discount_codes(applies_to);
-
--- Discount junction indexes
-CREATE INDEX idx_discount_products_discount ON discount_products(discount_id);
-CREATE INDEX idx_discount_products_product ON discount_products(product_id);
-CREATE INDEX idx_discount_categories_discount ON discount_categories(discount_id);
-CREATE INDEX idx_discount_categories_category ON discount_categories(category_id);
-
--- Inventory indexes
-CREATE INDEX idx_inventory_product ON inventory_history(product_id);
-CREATE INDEX idx_inventory_type ON inventory_history(transaction_type);
-CREATE INDEX idx_inventory_date ON inventory_history(created_at);
-
--- Supplier-Product indexes
-CREATE INDEX idx_supplier_products_supplier ON supplier_products(supplier_id);
-CREATE INDEX idx_supplier_products_product ON supplier_products(product_id);
-CREATE INDEX idx_supplier_products_preferred ON supplier_products(is_preferred);
-
--- Review indexes
-CREATE INDEX idx_reviews_product ON product_reviews(product_id);
-CREATE INDEX idx_reviews_user ON product_reviews(user_id);
-CREATE INDEX idx_reviews_order ON product_reviews(order_id);
-
--- Product Images indexes
-CREATE INDEX idx_product_images_product ON product_images(product_id);
-CREATE INDEX idx_product_images_primary ON product_images(is_primary);
-
--- ============================================
--- INITIAL DATA
--- ============================================
-
--- Insert default roles
-INSERT INTO roles (role_name, description) VALUES
-('Admin', 'Full system access and management'),
-('Inventory Manager', 'Manages inventory and restocking'),
-('Customer', 'Regular customer with shopping privileges');
-
--- Insert sample NBA teams
-INSERT INTO nba_teams (team_name, team_code, city, conference, division) VALUES
-('Los Angeles Lakers', 'LAL', 'Los Angeles', 'Western', 'Pacific'),
-('Golden State Warriors', 'GSW', 'San Francisco', 'Western', 'Pacific'),
-('Boston Celtics', 'BOS', 'Boston', 'Eastern', 'Atlantic'),
-('Miami Heat', 'MIA', 'Miami', 'Eastern', 'Southeast'),
-('Chicago Bulls', 'CHI', 'Chicago', 'Eastern', 'Central'),
-('Brooklyn Nets', 'BKN', 'Brooklyn', 'Eastern', 'Atlantic'),
-('Phoenix Suns', 'PHX', 'Phoenix', 'Western', 'Pacific'),
-('Milwaukee Bucks', 'MIL', 'Milwaukee', 'Eastern', 'Central');
-
--- Insert sample categories with hierarchy
-INSERT INTO categories (category_name, description, parent_category_id) VALUES
-('Jerseys', 'Official NBA team jerseys', NULL),
-('T-Shirts', 'Casual NBA team t-shirts', NULL),
-('Hoodies', 'NBA team hoodies and sweatshirts', NULL),
-('Caps', 'NBA team caps and hats', NULL),
-('Shorts', 'NBA team shorts', NULL),
-('Accessories', 'NBA team accessories and merchandise', NULL),
-('Premium', 'Premium and limited edition items', NULL),
-('Sale', 'Items on sale', NULL);
-
--- ============================================
--- SAMPLE USAGE EXAMPLES
--- ============================================
-
--- Example: Create a product that belongs to multiple categories
--- INSERT INTO products (team_id, product_name, price, stock_quantity) 
--- VALUES (1, 'Lakers Championship Jersey', 129.99, 50);
--- 
--- INSERT INTO product_categories (product_id, category_id, is_primary) VALUES
--- (1, 1, TRUE),  -- Primary category: Jerseys
--- (1, 7, FALSE); -- Secondary category: Premium
-
--- Example: Create a discount for specific categories
--- INSERT INTO discount_codes (code, discount_type, discount_value, applies_to, start_date)
--- VALUES ('JERSEY20', 'percentage', 20.00, 'specific_categories', NOW());
--- 
--- INSERT INTO discount_categories (discount_id, category_id) VALUES
--- (1, 1); -- Applies to Jerseys category
-
--- Example: Create a discount for specific products
--- INSERT INTO discount_codes (code, discount_type, discount_value, applies_to, start_date)
--- VALUES ('LAKERS10', 'percentage', 10.00, 'specific_products', NOW());
--- 
--- INSERT INTO discount_products (discount_id, product_id) VALUES
--- (2, 1), (2, 2), (2, 3); -- Applies to specific Lakers products
+INSERT IGNORE INTO inventory_history (history_id, product_id, transaction_type, quantity_change, previous_stock, new_stock, reference_id, reference_type, created_by, created_at, notes) VALUES
+(7001, 1, 'restock', 50, 0, 50, 5001, 'restock', 1, '2025-09-10 09:00:00', 'Backfill expense PHP 70650.00 (cost 1413.00)'),
+(7002, 2, 'restock', 50, 0, 50, 5002, 'restock', 1, '2025-09-10 09:05:00', 'Backfill expense PHP 74190.00 (cost 1483.80)'),
+(7003, 3, 'restock', 50, 0, 50, 5003, 'restock', 1, '2025-09-10 09:10:00', 'Backfill expense PHP 79470.00 (cost 1589.40)'),
+(7004, 4, 'restock', 50, 0, 50, 5004, 'restock', 1, '2025-09-10 09:15:00', 'Backfill expense PHP 176640.00 (cost 3532.80)'),
+(7005, 5, 'restock', 50, 0, 50, 5005, 'restock', 1, '2025-09-10 09:20:00', 'Backfill expense PHP 70650.00 (cost 1413.00)'),
+(7006, 6, 'restock', 50, 0, 50, 5006, 'restock', 1, '2025-09-11 09:00:00', 'Backfill expense PHP 79470.00 (cost 1589.40)'),
+(7007, 7, 'restock', 50, 0, 50, 5007, 'restock', 1, '2025-09-11 09:05:00', 'Backfill expense PHP 44160.00 (cost 883.20)'),
+(7008, 8, 'restock', 50, 0, 50, 5008, 'restock', 1, '2025-09-11 09:10:00', 'Backfill expense PHP 105990.00 (cost 2119.80)'),
+(7009, 9, 'restock', 50, 0, 50, 5009, 'restock', 1, '2025-09-11 09:15:00', 'Backfill expense PHP 60060.00 (cost 1201.20)'),
+(7010, 10, 'restock', 50, 0, 50, 5010, 'restock', 1, '2025-09-11 09:20:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7011, 11, 'restock', 50, 0, 50, 5011, 'restock', 1, '2025-09-12 09:00:00', 'Backfill expense PHP 61830.00 (cost 1236.60)'),
+(7012, 12, 'restock', 50, 0, 50, 5012, 'restock', 1, '2025-09-12 09:05:00', 'Backfill expense PHP 238500.00 (cost 4770.00)'),
+(7013, 13, 'restock', 50, 0, 50, 5013, 'restock', 1, '2025-09-12 09:10:00', 'Backfill expense PHP 141330.00 (cost 2826.60)'),
+(7014, 14, 'restock', 50, 0, 50, 5014, 'restock', 1, '2025-09-12 09:15:00', 'Backfill expense PHP 74190.00 (cost 1483.80)'),
+(7015, 15, 'restock', 50, 0, 50, 5015, 'restock', 1, '2025-09-12 09:20:00', 'Backfill expense PHP 167850.00 (cost 3357.00)'),
+(7016, 16, 'restock', 50, 0, 50, 5016, 'restock', 1, '2025-09-13 09:00:00', 'Backfill expense PHP 238500.00 (cost 4770.00)'),
+(7017, 17, 'restock', 50, 0, 50, 5017, 'restock', 1, '2025-09-13 09:05:00', 'Backfill expense PHP 97170.00 (cost 1943.40)'),
+(7018, 18, 'restock', 50, 0, 50, 5018, 'restock', 1, '2025-09-13 09:10:00', 'Backfill expense PHP 318000.00 (cost 6360.00)'),
+(7019, 19, 'restock', 50, 0, 50, 5019, 'restock', 1, '2025-09-13 09:15:00', 'Backfill expense PHP 150180.00 (cost 3003.60)'),
+(7020, 20, 'restock', 50, 0, 50, 5020, 'restock', 1, '2025-09-13 09:20:00', 'Backfill expense PHP 61830.00 (cost 1236.60)'),
+(7021, 21, 'restock', 50, 0, 50, 5021, 'restock', 1, '2025-09-14 09:00:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7022, 22, 'restock', 50, 0, 50, 5022, 'restock', 1, '2025-09-14 09:05:00', 'Backfill expense PHP 79500.00 (cost 1590.00)'),
+(7023, 23, 'restock', 50, 0, 50, 5023, 'restock', 1, '2025-09-14 09:10:00', 'Backfill expense PHP 167850.00 (cost 3357.00)'),
+(7024, 24, 'restock', 50, 0, 50, 5024, 'restock', 1, '2025-09-14 09:15:00', 'Backfill expense PHP 74190.00 (cost 1483.80)'),
+(7025, 25, 'restock', 50, 0, 50, 5025, 'restock', 1, '2025-09-14 09:20:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7026, 26, 'restock', 50, 0, 50, 5026, 'restock', 1, '2025-09-15 09:00:00', 'Backfill expense PHP 70650.00 (cost 1413.00)'),
+(7027, 27, 'restock', 50, 0, 50, 5027, 'restock', 1, '2025-09-15 09:05:00', 'Backfill expense PHP 60060.00 (cost 1201.20)'),
+(7028, 28, 'restock', 50, 0, 50, 5028, 'restock', 1, '2025-09-15 09:10:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7029, 29, 'restock', 50, 0, 50, 5029, 'restock', 1, '2025-09-15 09:15:00', 'Backfill expense PHP 44160.00 (cost 883.20)'),
+(7030, 30, 'restock', 50, 0, 50, 5030, 'restock', 1, '2025-09-15 09:20:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7031, 31, 'restock', 50, 0, 50, 5031, 'restock', 1, '2025-09-16 09:00:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7032, 32, 'restock', 50, 0, 50, 5032, 'restock', 1, '2025-09-16 09:05:00', 'Backfill expense PHP 105990.00 (cost 2119.80)'),
+(7033, 33, 'restock', 50, 0, 50, 5033, 'restock', 1, '2025-09-16 09:10:00', 'Backfill expense PHP 141330.00 (cost 2826.60)'),
+(7034, 34, 'restock', 50, 0, 50, 5034, 'restock', 1, '2025-09-16 09:15:00', 'Backfill expense PHP 61830.00 (cost 1236.60)'),
+(7035, 35, 'restock', 50, 0, 50, 5035, 'restock', 1, '2025-09-16 09:20:00', 'Backfill expense PHP 88320.00 (cost 1766.40)'),
+(7036, 36, 'restock', 50, 0, 50, 5036, 'restock', 1, '2025-09-17 09:00:00', 'Backfill expense PHP 79470.00 (cost 1589.40)'),
+(7037, 37, 'restock', 50, 0, 50, 5037, 'restock', 1, '2025-09-17 09:05:00', 'Backfill expense PHP 70650.00 (cost 1413.00)'),
+(7038, 38, 'restock', 50, 0, 50, 5038, 'restock', 1, '2025-09-17 09:10:00', 'Backfill expense PHP 70650.00 (cost 1413.00)'),
+(7039, 39, 'restock', 50, 0, 50, 5039, 'restock', 1, '2025-09-17 09:15:00', 'Backfill expense PHP 74190.00 (cost 1483.80)'),
+(7040, 40, 'restock', 50, 0, 50, 5040, 'restock', 1, '2025-09-17 09:20:00', 'Backfill expense PHP 44160.00 (cost 883.20)'),
+(7041, 41, 'restock', 50, 0, 50, 5041, 'restock', 1, '2025-09-18 09:00:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7042, 42, 'restock', 50, 0, 50, 5042, 'restock', 1, '2025-09-18 09:05:00', 'Backfill expense PHP 159000.00 (cost 3180.00)'),
+(7043, 43, 'restock', 50, 0, 50, 5043, 'restock', 1, '2025-09-18 09:10:00', 'Backfill expense PHP 74190.00 (cost 1483.80)'),
+(7044, 44, 'restock', 50, 0, 50, 5044, 'restock', 1, '2025-09-18 09:15:00', 'Backfill expense PHP 132510.00 (cost 2650.20)'),
+(7045, 45, 'restock', 50, 0, 50, 5045, 'restock', 1, '2025-09-18 09:20:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7046, 46, 'restock', 50, 0, 50, 5046, 'restock', 1, '2025-09-19 09:00:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7047, 47, 'restock', 50, 0, 50, 5047, 'restock', 1, '2025-09-19 09:05:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7048, 48, 'restock', 50, 0, 50, 5048, 'restock', 1, '2025-09-19 09:10:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7049, 49, 'restock', 50, 0, 50, 5049, 'restock', 1, '2025-09-19 09:15:00', 'Backfill expense PHP 61830.00 (cost 1236.60)'),
+(7050, 50, 'restock', 50, 0, 50, 5050, 'restock', 1, '2025-09-19 09:20:00', 'Backfill expense PHP 296550.00 (cost 5931.00)'),
+(7051, 51, 'restock', 50, 0, 50, 5051, 'restock', 1, '2025-09-20 09:00:00', 'Backfill expense PHP 67110.00 (cost 1342.20)'),
+(7052, 52, 'restock', 50, 0, 50, 5052, 'restock', 1, '2025-09-20 09:05:00', 'Backfill expense PHP 61830.00 (cost 1236.60)'),
+(7053, 53, 'restock', 50, 0, 50, 5053, 'restock', 1, '2025-09-20 09:10:00', 'Backfill expense PHP 74190.00 (cost 1483.80)'),
+(7054, 54, 'restock', 50, 0, 50, 5054, 'restock', 1, '2025-09-21 09:00:00', 'Backfill expense PHP 238500.00 (cost 4770.00)'),
+(7055, 55, 'restock', 50, 0, 50, 5055, 'restock', 1, '2025-09-21 09:05:00', 'Backfill expense PHP 238500.00 (cost 4770.00)'),
+(7056, 56, 'restock', 50, 0, 50, 5056, 'restock', 1, '2025-09-21 09:10:00', 'Backfill expense PHP 44160.00 (cost 883.20)'),
+(7057, 57, 'restock', 50, 0, 50, 5057, 'restock', 1, '2025-09-21 09:15:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7058, 58, 'restock', 50, 0, 50, 5058, 'restock', 1, '2025-09-21 09:20:00', 'Backfill expense PHP 70650.00 (cost 1413.00)'),
+(7059, 59, 'restock', 50, 0, 50, 5059, 'restock', 1, '2025-09-22 09:00:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7060, 60, 'restock', 50, 0, 50, 5060, 'restock', 1, '2025-09-22 09:05:00', 'Backfill expense PHP 296550.00 (cost 5931.00)'),
+(7061, 61, 'restock', 50, 0, 50, 5061, 'restock', 1, '2025-09-22 09:10:00', 'Backfill expense PHP 74190.00 (cost 1483.80)'),
+(7062, 62, 'restock', 50, 0, 50, 5062, 'restock', 1, '2025-09-22 09:15:00', 'Backfill expense PHP 70650.00 (cost 1413.00)'),
+(7063, 63, 'restock', 50, 0, 50, 5063, 'restock', 1, '2025-09-23 09:00:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7064, 64, 'restock', 50, 0, 50, 5064, 'restock', 1, '2025-09-23 09:05:00', 'Backfill expense PHP 77850.00 (cost 1557.00)'),
+(7065, 65, 'restock', 50, 0, 50, 5065, 'restock', 1, '2025-09-23 09:10:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7066, 66, 'restock', 50, 0, 50, 5066, 'restock', 1, '2025-09-23 09:15:00', 'Backfill expense PHP 21000.00 (cost 420.00)'),
+(7067, 67, 'restock', 50, 0, 50, 5067, 'restock', 1, '2025-09-23 09:20:00', 'Backfill expense PHP 62850.00 (cost 1257.00)'),
+(7068, 68, 'restock', 50, 0, 50, 5068, 'restock', 1, '2025-09-24 09:00:00', 'Backfill expense PHP 79470.00 (cost 1589.40)'),
+(7069, 69, 'restock', 50, 0, 50, 5069, 'restock', 1, '2025-09-24 09:05:00', 'Backfill expense PHP 159000.00 (cost 3180.00)'),
+(7070, 70, 'restock', 50, 0, 50, 5070, 'restock', 1, '2025-09-24 09:10:00', 'Backfill expense PHP 211980.00 (cost 4239.60)'),
+(7071, 71, 'restock', 50, 0, 50, 5071, 'restock', 1, '2025-09-24 09:15:00', 'Backfill expense PHP 60000.00 (cost 1200.00)'),
+(7072, 72, 'restock', 50, 0, 50, 5072, 'restock', 1, '2025-09-24 09:20:00', 'Backfill expense PHP 141330.00 (cost 2826.60)');
