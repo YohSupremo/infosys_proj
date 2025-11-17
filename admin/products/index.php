@@ -138,7 +138,11 @@ if ($is_inventory_manager && !$is_admin) {
                                                 <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Deactivate this product?')">Deactivate</button>
                                             </form>
                                         <?php else: ?>
-                                            <span class="text-muted">Inactive</span>
+                                            <form method="POST" action="reactivate.php" class="d-inline">
+                                                <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
+                                                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($current_products_url); ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-success" onclick="return confirm('Reactivate this product?')">Reactivate</button>
+                                            </form>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

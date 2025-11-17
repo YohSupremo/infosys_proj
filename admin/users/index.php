@@ -11,6 +11,12 @@ if (!in_array($status_filter, $allowed_statuses, true)) {
     $status_filter = 'active';
 }
 
+$current_users_url = BASE_URL . '/admin/users/index.php';
+$user_query_string = $_SERVER['QUERY_STRING'] ?? '';
+if (!empty($user_query_string)) {
+    $current_users_url .= '?' . $user_query_string;
+}
+
 $query = "SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE 1=1";
 $types = '';
 $params = [];
@@ -96,10 +102,19 @@ $users = $stmt->get_result();
                                     </td>
                                     <td>
                                         <a href="<?php echo BASE_URL; ?>/admin/users/edit.php?id=<?php echo $user['user_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <form method="POST" action="delete.php" class="d-inline">
-                                            <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this user?')">Delete</button>
-                                        </form>
+                                        <?php if ($user['is_active']): ?>
+                                            <form method="POST" action="delete.php" class="d-inline">
+                                                <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
+                                                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($current_users_url); ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Deactivate this user?')">Deactivate</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <form method="POST" action="reactivate.php" class="d-inline">
+                                                <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
+                                                <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($current_users_url); ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-success ms-1" onclick="return confirm('Reactivate this user?')">Reactivate</button>
+                                            </form>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
