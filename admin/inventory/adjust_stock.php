@@ -157,13 +157,16 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 </div>
 
 <script>
+
+    //for dropdown
 function updateStockInfo() {
     const select = document.getElementById('product_id');
     const selectedOption = select.options[select.selectedIndex];
     const currentStock = selectedOption.getAttribute('data-stock') || '0';
     document.getElementById('currentStockDisplay').textContent = currentStock;
 }
-
+ 
+  //for quantity changes detection
 function setQuantityChange(value) {
     const input = document.getElementById('quantity_change');
     const current = parseInt(input.value) || 0;
