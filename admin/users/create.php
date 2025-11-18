@@ -13,11 +13,9 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
 <?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Add New User</h2>
-    
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7 col-xl-6">
-            <div class="card">
+    <div class="centered-form-wrapper">
+        <h2 class="mb-4">Add New User</h2>
+        <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">User Information</h5>
                 </div>
@@ -72,7 +70,6 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                         <a href="<?php echo BASE_URL; ?>/admin/users/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
-            </div>
         </div>
     </div>
 </div>

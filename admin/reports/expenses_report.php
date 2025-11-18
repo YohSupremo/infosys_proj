@@ -87,20 +87,32 @@ if ($has_filter) {
 	<div class="card mb-4">
 		<div class="card-body">
 			<form method="GET" action="">
-				<div class="row g-3 align-items-end">
+				<div class="row g-3">
 					<div class="col-md-3">
 						<label for="start_date" class="form-label">Start Date</label>
-						<input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" placeholder="YYYY-MM-DD">
-						<small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-01)</small>
+						<div>
+							<input type="text" class="form-control" id="start_date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" placeholder="YYYY-MM-DD">
+							<small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-01)</small>
+						</div>
 					</div>
 					<div class="col-md-3">
 						<label for="end_date" class="form-label">End Date</label>
-						<input type="text" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" placeholder="YYYY-MM-DD">
-						<small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-31)</small>
+						<div>
+							<input type="text" class="form-control" id="end_date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" placeholder="YYYY-MM-DD">
+							<small class="text-muted">Format: YYYY-MM-DD (e.g. 2025-01-31)</small>
+						</div>
 					</div>
 					<div class="col-md-3">
-						<button type="submit" class="btn btn-primary">Apply Filter</button>
-						<a href="<?php echo BASE_URL; ?>/admin/reports/expenses_report.php" class="btn btn-outline-secondary">Reset</a>
+						<div class="form-label">&nbsp;</div>
+						<div>
+							<button type="submit" class="btn btn-primary w-100">Apply Filter</button>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-label">&nbsp;</div>
+						<div>
+							<a href="<?php echo BASE_URL; ?>/admin/reports/expenses_report.php" class="btn btn-outline-secondary w-100">Reset</a>
+						</div>
 					</div>
 				</div>
 				<?php if ($has_filter): ?>

@@ -96,11 +96,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Update Order Status</h2>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
+    <div class="centered-form-wrapper">
+        <h2 class="mb-4">Update Order Status</h2>
+        <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Current Status: <?php echo htmlspecialchars($order['order_status']); ?></h5>
                 </div>
@@ -132,7 +130,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <a href="<?php echo BASE_URL; ?>/admin/orders/view.php?id=<?php echo $order_id; ?>" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
-            </div>
         </div>
     </div>
 </div>

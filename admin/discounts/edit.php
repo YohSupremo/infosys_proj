@@ -56,11 +56,9 @@ $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 OR
 <?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Edit Discount</h2>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
+    <div class="centered-form-wrapper">
+        <h2 class="mb-4">Edit Discount</h2>
+        <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Discount Information</h5>
                 </div>
@@ -165,7 +163,6 @@ $categories_list = $conn->query("SELECT * FROM categories WHERE is_active = 1 OR
                         <a href="index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
-            </div>
         </div>
     </div>
 </div>

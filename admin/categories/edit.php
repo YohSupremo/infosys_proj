@@ -34,11 +34,9 @@ $categories = $conn->query("SELECT * FROM categories WHERE category_id != $categ
 <?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Edit Category</h2>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
+    <div class="centered-form-wrapper">
+        <h2 class="mb-4">Edit Category</h2>
+        <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Category Information</h5>
                 </div>
@@ -76,7 +74,6 @@ $categories = $conn->query("SELECT * FROM categories WHERE category_id != $categ
                         <a href="index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
-            </div>
         </div>
     </div>
 </div>

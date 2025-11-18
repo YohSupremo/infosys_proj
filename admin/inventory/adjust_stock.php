@@ -85,11 +85,9 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Adjust Stock</h2>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
+    <div class="centered-form-wrapper">
+        <h2 class="mb-4">Adjust Stock</h2>
+        <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Stock Adjustment</h5>
                 </div>
@@ -151,7 +149,6 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                         <a href="<?php echo BASE_URL; ?>/admin/inventory/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
-            </div>
         </div>
     </div>
 </div>

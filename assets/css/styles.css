@@ -157,6 +157,24 @@ body {
     margin-bottom: 5px;
 }
 
+/* Centered single-form layouts */
+.centered-form-wrapper {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 1200px) {
+    .centered-form-wrapper {
+        max-width: 840px;
+    }
+}
+
+.centered-form-wrapper .page-title,
+.centered-form-wrapper h2 {
+    text-align: center;
+}
+
 /* Tables */
 .table {
     background-color: var(--white);

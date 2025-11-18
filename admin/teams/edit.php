@@ -32,11 +32,9 @@ unset($_SESSION['error']);
 <?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Edit Team</h2>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
+    <div class="centered-form-wrapper">
+        <h2 class="mb-4">Edit Team</h2>
+        <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Team Information</h5>
                 </div>
@@ -75,7 +73,6 @@ unset($_SESSION['error']);
                         <a href="index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
-            </div>
         </div>
     </div>
 </div>

@@ -17,11 +17,9 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
 <?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
-    <h2 class="mb-4">Add New Product</h2>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
+    <div class="centered-form-wrapper">
+        <h2 class="mb-4">Add New Product</h2>
+        <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Product Information</h5>
                 </div>
@@ -86,7 +84,6 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                         <a href="<?php echo BASE_URL; ?>/admin/products/index.php" class="btn btn-outline-secondary">Cancel</a>
                     </form>
                 </div>
-            </div>
         </div>
     </div>
 </div>
