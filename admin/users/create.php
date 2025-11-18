@@ -15,8 +15,8 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
 <div class="container my-5">
     <h2 class="mb-4">Add New User</h2>
     
-    <div class="row">
-        <div class="col-md-6">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7 col-xl-6">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">User Information</h5>

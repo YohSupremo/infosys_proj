@@ -60,7 +60,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="<?= $base_url ?>/admin/users/index.php"><i class="bi bi-person-lines-fill"></i> All Users</a></li>
                         <li><a class="dropdown-item" href="<?= $base_url ?>/admin/users/create.php"><i class="bi bi-person-plus"></i> Add User</a></li>
-                        <li><a class="dropdown-item" href="<?= $base_url ?>/admin/roles/index.php"><i class="bi bi-shield"></i> Roles</a></li>
                     </ul>
                 </li>
 				<?php endif; ?>

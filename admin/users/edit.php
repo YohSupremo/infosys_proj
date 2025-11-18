@@ -36,8 +36,8 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
 <div class="container my-5">
     <h2 class="mb-4">Edit User</h2>
     
-    <div class="row">
-		<div class="col-md-8">
+    <div class="row justify-content-center">
+		<div class="col-md-9 col-lg-8 col-xl-7">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">User Information</h5>
