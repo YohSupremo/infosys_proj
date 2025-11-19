@@ -10,8 +10,7 @@
             $base_url = BASE_URL;
     
 
-    // Determine correct CSS path relative to the including script
-    // Assets folder is always at root level
+    
 
    
         $css_path = $base_url . '/assets/css/styles.css';
