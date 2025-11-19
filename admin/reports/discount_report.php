@@ -4,11 +4,15 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
 
-$discounts = $conn->query("SELECT dc.*, 
-    (SELECT COUNT(*) FROM discount_usage WHERE discount_id = dc.discount_id) as times_used,
-    (SELECT SUM(discount_amount) FROM discount_usage WHERE discount_id = dc.discount_id) as total_discount_amount
-    FROM discount_codes dc 
-    ORDER BY dc.created_at DESC");
+$discounts = $conn->query("SELECT 
+    dc.*,
+    COUNT(du.discount_id) AS times_used,
+    SUM(du.discount_amount) AS total_discount_amount
+    FROM discount_codes dc
+    LEFT JOIN discount_usage du 
+    ON du.discount_id = dc.discount_id
+    GROUP BY dc.discount_id
+    ORDER BY dc.created_at DESC;");
 ?>
 
 <?php include '../../includes/admin_navbar.php'; ?>
