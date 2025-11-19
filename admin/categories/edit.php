@@ -3,7 +3,7 @@ $page_title = 'Edit Category - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+//UI lang din to 
 $category_id = intval($_GET['id'] ?? 0);
 $error = '';
 

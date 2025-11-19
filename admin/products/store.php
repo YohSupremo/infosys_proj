@@ -1,7 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-
+// galing create.php form method
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_name = sanitize($_POST['product_name'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
@@ -17,8 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: create.php');
         exit();
     }
-    
-    // Validate price format
+
     if (empty($_POST['price']) || !is_numeric($_POST['price']) || floatval($_POST['price']) < 0) {
         $_SESSION['error'] = 'Price must be a valid number greater than or equal to 0.';
         header('Location: create.php');
@@ -31,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Handle single image upload (for backward compatibility)
+    // single image upload
     $image_url = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = '../../assets/images/products/';
@@ -52,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // New products will start with zero stock. Stock will be managed through Inventory and Restock screens.
+    // 0 stock muna
     $stmt = $conn->prepare("INSERT INTO products (team_id, product_name, description, price, image_url, is_active) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issdsi", $team_id, $product_name, $description, $price, $image_url, $is_active);
     
@@ -60,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $product_id = $conn->insert_id;
         $stmt->close();
         
-        // Handle multiple image uploads (MP1 Requirement)
+        //multiple images
         if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
             $upload_dir = '../../assets/images/products/';
             if (!is_dir($upload_dir)) {
@@ -94,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Add categories
+        //  categories
         if (!empty($categories)) {
             $cat_stmt = $conn->prepare("INSERT INTO product_categories (product_id, category_id, is_primary) VALUES (?, ?, ?)");
             foreach ($categories as $index => $category_id) {

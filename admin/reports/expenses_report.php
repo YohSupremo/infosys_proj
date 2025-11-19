@@ -10,7 +10,7 @@ $start_date = isset($_GET['start_date']) ? trim($_GET['start_date']) : '';
 $end_date = isset($_GET['end_date']) ? trim($_GET['end_date']) : '';
 $has_filter = (!empty($start_date) && !empty($end_date));
 
-// Validate date formats if provided
+// Validation 
 if (!empty($start_date)) {
     $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
     if (!preg_match($datePattern, $start_date)) {
@@ -29,7 +29,7 @@ if (!empty($end_date)) {
     }
 }
 
-// Total expenses from restocking transactions (optionally filtered)
+// filter for total expenses base on date range
 $total_expenses = 0;
 if ($has_filter) {
 	$sum_stmt = $conn->prepare("SELECT SUM(total_cost) AS total FROM restocking_transactions WHERE restock_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)");
@@ -49,7 +49,7 @@ if ($has_filter) {
 	}
 }
 
-// Restocking transactions list (optionally filtered)
+
 if ($has_filter) {
 	$list_stmt = $conn->prepare("
 		SELECT rt.*, s.supplier_name, u.first_name, u.last_name

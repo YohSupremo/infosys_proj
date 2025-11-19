@@ -1,7 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-
+// for creating a new team logic, galing data neto sa create.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $team_name = sanitize($_POST['team_name'] ?? '');
     $team_code = sanitize($_POST['team_code'] ?? '');

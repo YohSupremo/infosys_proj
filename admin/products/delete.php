@@ -3,7 +3,7 @@ include '../../config/config.php';
 requireAdminOrInventoryManager();
 
 $redirect = 'index.php';
-
+// soft delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_id = intval($_POST['product_id'] ?? 0);
     $redirect_input = $_POST['redirect'] ?? '';

@@ -3,7 +3,7 @@ $page_title = 'Edit Team - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// UI for editing team
 $team_id = intval($_GET['id'] ?? 0);
 $error = '';
 

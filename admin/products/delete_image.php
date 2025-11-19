@@ -10,7 +10,7 @@ if (!$image_id || !$product_id) {
     exit();
 }
 
-// Get image info before deletion
+// kunin image
 $img_stmt = $conn->prepare("SELECT image_url FROM product_images WHERE image_id = ? AND product_id = ?");
 $img_stmt->bind_param("ii", $image_id, $product_id);
 $img_stmt->execute();
@@ -19,7 +19,7 @@ $img_result = $img_stmt->get_result();
 if ($img_result->num_rows > 0) {
     $image = $img_result->fetch_assoc();
     
-    // Delete from database
+    //remove from db
     $delete_stmt = $conn->prepare("DELETE FROM product_images WHERE image_id = ? AND product_id = ?");
     $delete_stmt->bind_param("ii", $image_id, $product_id);
     $delete_stmt->execute();

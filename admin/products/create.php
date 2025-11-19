@@ -7,10 +7,10 @@ requireAdmin();
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 
-// Get teams
+// kunin teams
 $teams = $conn->query("SELECT * FROM nba_teams ORDER BY team_name");
 
-// Get categories
+// fetch categories
 $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY category_name");
 ?>
 
@@ -89,7 +89,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
 </div>
 
 <script>
-// Single image preview
+// for creating img showing of prev ng thumbnail 
 document.getElementById('image').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -102,7 +102,7 @@ document.getElementById('image').addEventListener('change', function(e) {
     }
 });
 
-// Multiple images preview
+// multiple naman to
 document.getElementById('images').addEventListener('change', function(e) {
     const preview = document.getElementById('imagesPreview');
     preview.innerHTML = '';

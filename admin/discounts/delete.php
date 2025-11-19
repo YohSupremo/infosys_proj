@@ -1,7 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-
+//delete just from an inline code sa index.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $discount_id = intval($_POST['discount_id'] ?? 0);
     
@@ -16,4 +16,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 header('Location: index.php');
 exit();
 ?>
-

@@ -5,8 +5,8 @@ include '../../includes/header.php';
 requireAdminOrInventoryManager();
 
 $filter = $_GET['filter'] ?? 'all';
-
-// Build query
+//ui din to basically jst fetching things
+// building query
 $where_clause = "";
 if ($filter !== 'all') {
     $filter_escaped = $conn->real_escape_string($filter);
@@ -34,8 +34,8 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 
 <div class="container my-5">
     <h2 class="mb-4">Inventory History</h2>
-
-    <!-- Filter Buttons -->
+    
+    <!-- filters -->
     <div class="mb-3">
         <div class="btn-group" role="group" aria-label="Filter history">
             <a href="?filter=all" class="btn btn-sm <?php echo $filter === 'all' ? 'btn-primary' : 'btn-outline-primary'; ?>">

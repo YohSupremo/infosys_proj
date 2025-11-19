@@ -4,23 +4,18 @@ include '../config/config.php';
 include '../includes/header.php';
 
 requireAdminOrInventoryManager();
-
-// Stats for inventory-focused dashboard
+// inventory focused dashboard
 $stats = array();
 
-// Total active products
 $result = $conn->query("SELECT COUNT(*) as count FROM products WHERE is_active = 1");
 $stats['products'] = $result ? intval($result->fetch_assoc()['count']) : 0;
 
-// Low stock (threshold 10)
 $result = $conn->query("SELECT COUNT(*) as count FROM products WHERE is_active = 1 AND stock_quantity < 10");
 $stats['low_stock'] = $result ? intval($result->fetch_assoc()['count']) : 0;
 
-// Out of stock
 $result = $conn->query("SELECT COUNT(*) as count FROM products WHERE is_active = 1 AND stock_quantity = 0");
 $stats['out_of_stock'] = $result ? intval($result->fetch_assoc()['count']) : 0;
 
-// Recent restocks
 $recent_restocks = $conn->query("SELECT ih.*, p.product_name FROM inventory_history ih JOIN products p ON ih.product_id = p.product_id WHERE ih.transaction_type = 'restock' ORDER BY ih.created_at DESC LIMIT 10");
 ?>
 

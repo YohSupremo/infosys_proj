@@ -5,18 +5,15 @@ include '../includes/header.php';
 
 requireAdmin();
 
-// Get statistics
+ // puro count lang due to nature of dashboards.
 $stats = [];
 
-// Total products
 $result = $conn->query("SELECT COUNT(*) as count FROM products");
 $stats['products'] = $result->fetch_assoc()['count'];
 
-// Total orders
 $result = $conn->query("SELECT COUNT(*) as count FROM orders");
 $stats['orders'] = $result->fetch_assoc()['count'];
 
-// Total users
 $result = $conn->query("SELECT COUNT(*) as count FROM users");
 $stats['users'] = $result->fetch_assoc()['count'];
 
@@ -35,15 +32,12 @@ $row = $result->fetch_assoc();
 $revenue = $row && $row['total'] ? $row['total'] : 0;
 $stats['revenue'] = $revenue;
 
-// Pending orders
 $result = $conn->query("SELECT COUNT(*) as count FROM orders WHERE order_status = 'Pending'");
 $stats['pending_orders'] = $result->fetch_assoc()['count'];
 
-// Low stock products
 $result = $conn->query("SELECT COUNT(*) as count FROM products WHERE stock_quantity < 10 AND is_active = 1");
 $stats['low_stock'] = $result->fetch_assoc()['count'];
 
-// Recent orders
 $recent_orders = $conn->query("SELECT o.*, u.first_name, u.last_name FROM orders o JOIN users u ON o.user_id = u.user_id ORDER BY o.order_date DESC LIMIT 5");
 
 ?>
@@ -108,7 +102,6 @@ $recent_orders = $conn->query("SELECT o.*, u.first_name, u.last_name FROM orders
         </div>
     </div>
     
-    <!-- Recent Orders -->
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0">Recent Orders</h5>

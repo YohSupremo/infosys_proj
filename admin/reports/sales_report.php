@@ -3,12 +3,12 @@ $page_title = 'Sales Report - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// sales report with date filter
 $error = '';
 $start_date = sanitize($_GET['start_date'] ?? date('Y-m-01'));
 $end_date = sanitize($_GET['end_date'] ?? date('Y-m-d'));
 
-// Validate date formats if provided
+// Validation sa filters
 if (!empty($_GET['start_date'])) {
     $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
     if (!preg_match($datePattern, $start_date)) {

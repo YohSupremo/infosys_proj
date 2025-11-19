@@ -1,7 +1,9 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-
+// this is from edit.php form method
+//logic ng edit.php
+// puro validation to basta(9999)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $discount_id = intval($_POST['discount_id'] ?? 0);
     $code = sanitize($_POST['code'] ?? '');
@@ -26,21 +28,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Validation
     if (empty($code) || empty($discount_type)) {
         $_SESSION['error'] = 'Code and discount type are required.';
         header('Location: edit.php?id=' . $discount_id);
         exit();
     }
     
-    // Validate discount value format
     if (empty($_POST['discount_value']) || !is_numeric($_POST['discount_value']) || floatval($_POST['discount_value']) < 0) {
         $_SESSION['error'] = 'Discount value must be a valid number greater than or equal to 0.';
         header('Location: edit.php?id=' . $discount_id);
         exit();
     }
     
-    // Validate start date format
     if (empty($start_date)) {
         $_SESSION['error'] = 'Start date is required.';
         header('Location: edit.php?id=' . $discount_id);
@@ -54,28 +53,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Validate expiration date format if provided
     if (!empty($expiration_date) && !preg_match($datePattern, $expiration_date)) {
         $_SESSION['error'] = 'Expiration date must be in format: YYYY-MM-DD HH:MM (e.g. 2025-12-31 23:59)';
         header('Location: edit.php?id=' . $discount_id);
         exit();
     }
     
-    // Validate min purchase amount format
     if (!empty($_POST['min_purchase_amount']) && (!is_numeric($_POST['min_purchase_amount']) || floatval($_POST['min_purchase_amount']) < 0)) {
         $_SESSION['error'] = 'Min purchase amount must be a valid number greater than or equal to 0.';
         header('Location: edit.php?id=' . $discount_id);
         exit();
     }
     
-    // Validate max discount amount format
     if (!empty($_POST['max_discount_amount']) && (!is_numeric($_POST['max_discount_amount']) || floatval($_POST['max_discount_amount']) < 0)) {
         $_SESSION['error'] = 'Max discount amount must be a valid number greater than or equal to 0.';
         header('Location: edit.php?id=' . $discount_id);
         exit();
     }
     
-    // Validate usage limit format
     if (!empty($_POST['usage_limit']) && (!is_numeric($_POST['usage_limit']) || intval($_POST['usage_limit']) < 0)) {
         $_SESSION['error'] = 'Usage limit must be a valid whole number greater than or equal to 0.';
         header('Location: edit.php?id=' . $discount_id);
@@ -105,7 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($update_stmt->execute()) {
         $update_stmt->close();
         
-        // Update products
         $del_prod = $conn->prepare("DELETE FROM discount_products WHERE discount_id = ?");
         $del_prod->bind_param("i", $discount_id);
         $del_prod->execute();
@@ -120,7 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $prod_stmt->close();
         }
         
-        // Update categories
         $del_cat = $conn->prepare("DELETE FROM discount_categories WHERE discount_id = ?");
         $del_cat->bind_param("i", $discount_id);
         $del_cat->execute();

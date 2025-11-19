@@ -3,7 +3,7 @@ $page_title = 'Discounts - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// main Ui
 $discounts = $conn->query("SELECT dc.*, COUNT(du.usage_id) AS times_used 
                            FROM discount_codes dc
                            LEFT JOIN discount_usage du ON dc.discount_id = du.discount_id

@@ -3,7 +3,7 @@ $page_title = 'Discount Report - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+ // viewing of discount reports
 $discounts = $conn->query("SELECT 
     dc.*,
     COUNT(du.discount_id) AS times_used,

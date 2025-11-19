@@ -3,7 +3,7 @@ $page_title = 'User Report - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+ // users viewing
 $users = $conn->query("SELECT u.*, r.role_name,
     (SELECT COUNT(*) FROM orders WHERE user_id = u.user_id) as total_orders,
     (SELECT SUM(total_amount) FROM orders WHERE user_id = u.user_id AND order_status != 'Cancelled') as total_spent

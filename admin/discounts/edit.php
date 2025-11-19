@@ -3,7 +3,9 @@ $page_title = 'Edit Discount - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+//UI lang din to
+// kung may ifefetch man kung ano lang yung mga products yan
+// data is given to update.php
 $discount_id = intval($_GET['id'] ?? 0);
 $error = '';
 
@@ -25,7 +27,7 @@ if ($result->num_rows === 0) {
 $discount = $result->fetch_assoc();
 $stmt->close();
 
-// Get associated products and categories
+// fetching ng products
 $discount_products = [];
 $prod_stmt = $conn->prepare("SELECT product_id FROM discount_products WHERE discount_id = ?");
 $prod_stmt->bind_param("i", $discount_id);
@@ -35,7 +37,7 @@ while ($p = $prod_result->fetch_assoc()) {
     $discount_products[] = $p['product_id'];
 }
 $prod_stmt->close();
-
+// this is just for categories and their discounts codes
 $discount_categories = [];
 $cat_stmt = $conn->prepare("SELECT category_id FROM discount_categories WHERE discount_id = ?");
 $cat_stmt->bind_param("i", $discount_id);

@@ -3,7 +3,7 @@ $page_title = 'Edit User - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// editing UI
 $user_id = intval($_GET['id'] ?? 0);
 $error = '';
 

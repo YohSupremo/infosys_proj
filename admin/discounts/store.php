@@ -1,7 +1,8 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-
+// waaaaaaaaaaa dami 
+//logic ng create.php form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code = sanitize($_POST['code'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
@@ -22,27 +23,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
 
 
-    // Validation
+    // checker lang kung meron 
     if (empty($code) || empty($discount_type)) {
         $_SESSION['error'] = 'Code and discount type are required.';
         header('Location: create.php');
         exit();
     }
     
-    // Validate discount value format
+    // tignan if valid number
     if (empty($_POST['discount_value']) || !is_numeric($_POST['discount_value']) || floatval($_POST['discount_value']) < 0) {
         $_SESSION['error'] = 'Discount value must be a valid number greater than or equal to 0.';
         header('Location: create.php');
         exit();
     }
     
-    // Validate start date format
+    // jst the same as the two
     if (empty($start_date)) {
         $_SESSION['error'] = 'Start date is required.';
         header('Location: create.php');
         exit();
     }
-    
+    // basic iexplain to puro \d kasi digits and just {amount of numbers expected} 
     $datePattern = '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/';
     if (!preg_match($datePattern, $start_date)) {
         $_SESSION['error'] = 'Start date must be in format: YYYY-MM-DD HH:MM (e.g. 2025-01-15 10:30)';
@@ -50,34 +51,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Validate expiration date format if provided
+    // checking ng expiration date format if provided
     if (!empty($expiration_date) && !preg_match($datePattern, $expiration_date)) {
         $_SESSION['error'] = 'Expiration date must be in format: YYYY-MM-DD HH:MM (e.g. 2025-12-31 23:59)';
         header('Location: create.php');
         exit();
     }
     
-    // Validate min purchase amount format
+    // puro validation to basta
     if (!empty($_POST['min_purchase_amount']) && (!is_numeric($_POST['min_purchase_amount']) || floatval($_POST['min_purchase_amount']) < 0)) {
         $_SESSION['error'] = 'Min purchase amount must be a valid number greater than or equal to 0.';
         header('Location: create.php');
         exit();
     }
     
-    // Validate max discount amount format
+    // validation number ewan
     if (!empty($_POST['max_discount_amount']) && (!is_numeric($_POST['max_discount_amount']) || floatval($_POST['max_discount_amount']) < 0)) {
         $_SESSION['error'] = 'Max discount amount must be a valid number greater than or equal to 0.';
         header('Location: create.php');
         exit();
     }
     
-    // Validate usage limit format
+    // validation number idk madami e
     if (!empty($_POST['usage_limit']) && (!is_numeric($_POST['usage_limit']) || intval($_POST['usage_limit']) < 0)) {
         $_SESSION['error'] = 'Usage limit must be a valid whole number greater than or equal to 0.';
         header('Location: create.php');
         exit();
     }
-    
+    // puro validation to basta(9999)
     if ($discount_value <= 0) {
         $_SESSION['error'] = 'Discount value must be greater than 0.';
         header('Location: create.php');
@@ -102,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $discount_id = $conn->insert_id;
         $stmt->close();
         
-        // Add products if applies to specific products
+        // for specific product discounts
         if ($applies_to === 'specific_products' && !empty($products)) {
             $prod_stmt = $conn->prepare("INSERT INTO discount_products (discount_id, product_id) VALUES (?, ?)");
             foreach ($products as $product_id) {
@@ -112,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $prod_stmt->close();
         }
         
-        // Add categories if applies to specific categories
+        // to naman by categories
         if ($applies_to === 'specific_categories' && !empty($categories)) {
             $cat_stmt = $conn->prepare("INSERT INTO discount_categories (discount_id, category_id) VALUES (?, ?)");
             foreach ($categories as $category_id) {

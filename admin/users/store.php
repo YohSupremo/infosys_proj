@@ -1,7 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-
+// from create.php data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';

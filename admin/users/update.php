@@ -1,7 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-
+// from edit.php data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = intval($_POST['user_id'] ?? 0);
     $first_name = sanitize($_POST['first_name'] ?? '');

@@ -3,14 +3,13 @@ $page_title = 'Net Income Report - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
-// Date filter (optional - requires both start and end to apply)
+//has date filter
 $error = '';
 $start_date = isset($_GET['start_date']) ? trim($_GET['start_date']) : '';
 $end_date = isset($_GET['end_date']) ? trim($_GET['end_date']) : '';
 $has_filter = (!empty($start_date) && !empty($end_date));
 
-// Validate date formats if provided
+// Validation
 if (!empty($start_date)) {
     $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
     if (!preg_match($datePattern, $start_date)) {

@@ -3,7 +3,7 @@ $page_title = 'NBA Teams - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// main ui
 $teams = $conn->query("SELECT * FROM nba_teams ORDER BY team_name");
 ?>
 

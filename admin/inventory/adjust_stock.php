@@ -16,14 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity_change = intval($_POST['quantity_change'] ?? 0);
     $adjustment_notes = sanitize($_POST['adjustment_notes'] ?? '');
     $user_id = $_SESSION['user_id'];
-    
-    // Server-side validation
+
     if ($product_id <= 0) {
         $error = 'Please select a product.';
     } elseif ($quantity_change == 0) {
         $error = 'Quantity change cannot be zero.';
     } else {
-        // Get current stock
         $stock_stmt = $conn->prepare("SELECT stock_quantity FROM products WHERE product_id = ?");
         $stock_stmt->bind_param("i", $product_id);
         $stock_stmt->execute();
@@ -35,17 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $current_stock = $stock_result->fetch_assoc()['stock_quantity'];
             $new_stock = $current_stock + $quantity_change;
             
-            // Prevent negative stock
             if ($new_stock < 0) {
                 $error = 'Cannot adjust stock below zero. Current stock: ' . $current_stock;
             } else {
-                // Update stock
                 $update_stmt = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE product_id = ?");
                 $update_stmt->bind_param("ii", $new_stock, $product_id);
                 $update_stmt->execute();
                 $update_stmt->close();
                 
-                // Record inventory history with adjustment type
                 $inv_stmt = $conn->prepare("INSERT INTO inventory_history (product_id, transaction_type, quantity_change, previous_stock, new_stock, reference_id, reference_type, created_by, notes) VALUES (?, 'adjustment', ?, ?, ?, NULL, 'adjustment', ?, ?)");
                 $inv_stmt->bind_param("iiiiis", $product_id, $quantity_change, $current_stock, $new_stock, $user_id, $adjustment_notes);
                 $inv_stmt->execute();
@@ -60,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get product info if product_id is provided
 $product = null;
 if ($product_id > 0) {
     $product_stmt = $conn->prepare("SELECT product_id, product_name, stock_quantity FROM products WHERE product_id = ?");
@@ -105,6 +99,7 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                             <select class="form-select" id="product_id" name="product_id" onchange="updateStockInfo()">
                                 <option value="0">Select Product</option>
                                 <?php 
+                                // just to reset the pointer since nagamit nga kanina from the $products_list
                                 $products_list->data_seek(0);
                                 while ($prod = $products_list->fetch_assoc()): 
                                 ?>
@@ -173,7 +168,7 @@ function setQuantityChange(value) {
 // Update when product changes
 document.getElementById('product_id').addEventListener('change', updateStockInfo);
 
-// Initialize on page load
+// runs on page load
 updateStockInfo();
 </script>
 

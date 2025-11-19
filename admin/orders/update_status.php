@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $notes = sanitize($_POST['notes'] ?? '');
     $user_id = $_SESSION['user_id'];
     
-    // Server-side validation
+    // validations 
     if (empty($new_status)) {
         $error = 'Please select a status.';
     } elseif (!in_array($new_status, ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'])) {
@@ -47,15 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update_stmt->bind_param("si", $new_status, $order_id);
         
         if ($update_stmt->execute()) {
-            // Record status history
+            // log status history
             $history_stmt = $conn->prepare("INSERT INTO order_status_history (order_id, old_status, new_status, changed_by, notes) VALUES (?, ?, ?, ?, ?)");
             $history_stmt->bind_param("issis", $order_id, $old_status, $new_status, $user_id, $notes);
             $history_stmt->execute();
             $history_stmt->close();
             
-            // Send email notification (Term Test Requirement)
+            // Send email notif
             if ($old_status !== $new_status) {
-                // Get order items for email
+                // Get order items 
                 $items_stmt = $conn->prepare("SELECT * FROM order_items WHERE order_id = ?");
                 $items_stmt->bind_param("i", $order_id);
                 $items_stmt->execute();
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $items_stmt->close();
                 
-                // Send email with product list, subtotal, and grand total
+                // Send email with product list, subtotal, and total
                 $to_email = $order['email'];
                 $to_name = $order['first_name'] . ' ' . $order['last_name'];
                 sendOrderStatusEmail(

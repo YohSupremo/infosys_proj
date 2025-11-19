@@ -4,10 +4,10 @@ include '../../config/config.php';
 include '../../includes/header.php';
 
 requireAdmin();
-
+// main ui puro filtering and searching lang to
 $search = trim($_GET['search'] ?? '');
 $status_filter = $_GET['status'] ?? 'all';
-
+//puro query building ginawa sa buong file jsut for filtering
 $default_statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Completed', 'Cancelled'];
 $status_options = $default_statuses;
 $status_result = $conn->query("SELECT DISTINCT order_status FROM orders ORDER BY order_status");

@@ -190,7 +190,7 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 <script>
     // dropdowns things for add product
 document.getElementById('addProduct').addEventListener('click', function() {
-    const container = document.getElementById('productsContainer');
+    const container = document.getElementById('productsContainer'); // creation of container
     const template = container.querySelector('.product-row');
     const newRow = template.cloneNode(true);
     newRow.querySelectorAll('input, select').forEach(input => {
@@ -199,15 +199,15 @@ document.getElementById('addProduct').addEventListener('click', function() {
     container.appendChild(newRow);
 });
 
-// 
+// remove button handling sabi ni __
 document.getElementById('productsContainer').addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-product') || e.target.closest('.remove-product')) {
+    if (e.target.classList.contains('remove-product') || e.target.closest('.remove-product')) { // name is from bootstrap things
         const button = e.target.classList.contains('remove-product') ? e.target : e.target.closest('.remove-product');
         const rows = document.querySelectorAll('.product-row');
-        if (rows.length > 1) {
+        if (rows.length > 1) { //checker if isa lang natitira na product di na pwede idelete
             button.closest('.product-row').remove();
         } else {
-            alert('At least one product is required.');
+            alert('At least one product is required.'); 
         }
     }
 });

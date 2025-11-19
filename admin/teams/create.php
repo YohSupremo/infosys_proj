@@ -3,7 +3,7 @@ $page_title = 'Add Team - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// add team UI
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 ?>

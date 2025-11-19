@@ -3,7 +3,7 @@ $page_title = 'Order Details - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// this is the view button when the admin clicks view in index.php
 $order_id = intval($_GET['id'] ?? 0);
 
 if (!$order_id) {

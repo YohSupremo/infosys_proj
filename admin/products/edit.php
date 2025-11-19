@@ -3,7 +3,7 @@ $page_title = 'Edit Product - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-
+// same as the other edits
 $product_id = intval($_GET['id'] ?? 0);
 $error = '';
 $success = '';
@@ -13,7 +13,6 @@ if (!$product_id) {
     exit();
 }
 
-// Get product
 $stmt = $conn->prepare("SELECT * FROM products WHERE product_id = ?");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
@@ -27,7 +26,7 @@ if ($result->num_rows === 0) {
 $product = $result->fetch_assoc();
 $stmt->close();
 
-// Get product categories
+// categories
 $product_categories = [];
 $cat_stmt = $conn->prepare("SELECT category_id FROM product_categories WHERE product_id = ?");
 $cat_stmt->bind_param("i", $product_id);
@@ -38,7 +37,7 @@ while ($cat = $cat_result->fetch_assoc()) {
 }
 $cat_stmt->close();
 
-// Get product images (MP1 Requirement)
+// images
 $images_stmt = $conn->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY display_order ASC, is_primary DESC");
 $images_stmt->bind_param("i", $product_id);
 $images_stmt->execute();
@@ -52,10 +51,10 @@ $images_stmt->close();
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 
-// Get teams
+// teams
 $teams = $conn->query("SELECT * FROM nba_teams ORDER BY team_name");
 
-// Get categories
+// categories
 $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY category_name");
 ?>
 
@@ -172,7 +171,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
 </div>
 
 <script>
-// Single image preview
+// preview img-thumbnail
 document.getElementById('image').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -185,7 +184,7 @@ document.getElementById('image').addEventListener('change', function(e) {
     }
 });
 
-// Multiple images preview
+// Mpreview multiple images
 document.getElementById('images').addEventListener('change', function(e) {
     const preview = document.getElementById('imagesPreview');
     preview.innerHTML = '';
