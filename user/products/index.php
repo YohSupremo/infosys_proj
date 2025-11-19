@@ -8,14 +8,15 @@ $search = sanitize($_GET['search'] ?? '');
 $team_id = intval($_GET['team_id'] ?? 0);
 $category_id = intval($_GET['category_id'] ?? 0);
 
-// Build query
+// left join para lumabas parin lahat ng product kahit yung naka-anchor sa deleted nba teams
 $query = "SELECT DISTINCT p.*, t.team_name, t.team_code 
           FROM products p 
           LEFT JOIN nba_teams t ON p.team_id = t.team_id 
           WHERE p.is_active = 1";
-$params = [];
-$types = "";
+$params = []; //i-store lahat ng value ng parameters dito
+$types = ""; //stacking ng types para sa prepared statement 
 
+//for filtering, nag a-append ng query
 if ($search) {
     $query .= " AND (p.product_name LIKE ? OR p.description LIKE ?)";
     $search_param = "%$search%";
@@ -24,12 +25,14 @@ if ($search) {
     $types .= "ss";
 }
 
+//if filtered by team
 if ($team_id > 0) {
     $query .= " AND p.team_id = ?";
     $params[] = $team_id;
     $types .= "i";
 }
 
+//if filtered by category
 if ($category_id > 0) {
     $query .= " AND p.product_id IN (SELECT product_id FROM product_categories WHERE category_id = ?)";
     $params[] = $category_id;
@@ -45,10 +48,10 @@ if (!empty($params)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Get teams for filter
+// get teams for filter para sa dropdown
 $teams_result = $conn->query("SELECT * FROM nba_teams ORDER BY team_name");
 
-// Get categories for filter
+// get categories for filter, para sa dropdown
 $categories_result = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER BY category_name");
 ?>
 

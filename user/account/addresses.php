@@ -4,8 +4,10 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireLogin();
 
+//index ng address na naka-anchor sa user
 $user_id = $_SESSION['user_id'];
 
+//fetch addresses
 $stmt = $conn->prepare("SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, created_at DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($confirm !== 'DEACTIVATE') {
         $error = 'Please type "DEACTIVATE" to confirm.';
     } else {
-        // Deactivate user account (FR1.1.4)
+        // Deactivate user account 
         $deactivate_stmt = $conn->prepare("UPDATE users SET is_active = 0 WHERE user_id = ?");
         $deactivate_stmt->bind_param("i", $user_id);
         

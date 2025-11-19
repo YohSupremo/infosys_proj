@@ -3,6 +3,7 @@ $page_title = 'Forgot Password - NBA Shop';
 include '../../config/config.php';
 include '../../includes/header.php';
 
+//gumamit ng mailtrap for sending verification code, specifically under phpmailer
 use PHPMailer\PHPMailer\PHPMailer;
 
 require('../../vendor/autoload.php');
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
-            $verification_code = rand(100000, 999999);
+            $verification_code = rand(100000, 999999); //generates random number
             $_SESSION['reset_email'] = $email;
             $_SESSION['reset_code'] = $verification_code;
             $_SESSION['reset_code_expires'] = time() + 600; // 10 minutes

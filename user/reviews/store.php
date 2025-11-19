@@ -10,7 +10,7 @@ $bad_words = [
 
 function censorText($text, $bad_words) {
     $sub_map = [
-      'a' => '[a@4áàâäãåā]',  
+    'a' => '[a@4áàâäãåā]',  
     'i' => '[i1!|íìîïī]',   
     'o' => '[o0óòôöõō]',   
     'e' => '[e3éèêëē]',    
@@ -19,6 +19,7 @@ function censorText($text, $bad_words) {
     't' => '[t7+]',
     ];
 
+    //gawa ng regex pattern kada-badword
     foreach ($bad_words as $word) {
         $escaped = preg_quote($word, '/');
       
@@ -32,10 +33,11 @@ function censorText($text, $bad_words) {
                 $pattern_chars .= $ch;
             }
         }
+        //finds white spaces then replace it with \s+ which is a pattern in regex for white space
        $pattern_chars = preg_replace('/\s+/', '\\s+', $pattern_chars);    
-        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
+        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu'; //negative look behind, negative lookahead
         $replacement = str_repeat('*', mb_strlen($word));
-        $text = preg_replace($pattern, $replacement, $text);
+        $text = preg_replace($pattern, $replacement, $text); //kapag na-detect yung word or same sa pattern na ginawa, papalitan ng ast
     }
 
     return $text;
@@ -51,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Verify user has completed order for this product (MP4 Requirement)
+    // check if nakapag-order naba sa product and na-deliver na 
     $order_check = $conn->prepare("SELECT o.order_id, o.order_status, oi.product_id 
                                     FROM orders o 
                                     JOIN order_items oi ON o.order_id = oi.order_id 
@@ -68,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $order_check->close();
     
-    // Check if review already exists
+    // check if may review record na or na-review na yung product
     $existing_review = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? AND order_id = ?");
     $existing_review->bind_param("iii", $user_id, $product_id, $order_id);
     $existing_review->execute();
@@ -85,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rating = intval($_POST['rating'] ?? 0);
     $review_text = sanitize($_POST['review_text'] ?? '');
     
-    // Server-side validation
+    // server-side validation
     if ($rating < 1 || $rating > 5) {
         $_SESSION['error'] = 'Please select a valid rating (1-5 stars).';
         header('Location: create.php?product_id=' . $product_id . '&order_id=' . $order_id);
@@ -100,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Apply regex filter for bad words (MP4 Requirement)
+    // call function para ma-filter yung comment
     $filtered_text = censorText($review_text, $bad_words);
 
     $insert_stmt = $conn->prepare("INSERT INTO product_reviews (product_id, user_id, order_id, rating, review_text) VALUES (?, ?, ?, ?, ?)");

@@ -11,7 +11,7 @@ if (!$product_id) {
     exit();
 }
 
-
+// left join para lumabas parin lahat ng product kahit yung naka-anchor sa deleted nba teams
 $stmt = $conn->prepare("SELECT p.*, t.team_name, t.team_code FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id WHERE p.product_id = ? AND p.is_active = 1");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
@@ -24,15 +24,15 @@ if ($result->num_rows === 0) {
 
 $product = $result->fetch_assoc();
 
-// Get categories
+// fetch all categories para narin kapag nag view, mas-show anong category naka-anchor sa selected product
 $cat_stmt = $conn->prepare("SELECT c.category_name FROM categories c JOIN product_categories pc ON c.category_id = pc.category_id WHERE pc.product_id = ?");
 $cat_stmt->bind_param("i", $product_id);
 $cat_stmt->execute();
 $categories = $cat_stmt->get_result();
 
-// Get product images (MP1 Requirement - Multiple Photos)
-// Include main product image from products table as the first image
-$product_images = [];
+// get product images
+// include main product image from products table as the first image
+$product_images = []; // array kung saan ilalagay yung product images, primary and other images
 
 // Add main product image if it exists
 if (!empty($product['image_url'])) {
@@ -40,16 +40,16 @@ if (!empty($product['image_url'])) {
         'image_url' => $product['image_url'],
         'is_primary' => 1,
         'display_order' => 0
-    ];
+    ]; //associative array of images to use later 
 }
 
-// Get additional images from product_images table
+// get additional images from product_images table
 $images_stmt = $conn->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY is_primary DESC, display_order ASC");
 $images_stmt->bind_param("i", $product_id);
 $images_stmt->execute();
 $images_result = $images_stmt->get_result();
 while ($img = $images_result->fetch_assoc()) {
-    // Skip if this image is already in the array (shouldn't happen, but just in case)
+    // skip if this image is already in the array (shouldn't happen, but just in case)
     $exists = false;
     foreach ($product_images as $existing) {
         if ($existing['image_url'] === $img['image_url']) {
@@ -63,21 +63,21 @@ while ($img = $images_result->fetch_assoc()) {
 }
 $images_stmt->close();
 
-// Get reviews (MP4 Requirement)
+// get reviews 
 $reviews_stmt = $conn->prepare("SELECT r.*, u.first_name, u.last_name FROM product_reviews r JOIN users u ON r.user_id = u.user_id WHERE r.product_id = ? ORDER BY r.created_at DESC");
 $reviews_stmt->bind_param("i", $product_id);
 $reviews_stmt->execute();
 $reviews_result = $reviews_stmt->get_result();
 
-// Check if current user can review (has completed order) - Any user who purchased can review
+// check if current user can review (has completed order) - Any user who purchased can review (delivered)
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 $can_review = false;
-$reviewable_orders = [];
+$reviewable_orders = []; // array for orders na ang status is delivered  na, to be used later
 $user_has_review = false;
 $user_review_id = null;
 
 if ($user_id) {
-    // Check if user has any delivered orders containing this product
+    // check if user has any delivered orders containing this product
     $order_check = $conn->prepare("SELECT DISTINCT o.order_id FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.user_id = ? AND oi.product_id = ? AND o.order_status = 'Delivered'");
     $order_check->bind_param("ii", $user_id, $product_id);
     $order_check->execute();
@@ -90,7 +90,7 @@ if ($user_id) {
     }
     $order_check->close();
     
-    // Check if user already has a review for this product
+    // check if user already has a review for this product
     $user_review_check = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? LIMIT 1");
     $user_review_check->bind_param("ii", $user_id, $product_id);
     $user_review_check->execute();
@@ -120,7 +120,7 @@ if ($user_id) {
     <?php endif; ?>
     <div class="row">
         <div class="col-md-6">
-            <!-- Product Images (MP1 - Multiple Photos) -->
+            <!-- Product Images  -->
             <?php if (count($product_images) > 0): ?>
                 <!-- Main Image -->
                 <div class="mb-3">
@@ -182,7 +182,8 @@ if ($user_id) {
                         </div>
                         <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
                     </form>
-                <?php else: ?>
+                <?php else: ?> 
+                      <!-- Invalid credentials -->
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i> <strong>You need to login to shop.</strong>
                         <p class="mb-2 mt-2">Please login or create an account to add items to your cart.</p>
@@ -204,6 +205,7 @@ if ($user_id) {
                         <a href="<?php echo BASE_URL; ?>/user/reviews/edit.php?id=<?php echo $user_review_id; ?>" class="btn btn-success">
                             <i class="bi bi-pencil"></i> Edit Your Review
                         </a>
+                       
                     <?php else: ?>
                         <a href="<?php echo BASE_URL; ?>/user/reviews/create.php?product_id=<?php echo $product_id; ?>&order_id=<?php echo $reviewable_orders[0]; ?>" class="btn btn-primary">
                             <i class="bi bi-star"></i> Write a Review
@@ -220,7 +222,7 @@ if ($user_id) {
         </div>
     </div>
     
-    <!-- Reviews Section (MP4 Requirement) -->
+    <!-- Reviews Section -->
     <div class="row mt-5">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">

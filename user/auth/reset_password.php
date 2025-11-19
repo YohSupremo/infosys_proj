@@ -7,6 +7,7 @@ $error = '';
 $success = '';
 $notice = '';
 
+//itong file, pang validate lang kung tama ba yung verification code mo pati new password validation
 if (!isset($_SESSION['reset_email']) || !isset($_SESSION['reset_code'])) {
     header('Location: ' . BASE_URL . '/user/auth/forgot_password.php');
     exit();

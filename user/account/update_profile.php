@@ -3,7 +3,7 @@ include '../../config/config.php';
 requireLogin();
 
 $user_id = $_SESSION['user_id'];
-
+//dito yung action ng edit_profile, replacing what's and the form control and updates the database
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = sanitize($_POST['first_name'] ?? '');
     $last_name = sanitize($_POST['last_name'] ?? '');
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!empty($password) && strlen($password) < 6) {
         $_SESSION['error'] = 'Password must be at least 6 characters long.';
     } else {
-        // Get current user data to know existing profile photo
+        // get current user data to know existing profile photo
         $stmt = $conn->prepare("SELECT profile_photo FROM users WHERE user_id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -29,11 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $profile_photo = $current ? $current['profile_photo'] : null;
 
-        // Handle profile photo upload
+        // handle profile photo upload
         if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
             $upload_dir = '../../assets/images/profiles/';
             if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
+                mkdir($upload_dir, 0777, true); //if wala pang directory, gagawa ng directory
             }
 
             $file_ext = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));

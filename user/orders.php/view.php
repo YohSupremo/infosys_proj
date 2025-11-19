@@ -12,7 +12,7 @@ if (!$order_id) {
     exit();
 }
 
-// Fetch order and item details using view plus product image
+// fetch order and item details using view plus product image
 $details_stmt = $conn->prepare("SELECT v.*, p.image_url 
     FROM v_order_details v 
     LEFT JOIN products p ON v.product_id = p.product_id 
@@ -33,6 +33,7 @@ while ($row = $details_result->fetch_assoc()) {
 }
 $details_stmt->close();
 
+//rows[0] lang  since if maraming product sa isang order, pare-parehas lang naman ng order info like payment method, address, etc
 $order = $rows[0];
 
 // Items come from rows that have order_item_id

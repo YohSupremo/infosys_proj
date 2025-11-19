@@ -5,7 +5,7 @@ include '../../includes/header.php';
 requireLogin();
 
 $user_id = $_SESSION['user_id'];
-$address_id = intval($_GET['id'] ?? 0);
+$address_id = intval($_GET['id'] ?? 0); 
 $error = '';
 $success = '';
 

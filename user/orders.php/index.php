@@ -6,6 +6,7 @@ requireLogin();
 
 $user_id = $_SESSION['user_id'];
 
+// use view in fetching orders
 $orders_stmt = $conn->prepare("SELECT order_id, order_date, order_status, total_amount, address_line1, city, state 
     FROM v_order_details 
     WHERE user_id = ? 

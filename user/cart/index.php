@@ -8,20 +8,20 @@ $user_id = $_SESSION['user_id'];
 $error = $_GET['error'] ?? '';
 $success = $_GET['success'] ?? '';
 
-// Get cart
+// get cart
 $cart_stmt = $conn->prepare("SELECT cart_id FROM shopping_cart WHERE user_id = ?");
 $cart_stmt->bind_param("i", $user_id);
 $cart_stmt->execute();
 $cart_result = $cart_stmt->get_result();
 
-$cart_items = [];
+$cart_items = []; //ilalagay items dito, to be used
 $total = 0;
 
 if ($cart_result->num_rows > 0) {
     $cart = $cart_result->fetch_assoc();
     $cart_id = $cart['cart_id'];
     
-    // Get cart items
+    // fetch yung current na laman ng cart
     $items_stmt = $conn->prepare("SELECT ci.*, p.product_name, p.price, p.image_url, p.stock_quantity FROM cart_items ci JOIN products p ON ci.product_id = p.product_id WHERE ci.cart_id = ?");
     $items_stmt->bind_param("i", $cart_id);
     $items_stmt->execute();

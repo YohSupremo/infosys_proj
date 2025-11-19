@@ -4,8 +4,10 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireLogin();
 
+//ito yung parang index, dito naka-link yung ibang buttons (origin)
 $user_id = $_SESSION['user_id'];
 
+//fetch ng user info along role name
 $stmt = $conn->prepare("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();

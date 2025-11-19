@@ -9,6 +9,7 @@ $user_id = $_SESSION['user_id'];
 $error = '';
 $success = '';
 
+// for adding addresses
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address_line1 = sanitize($_POST['address_line1'] ?? '');
     $address_line2 = sanitize($_POST['address_line2'] ?? '');
