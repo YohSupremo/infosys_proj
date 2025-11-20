@@ -72,14 +72,94 @@ if (isset($_SESSION['checkout_data'])) {
         
         if ($disc_result->num_rows > 0) {
             $discount = $disc_result->fetch_assoc();
+            $applies_to = $discount['applies_to'];
             
-            // check minimum purchase amount first
-            if (!$discount['min_purchase_amount'] || $subtotal >= $discount['min_purchase_amount']) {
+            // Calculate eligible subtotal based on applies_to
+            $eligible_subtotal = 0;
+            
+            if ($applies_to === 'all') {
+                // Discount applies to entire cart
+                $eligible_subtotal = $subtotal;
+            } elseif ($applies_to === 'specific_products') {
+                // Get product IDs that this discount applies to
+                $prod_disc_stmt = $conn->prepare("SELECT product_id FROM discount_products WHERE discount_id = ?");
+                $prod_disc_stmt->bind_param("i", $discount['discount_id']);
+                $prod_disc_stmt->execute();
+                $prod_disc_result = $prod_disc_stmt->get_result();
+                $discount_product_ids = [];
+                while ($row = $prod_disc_result->fetch_assoc()) {
+                    $discount_product_ids[] = intval($row['product_id']);
+                }
+                $prod_disc_stmt->close();
+                
+                // If no products are specified, discount doesn't apply
+                if (empty($discount_product_ids)) {
+                    $eligible_subtotal = 0;
+                } else {
+                    // Calculate subtotal only for matching products
+                    foreach ($cart_items as $item) {
+                        if (in_array(intval($item['product_id']), $discount_product_ids)) {
+                            $eligible_subtotal += $item['price'] * $item['quantity'];
+                        }
+                    }
+                }
+            } elseif ($applies_to === 'specific_categories') {
+                // Get category IDs that this discount applies to
+                $cat_disc_stmt = $conn->prepare("SELECT category_id FROM discount_categories WHERE discount_id = ?");
+                $cat_disc_stmt->bind_param("i", $discount['discount_id']);
+                $cat_disc_stmt->execute();
+                $cat_disc_result = $cat_disc_stmt->get_result();
+                $discount_category_ids = [];
+                while ($row = $cat_disc_result->fetch_assoc()) {
+                    $discount_category_ids[] = intval($row['category_id']);
+                }
+                $cat_disc_stmt->close();
+                
+                // If no categories are specified, discount doesn't apply
+                if (empty($discount_category_ids)) {
+                    $eligible_subtotal = 0;
+                } else {
+                    // Get product categories for cart items
+                    foreach ($cart_items as $item) {
+                        $prod_cat_stmt = $conn->prepare("SELECT category_id FROM product_categories WHERE product_id = ?");
+                        $prod_cat_stmt->bind_param("i", $item['product_id']);
+                        $prod_cat_stmt->execute();
+                        $prod_cat_result = $prod_cat_stmt->get_result();
+                        $item_categories = [];
+                        while ($row = $prod_cat_result->fetch_assoc()) {
+                            $item_categories[] = intval($row['category_id']);
+                        }
+                        $prod_cat_stmt->close();
+                        
+                        // Check if any category matches
+                        $has_match = false;
+                        foreach ($item_categories as $cat_id) {
+                            if (in_array($cat_id, $discount_category_ids)) {
+                                $has_match = true;
+                                break;
+                            }
+                        }
+                        
+                        if ($has_match) {
+                            $eligible_subtotal += $item['price'] * $item['quantity'];
+                        }
+                    }
+                }
+            }
+            
+            // Check if there are eligible items for specific product/category discounts
+            if ($applies_to !== 'all' && $eligible_subtotal == 0) {
+                // No eligible items, don't apply discount
+                $discount_id = null;
+                $discount_amount = 0;
+            }
+            // check minimum purchase amount
+            elseif (!$discount['min_purchase_amount'] || $eligible_subtotal >= $discount['min_purchase_amount']) {
                 $discount_id = $discount['discount_id'];
                 
-                // calculate discount based on type
+                // calculate discount based on eligible subtotal
                 if ($discount['discount_type'] === 'percentage') {
-                    $discount_amount = ($subtotal * $discount['discount_value']) / 100;
+                    $discount_amount = ($eligible_subtotal * $discount['discount_value']) / 100;
                     if ($discount['max_discount_amount'] && $discount_amount > $discount['max_discount_amount']) {
                         $discount_amount = $discount['max_discount_amount'];
                     }
@@ -173,6 +253,9 @@ if (isset($_SESSION['checkout_data'])) {
 		);
 	}
 	$user_stmt->close();
+	
+	// Clear discount session after successful order placement
+	unset($_SESSION['discount_code'], $_SESSION['discount_value'], $_SESSION['discount_type'], $_SESSION['discount_id']);
 	
     header("Location: " . BASE_URL . "/user/checkout/success.php?order_id=$order_id");
     exit();

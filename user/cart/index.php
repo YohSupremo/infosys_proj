@@ -8,6 +8,9 @@ $user_id = $_SESSION['user_id'];
 $error = $_GET['error'] ?? '';
 $success = $_GET['success'] ?? '';
 
+// Clear discount session when returning to cart (user exited checkout)
+unset($_SESSION['discount_code'], $_SESSION['discount_value'], $_SESSION['discount_type'], $_SESSION['discount_id']);
+
 // get cart
 $cart_stmt = $conn->prepare("SELECT cart_id FROM shopping_cart WHERE user_id = ?");
 $cart_stmt->bind_param("i", $user_id);
