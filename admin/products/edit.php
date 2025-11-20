@@ -131,7 +131,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Existing Product Images (MP1 - Multiple Photos)</label>
+                            <label class="form-label">Existing Product Images </label>
                             <?php if (count($product_images) > 0): ?>
                                 <div class="row mb-3">
                                     <?php foreach ($product_images as $img): ?>
