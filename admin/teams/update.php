@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// and this is from edit.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $team_id = intval($_POST['team_id'] ?? 0);
     $team_name = sanitize($_POST['team_name'] ?? '');

@@ -3,7 +3,6 @@ $page_title = 'Add Supplier - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-// crud nanaman
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 ?>

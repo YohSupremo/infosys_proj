@@ -2,7 +2,6 @@
 include '../../config/config.php';
 requireLogin();
 
-// get checkout data from session (set by checkout/index.php)
 if (isset($_SESSION['checkout_data'])) {
 	require '../../config/email_config.php';
 	require '../../vendor/autoload.php';
@@ -11,10 +10,8 @@ if (isset($_SESSION['checkout_data'])) {
     $payment_method = sanitize($_SESSION['checkout_data']['payment_method'] ?? 'Cash on Delivery');
     $discount_code = sanitize($_SESSION['checkout_data']['discount_code'] ?? '');
     
-    // Clear session data
     unset($_SESSION['checkout_data']);
     
-    // verify address belongs to user
     $addr_stmt = $conn->prepare("SELECT address_id FROM user_addresses WHERE address_id = ? AND user_id = ?");
     $addr_stmt->bind_param("ii", $address_id, $user_id);
     $addr_stmt->execute();
@@ -26,7 +23,6 @@ if (isset($_SESSION['checkout_data'])) {
     }
     $addr_stmt->close();
     
-    // get cart items
     $cart_stmt = $conn->prepare("SELECT cart_id FROM shopping_cart WHERE user_id = ?");
     $cart_stmt->bind_param("i", $user_id);
     $cart_stmt->execute();
@@ -60,7 +56,6 @@ if (isset($_SESSION['checkout_data'])) {
     $items_stmt->close();
     $cart_stmt->close();
     
-    // process discount
     $discount_id = null;
     $discount_amount = 0;
     
@@ -74,14 +69,11 @@ if (isset($_SESSION['checkout_data'])) {
             $discount = $disc_result->fetch_assoc();
             $applies_to = $discount['applies_to'];
             
-            // Calculate eligible subtotal based on applies_to
             $eligible_subtotal = 0;
             
             if ($applies_to === 'all') {
-                // Discount applies to entire cart
                 $eligible_subtotal = $subtotal;
             } elseif ($applies_to === 'specific_products') {
-                // Get product IDs that this discount applies to
                 $prod_disc_stmt = $conn->prepare("SELECT product_id FROM discount_products WHERE discount_id = ?");
                 $prod_disc_stmt->bind_param("i", $discount['discount_id']);
                 $prod_disc_stmt->execute();
@@ -92,11 +84,9 @@ if (isset($_SESSION['checkout_data'])) {
                 }
                 $prod_disc_stmt->close();
                 
-                // If no products are specified, discount doesn't apply
                 if (empty($discount_product_ids)) {
                     $eligible_subtotal = 0;
                 } else {
-                    // Calculate subtotal only for matching products
                     foreach ($cart_items as $item) {
                         if (in_array(intval($item['product_id']), $discount_product_ids)) {
                             $eligible_subtotal += $item['price'] * $item['quantity'];
@@ -104,7 +94,6 @@ if (isset($_SESSION['checkout_data'])) {
                     }
                 }
             } elseif ($applies_to === 'specific_categories') {
-                // Get category IDs that this discount applies to
                 $cat_disc_stmt = $conn->prepare("SELECT category_id FROM discount_categories WHERE discount_id = ?");
                 $cat_disc_stmt->bind_param("i", $discount['discount_id']);
                 $cat_disc_stmt->execute();
@@ -115,11 +104,9 @@ if (isset($_SESSION['checkout_data'])) {
                 }
                 $cat_disc_stmt->close();
                 
-                // If no categories are specified, discount doesn't apply
                 if (empty($discount_category_ids)) {
                     $eligible_subtotal = 0;
                 } else {
-                    // Get product categories for cart items
                     foreach ($cart_items as $item) {
                         $prod_cat_stmt = $conn->prepare("SELECT category_id FROM product_categories WHERE product_id = ?");
                         $prod_cat_stmt->bind_param("i", $item['product_id']);
@@ -131,7 +118,6 @@ if (isset($_SESSION['checkout_data'])) {
                         }
                         $prod_cat_stmt->close();
                         
-                        // Check if any category matches
                         $has_match = false;
                         foreach ($item_categories as $cat_id) {
                             if (in_array($cat_id, $discount_category_ids)) {
@@ -147,17 +133,13 @@ if (isset($_SESSION['checkout_data'])) {
                 }
             }
             
-            // Check if there are eligible items for specific product/category discounts
             if ($applies_to !== 'all' && $eligible_subtotal == 0) {
-                // No eligible items, don't apply discount
                 $discount_id = null;
                 $discount_amount = 0;
             }
-            // check minimum purchase amount
             elseif (!$discount['min_purchase_amount'] || $eligible_subtotal >= $discount['min_purchase_amount']) {
                 $discount_id = $discount['discount_id'];
                 
-                // calculate discount based on eligible subtotal
                 if ($discount['discount_type'] === 'percentage') {
                     $discount_amount = ($eligible_subtotal * $discount['discount_value']) / 100;
                     if ($discount['max_discount_amount'] && $discount_amount > $discount['max_discount_amount']) {
@@ -174,14 +156,12 @@ if (isset($_SESSION['checkout_data'])) {
     $total_amount = $subtotal - $discount_amount;
     if ($total_amount < 0) $total_amount = 0;
     
-    // create order
     $order_stmt = $conn->prepare("INSERT INTO orders (user_id, address_id, discount_id, payment_method, subtotal, discount_amount, total_amount) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $order_stmt->bind_param("iiisddd", $user_id, $address_id, $discount_id, $payment_method, $subtotal, $discount_amount, $total_amount);
     $order_stmt->execute();
     $order_id = $conn->insert_id;
     $order_stmt->close();
     
-    // create order items and update stock
     foreach ($cart_items as $item) {
         $item_subtotal = $item['price'] * $item['quantity'];
         $order_item_stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
@@ -189,14 +169,12 @@ if (isset($_SESSION['checkout_data'])) {
         $order_item_stmt->execute();
         $order_item_stmt->close();
         
-        // update stock
         $new_stock = $item['stock_quantity'] - $item['quantity'];
         $update_stock = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE product_id = ?");
         $update_stock->bind_param("ii", $new_stock, $item['product_id']);
         $update_stock->execute();
         $update_stock->close();
         
-        // record inventory history
         $inv_stmt = $conn->prepare("INSERT INTO inventory_history (product_id, transaction_type, quantity_change, previous_stock, new_stock, reference_id, reference_type) VALUES (?, 'sale', ?, ?, ?, ?, 'order')");
         $qty_change = -$item['quantity'];
         $inv_stmt->bind_param("iiiii", $item['product_id'], $qty_change, $item['stock_quantity'], $new_stock, $order_id);
@@ -204,7 +182,6 @@ if (isset($_SESSION['checkout_data'])) {
         $inv_stmt->close();
     }
     
-    // update discount usage
     if ($discount_id) {
         $update_disc = $conn->prepare("UPDATE discount_codes SET times_used = times_used + 1 WHERE discount_id = ?");
         $update_disc->bind_param("i", $discount_id);
@@ -217,20 +194,17 @@ if (isset($_SESSION['checkout_data'])) {
         $disc_usage->close();
     }
     
-    // clear cart
     $clear_cart = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ?");
     $clear_cart->bind_param("i", $cart_id);
     $clear_cart->execute();
     $clear_cart->close();
     
-	// send order confirmation email to customer
 	$user_stmt = $conn->prepare("SELECT first_name, last_name, email FROM users WHERE user_id = ?");
 	$user_stmt->bind_param("i", $user_id);
 	$user_stmt->execute();
 	$user_res = $user_stmt->get_result();
 	if ($user_res && $user_res->num_rows > 0) {
 		$u = $user_res->fetch_assoc();
-		// fetch items for email
 		$oi_stmt = $conn->prepare("SELECT product_name, quantity, unit_price, subtotal FROM order_items WHERE order_id = ?");
 		$oi_stmt->bind_param("i", $order_id);
 		$oi_stmt->execute();
@@ -240,7 +214,6 @@ if (isset($_SESSION['checkout_data'])) {
 			$order_items[] = $row;
 		}
 		$oi_stmt->close();
-		// send status email (Pending)
 		sendOrderStatusEmail(
 			$u['email'],
 			$u['first_name'] . ' ' . $u['last_name'],
@@ -254,7 +227,6 @@ if (isset($_SESSION['checkout_data'])) {
 	}
 	$user_stmt->close();
 	
-	// Clear discount session after successful order placement
 	unset($_SESSION['discount_code'], $_SESSION['discount_value'], $_SESSION['discount_type'], $_SESSION['discount_id']);
 	
     header("Location: " . BASE_URL . "/user/checkout/success.php?order_id=$order_id");

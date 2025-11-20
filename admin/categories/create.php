@@ -4,8 +4,7 @@ include '../../config/config.php';
 include '../../includes/header.php';
 
 requireAdmin();
-//requireAdmin(); is just a checker sa role, so only admin can access this page
-// this also is just a form to pass to store.php
+
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 

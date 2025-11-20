@@ -7,19 +7,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity = intval($_POST['quantity'] ?? 1);
     $user_id = $_SESSION['user_id'];
     
-    // validate quantity format
     if (empty($_POST['quantity']) || !is_numeric($_POST['quantity']) || intval($_POST['quantity']) < 1) {
         header('Location: index.php?error=invalid_quantity');
         exit();
     }
     
     if ($cart_item_id > 0 && $quantity > 0) {
-        // verify cart ownership and check stock
         $check_stmt = $conn->prepare("SELECT ci.cart_item_id, p.stock_quantity FROM cart_items ci JOIN shopping_cart sc ON ci.cart_id = sc.cart_id JOIN products p ON ci.product_id = p.product_id WHERE ci.cart_item_id = ? AND sc.user_id = ?");
         $check_stmt->bind_param("ii", $cart_item_id, $user_id);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
-        //recheck ng stock since add to cart palang naman, p'wede maunahan
         if ($check_result->num_rows > 0) {
             $item = $check_result->fetch_assoc();
             if ($quantity <= $item['stock_quantity']) {

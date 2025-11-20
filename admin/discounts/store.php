@@ -1,8 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// waaaaaaaaaaa dami 
-//logic ng create.php form
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code = sanitize($_POST['code'] ?? '');
     $description = sanitize($_POST['description'] ?? '');

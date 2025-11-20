@@ -1,32 +1,25 @@
 <?php
-// Base URL configuration
 define('BASE_URL', '/infosys_proj');
 
-// Database configuration
 $db_host = 'localhost';
 $db_user = 'root';
 $db_pass = '';
 $db_name = 'infosys';
 
-// Create connection
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Helper function to check if user is logged in
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
-// Helper function to check user role
 function hasRole($role_name) {
     if (!isLoggedIn()) {
         return false;
@@ -34,7 +27,6 @@ function hasRole($role_name) {
     return isset($_SESSION['role_name']) && $_SESSION['role_name'] === $role_name;
 }
 
-// Helper function to require login
 function requireLogin() {
     if (!isLoggedIn()) {
         $_SESSION['redirect_message'] = 'Please login to access this page.';
@@ -43,7 +35,6 @@ function requireLogin() {
     }
 }
 
-// Helper function to require admin
 function requireAdmin() {
     requireLogin();
     if (!hasRole('Admin')) {
@@ -53,7 +44,6 @@ function requireAdmin() {
     }
 }
 
-// Helper function to require admin or inventory manager
 function requireAdminOrInventoryManager() {
     requireLogin();
     if (!hasRole('Admin') && !hasRole('Inventory Manager')) {
@@ -63,7 +53,6 @@ function requireAdminOrInventoryManager() {
     }
 }
 
-// Helper function to sanitize input
 function sanitize($data) {
     return htmlspecialchars(strip_tags(trim($data)));
 }

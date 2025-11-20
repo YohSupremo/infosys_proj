@@ -3,9 +3,7 @@ $page_title = 'Edit Discount - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-//UI lang din to
-// kung may ifefetch man kung ano lang yung mga products yan
-// data is given to update.php
+
 $discount_id = intval($_GET['id'] ?? 0);
 $error = '';
 

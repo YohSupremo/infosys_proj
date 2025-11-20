@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// galing create.php form method
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_name = sanitize($_POST['product_name'] ?? '');
     $description = sanitize($_POST['description'] ?? '');
@@ -11,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $categories = $_POST['categories'] ?? [];
     
-    // Validation
     if (empty($product_name)) {
         $_SESSION['error'] = 'Product name is required.';
         header('Location: create.php');
@@ -30,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // single image upload
     $image_url = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = '../../assets/images/products/';
@@ -51,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // 0 stock muna
     $stmt = $conn->prepare("INSERT INTO products (team_id, product_name, description, price, image_url, is_active) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issdsi", $team_id, $product_name, $description, $price, $image_url, $is_active);
     
@@ -59,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $product_id = $conn->insert_id;
         $stmt->close();
         
-        //multiple images
         if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
             $upload_dir = '../../assets/images/products/';
             if (!is_dir($upload_dir)) {
@@ -93,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        //  categories
         if (!empty($categories)) {
             $cat_stmt = $conn->prepare("INSERT INTO product_categories (product_id, category_id, is_primary) VALUES (?, ?, ?)");
             foreach ($categories as $index => $category_id) {

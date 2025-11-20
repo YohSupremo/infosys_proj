@@ -4,13 +4,11 @@ include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
 
-// Date filter (optional - applied only if both dates are provided)
 $error = '';
 $start_date = isset($_GET['start_date']) ? trim($_GET['start_date']) : '';
 $end_date = isset($_GET['end_date']) ? trim($_GET['end_date']) : '';
 $has_filter = (!empty($start_date) && !empty($end_date));
 
-// Validation 
 if (!empty($start_date)) {
     $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
     if (!preg_match($datePattern, $start_date)) {
@@ -29,7 +27,6 @@ if (!empty($end_date)) {
     }
 }
 
-// filter for total expenses base on date range
 $total_expenses = 0;
 if ($has_filter) {
 	$sum_stmt = $conn->prepare("SELECT SUM(total_cost) AS total FROM restocking_transactions WHERE restock_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)");

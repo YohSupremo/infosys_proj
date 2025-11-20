@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     
     if ($address_id > 0) {
-        // verify address belongs to user
         $check_stmt = $conn->prepare("SELECT address_id FROM user_addresses WHERE address_id = ? AND user_id = ?");
         $check_stmt->bind_param("ii", $address_id, $user_id);
         $check_stmt->execute();

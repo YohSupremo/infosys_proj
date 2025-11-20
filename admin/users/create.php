@@ -3,7 +3,6 @@ $page_title = 'Add User - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-// creation again of users
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 

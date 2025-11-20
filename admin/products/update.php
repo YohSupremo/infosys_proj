@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// logic ng edit.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_id = intval($_POST['product_id'] ?? 0);
     $product_name = sanitize($_POST['product_name'] ?? '');
@@ -17,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Get current product to preserve image_url if not updating
     $get_product = $conn->prepare("SELECT image_url FROM products WHERE product_id = ?");
     $get_product->bind_param("i", $product_id);
     $get_product->execute();
@@ -30,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_product = $product_result->fetch_assoc();
     $get_product->close();
     
-    // Validation
     if (empty($product_name)) {
         $_SESSION['error'] = 'Product name is required.';
         header('Location: edit.php?id=' . $product_id);
@@ -51,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $image_url = $current_product['image_url'];
     
-    // img upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = '../../assets/images/products/';
         if (!is_dir($upload_dir)) {
@@ -66,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $upload_path = $upload_dir . $new_filename;
             
             if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
-                // Delete old image if exists
                 if ($image_url && file_exists('../../' . $image_url)) {
                     unlink('../../' . $image_url);
                 }
@@ -81,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($update_stmt->execute()) {
         $update_stmt->close();
         
-        // update sa product_categories
         $del_cat = $conn->prepare("DELETE FROM product_categories WHERE product_id = ?");
         $del_cat->bind_param("i", $product_id);
         $del_cat->execute();
@@ -97,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $cat_stmt->close();
         }
         
-        // multiple images
         if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
             $upload_dir = '../../assets/images/products/';
             if (!is_dir($upload_dir)) {
@@ -106,7 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
             
-            // Get current max display_order
             $max_order_stmt = $conn->prepare("SELECT MAX(display_order) as max_order FROM product_images WHERE product_id = ?");
             $max_order_stmt->bind_param("i", $product_id);
             $max_order_stmt->execute();
@@ -125,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (move_uploaded_file($_FILES['images']['tmp_name'][$key], $upload_path)) {
                             $image_path = 'assets/images/products/' . $new_filename;
                             $max_order++;
-                            $is_primary = 0; // new uploads are not primary by default
+                            $is_primary = 0; 
                             
                             $img_stmt = $conn->prepare("INSERT INTO product_images (product_id, image_url, is_primary, display_order) VALUES (?, ?, ?, ?)");
                             $img_stmt->bind_param("isii", $product_id, $image_path, $is_primary, $max_order);

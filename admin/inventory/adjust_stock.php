@@ -99,7 +99,6 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
                             <select class="form-select" id="product_id" name="product_id" onchange="updateStockInfo()">
                                 <option value="0">Select Product</option>
                                 <?php 
-                                // just to reset the pointer since nagamit nga kanina from the $products_list
                                 $products_list->data_seek(0);
                                 while ($prod = $products_list->fetch_assoc()): 
                                 ?>
@@ -150,7 +149,6 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 
 <script>
 
-    //for dropdown
 function updateStockInfo() {
     const select = document.getElementById('product_id');
     const selectedOption = select.options[select.selectedIndex];
@@ -158,17 +156,14 @@ function updateStockInfo() {
     document.getElementById('currentStockDisplay').textContent = currentStock;
 }
  
-  //for quantity changes detection
 function setQuantityChange(value) {
     const input = document.getElementById('quantity_change');
     const current = parseInt(input.value) || 0;
     input.value = current + value;
 }
 
-// Update when product changes
 document.getElementById('product_id').addEventListener('change', updateStockInfo);
 
-// runs on page load
 updateStockInfo();
 </script>
 

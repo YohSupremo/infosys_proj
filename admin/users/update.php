@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// from edit.php data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = intval($_POST['user_id'] ?? 0);
     $first_name = sanitize($_POST['first_name'] ?? '');
@@ -17,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
-    // Handle profile photo upload (optional)
     if (isset($_FILES['profile_photo']) && isset($_FILES['profile_photo']['tmp_name']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = '../../assets/images/profiles/';
         if (!is_dir($upload_dir)) {

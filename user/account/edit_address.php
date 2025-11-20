@@ -14,7 +14,6 @@ if (!$address_id) {
     exit();
 }
 
-// Get address
 $stmt = $conn->prepare("SELECT * FROM user_addresses WHERE address_id = ? AND user_id = ?");
 $stmt->bind_param("ii", $address_id, $user_id);
 $stmt->execute();
@@ -40,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($address_line1) || empty($city) || empty($state) || empty($postal_code)) {
         $error = 'Please fill in all required fields.';
     } else {
-        // If setting as default, unset other defaults
         if ($is_default) {
             $unset_default = $conn->prepare("UPDATE user_addresses SET is_default = 0 WHERE user_id = ? AND address_id != ?");
             $unset_default->bind_param("ii", $user_id, $address_id);

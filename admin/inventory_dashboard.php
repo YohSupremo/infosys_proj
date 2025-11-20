@@ -4,7 +4,6 @@ include '../config/config.php';
 include '../includes/header.php';
 
 requireAdminOrInventoryManager();
-// inventory focused dashboard
 $stats = array();
 
 $result = $conn->query("SELECT COUNT(*) as count FROM products WHERE is_active = 1");

@@ -3,7 +3,6 @@ $page_title = 'Inventory Report - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdminOrInventoryManager();
-// just inventory reports
 $products = $conn->query("SELECT p.*, t.team_name, 
     (SELECT SUM(quantity_change) FROM inventory_history WHERE product_id = p.product_id AND transaction_type = 'restock') as total_restocked,
     (SELECT SUM(ABS(quantity_change)) FROM inventory_history WHERE product_id = p.product_id AND transaction_type = 'sale') as total_sold

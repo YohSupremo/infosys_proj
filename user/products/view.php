@@ -2,7 +2,6 @@
 $page_title = 'Product Details - NBA Shop';
 include '../../config/config.php';
 include '../../includes/header.php';
-// Allow unauthenticated users to view product details
 
 $product_id = intval($_GET['id'] ?? 0);
 
@@ -11,7 +10,6 @@ if (!$product_id) {
     exit();
 }
 
-// left join para lumabas parin lahat ng product kahit yung naka-anchor sa deleted nba teams
 $stmt = $conn->prepare("SELECT p.*, t.team_name, t.team_code FROM products p LEFT JOIN nba_teams t ON p.team_id = t.team_id WHERE p.product_id = ? AND p.is_active = 1");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
@@ -24,32 +22,27 @@ if ($result->num_rows === 0) {
 
 $product = $result->fetch_assoc();
 
-// fetch all categories para narin kapag nag view, mas-show anong category naka-anchor sa selected product
 $cat_stmt = $conn->prepare("SELECT c.category_name FROM categories c JOIN product_categories pc ON c.category_id = pc.category_id WHERE pc.product_id = ?");
 $cat_stmt->bind_param("i", $product_id);
 $cat_stmt->execute();
 $categories = $cat_stmt->get_result();
 
-// get product images
-// include main product image from products table as the first image
-$product_images = []; // array kung saan ilalagay yung product images, primary and other images
+$product_images = []; 
 
-// Add main product image if it exists
 if (!empty($product['image_url'])) {
     $product_images[] = [
         'image_url' => $product['image_url'],
         'is_primary' => 1,
         'display_order' => 0
-    ]; //associative array of images to use later 
+    ]; 
 }
 
-// get additional images from product_images table
+
 $images_stmt = $conn->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY is_primary DESC, display_order ASC");
 $images_stmt->bind_param("i", $product_id);
 $images_stmt->execute();
 $images_result = $images_stmt->get_result();
 while ($img = $images_result->fetch_assoc()) {
-    // skip if this image is already in the array (shouldn't happen, but just in case)
     $exists = false;
     foreach ($product_images as $existing) {
         if ($existing['image_url'] === $img['image_url']) {
@@ -63,21 +56,18 @@ while ($img = $images_result->fetch_assoc()) {
 }
 $images_stmt->close();
 
-// get reviews 
 $reviews_stmt = $conn->prepare("SELECT r.*, u.first_name, u.last_name FROM product_reviews r JOIN users u ON r.user_id = u.user_id WHERE r.product_id = ? ORDER BY r.created_at DESC");
 $reviews_stmt->bind_param("i", $product_id);
 $reviews_stmt->execute();
 $reviews_result = $reviews_stmt->get_result();
 
-// check if current user can review (has completed order) - Any user who purchased can review (delivered)
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 $can_review = false;
-$reviewable_orders = []; // array for orders na ang status is delivered  na, to be used later
+$reviewable_orders = []; 
 $user_has_review = false;
 $user_review_id = null;
 
 if ($user_id) {
-    // check if user has any delivered orders containing this product
     $order_check = $conn->prepare("SELECT DISTINCT o.order_id FROM orders o JOIN order_items oi ON o.order_id = oi.order_id WHERE o.user_id = ? AND oi.product_id = ? AND o.order_status = 'Delivered'");
     $order_check->bind_param("ii", $user_id, $product_id);
     $order_check->execute();
@@ -90,7 +80,6 @@ if ($user_id) {
     }
     $order_check->close();
     
-    // check if user already has a review for this product
     $user_review_check = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? LIMIT 1");
     $user_review_check->bind_param("ii", $user_id, $product_id);
     $user_review_check->execute();
@@ -120,13 +109,10 @@ if ($user_id) {
     <?php endif; ?>
     <div class="row">
         <div class="col-md-6">
-            <!-- Product Images  -->
             <?php if (count($product_images) > 0): ?>
-                <!-- Main Image -->
                 <div class="mb-3">
                     <img id="mainProductImage" src="../../<?php echo htmlspecialchars($product_images[0]['image_url']); ?>" class="img-fluid rounded" alt="<?php echo htmlspecialchars($product['product_name']); ?>" style="max-height: 500px; object-fit: contain;">
                 </div>
-                <!-- Thumbnail Gallery -->
                 <?php if (count($product_images) > 1): ?>
                     <div class="row">
                         <?php foreach ($product_images as $index => $img): ?>
@@ -140,7 +126,6 @@ if ($user_id) {
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <!-- Single image - no thumbnail gallery needed -->
                 <?php endif; ?>
             <?php else: ?>
                 <img src="../../assets/images/placeholder.jpg" class="img-fluid rounded" alt="No image">
@@ -183,7 +168,6 @@ if ($user_id) {
                         <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
                     </form>
                 <?php else: ?> 
-                      <!-- Invalid credentials -->
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i> <strong>You need to login to shop.</strong>
                         <p class="mb-2 mt-2">Please login or create an account to add items to your cart.</p>
@@ -222,7 +206,6 @@ if ($user_id) {
         </div>
     </div>
     
-    <!-- Reviews Section -->
     <div class="row mt-5">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -281,7 +264,6 @@ if ($user_id) {
     </div>
 </div>
 
-<!-- Scroll to Top Button -->
 <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000; width: 50px; height: 50px; border-radius: 50%; background-color: #007bff; color: white; border: none; cursor: pointer; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
     ↑
 </button>

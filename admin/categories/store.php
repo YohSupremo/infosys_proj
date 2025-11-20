@@ -1,9 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-//sanitize function is in config.php htmlspecialchars lang yan
-// dami ding null coalescing 
-//data is from create.php form
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_name = sanitize($_POST['category_name'] ?? '');
     $description = sanitize($_POST['description'] ?? '');

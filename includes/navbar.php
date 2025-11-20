@@ -1,5 +1,4 @@
 <?php 
-//for customer
 if (!defined('BASE_URL')) {
     define('BASE_URL', '/infosys_proj');
 }

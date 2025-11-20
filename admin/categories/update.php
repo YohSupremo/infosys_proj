@@ -1,8 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// logic to update category details
-// data is from edit.php form method
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_id = intval($_POST['category_id'] ?? 0);
     $category_name = sanitize($_POST['category_name'] ?? '');

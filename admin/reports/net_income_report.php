@@ -3,13 +3,11 @@ $page_title = 'Net Income Report - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-//has date filter
 $error = '';
 $start_date = isset($_GET['start_date']) ? trim($_GET['start_date']) : '';
 $end_date = isset($_GET['end_date']) ? trim($_GET['end_date']) : '';
 $has_filter = (!empty($start_date) && !empty($end_date));
 
-// Validation
 if (!empty($start_date)) {
     $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
     if (!preg_match($datePattern, $start_date)) {
@@ -28,9 +26,7 @@ if (!empty($end_date)) {
     }
 }
 
-// Revenue: 
-// - Cash payments are counted only when the order is Delivered.
-// - Non-cash (e.g., GCash, online) payments are counted immediately unless Cancelled.
+
 $total_revenue = 0;
 if ($has_filter) {
 	$rev_stmt = $conn->prepare("SELECT SUM(total_amount) AS total_revenue 
@@ -59,7 +55,6 @@ if ($rev_res && $rev_res->num_rows > 0) {
 }
 $rev_stmt->close();
 
-// Expenses: sum of restocking total cost
 $total_expenses = 0;
 if ($has_filter) {
 	$exp_stmt = $conn->prepare("SELECT SUM(total_cost) AS total_expenses FROM restocking_transactions WHERE restock_date BETWEEN ? AND DATE_ADD(?, INTERVAL 1 DAY)");
@@ -77,7 +72,6 @@ $exp_stmt->close();
 
 $net_income = $total_revenue - $total_expenses;
 
-// Recent period summaries (last 30 days)
 $rev30_stmt = $conn->prepare("SELECT SUM(total_amount) AS revenue_30 
     FROM orders 
     WHERE 

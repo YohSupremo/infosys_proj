@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// logic of edit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $supplier_id = intval($_POST['supplier_id'] ?? 0);
     $supplier_name = sanitize($_POST['supplier_name'] ?? '');

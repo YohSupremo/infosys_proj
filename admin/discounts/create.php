@@ -3,9 +3,7 @@ $page_title = 'Add Discount - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
-//flash msg lang 
-//as always this is UI
-// form method here is for store as always
+
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 

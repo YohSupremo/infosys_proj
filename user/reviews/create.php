@@ -17,7 +17,6 @@ if (!$product_id || !$order_id) {
     exit();
 }
 
-// Verify user has completed order for this product (MP4 Requirement)
 $order_check = $conn->prepare("SELECT o.order_id, o.order_status, oi.product_id 
                                 FROM orders o 
                                 JOIN order_items oi ON o.order_id = oi.order_id 
@@ -32,7 +31,6 @@ if ($order_result->num_rows === 0) {
 } else {
     $order_check->close();
     
-    // Check if review already exists
     $existing_review = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? AND order_id = ?");
     $existing_review->bind_param("iii", $user_id, $product_id, $order_id);
     $existing_review->execute();
@@ -49,7 +47,6 @@ if ($order_result->num_rows === 0) {
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 
-// Get product info
 $product_stmt = $conn->prepare("SELECT product_name FROM products WHERE product_id = ?");
 $product_stmt->bind_param("i", $product_id);
 $product_stmt->execute();

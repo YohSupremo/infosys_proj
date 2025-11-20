@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $team_id = intval($_POST['team_id'] ?? 0);
     

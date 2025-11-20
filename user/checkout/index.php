@@ -9,20 +9,18 @@ $error = '';
 $discount_message = '';
 $discount_amount = 0;
 
-// fetch lahat ng laman ng nasa cart
 $cart_stmt = $conn->prepare("SELECT cart_id FROM shopping_cart WHERE user_id = ?");
 $cart_stmt->bind_param("i", $user_id);
 $cart_stmt->execute();
 $cart_result = $cart_stmt->get_result();
 
-$cart_items = []; //array para sa laman ng cart, to be used later
+$cart_items = []; 
 $subtotal = 0;
 
 if ($cart_result->num_rows > 0) {
     $cart = $cart_result->fetch_assoc();
     $cart_id = $cart['cart_id'];
     
-    //fetch yung mga products na naka-anchor sa cart id
     $items_stmt = $conn->prepare("
         SELECT ci.*, p.product_name, p.price, p.stock_quantity 
         FROM cart_items ci 
@@ -34,15 +32,13 @@ if ($cart_result->num_rows > 0) {
     $items_result = $items_stmt->get_result();
     
     while ($item = $items_result->fetch_assoc()) {
-        //check yung quantity if valid
         if ($item['quantity'] > $item['stock_quantity']) {
             $error = "Insufficient stock for {$item['product_name']}";
             break;
         }
-        //para makuha yung total as a whole
         $item_total = $item['price'] * $item['quantity'];
         $subtotal += $item_total;
-        $cart_items[] = $item; //ilalagay yung item sa array, lahat ng finetch
+        $cart_items[] = $item;
     }
     $items_stmt->close();
 } else {
@@ -50,7 +46,6 @@ if ($cart_result->num_rows > 0) {
 }
 $cart_stmt->close();
 
-// fetch addresses
 $addresses_stmt = $conn->prepare("
     SELECT * FROM user_addresses 
     WHERE user_id = ? 
@@ -60,8 +55,7 @@ $addresses_stmt->bind_param("i", $user_id);
 $addresses_stmt->execute();
 $addresses_result = $addresses_stmt->get_result();
 
-//discount code logic 
-// Handle "Apply Discount"
+
 if (isset($_POST['apply_discount'])) {
     $entered_code = trim($_POST['discount_code']);
     $_SESSION['discount_code'] = $entered_code;
@@ -85,14 +79,11 @@ if (isset($_POST['apply_discount'])) {
             $discount_value = $discount['discount_value'];
             $applies_to = $discount['applies_to'];
             
-            // Calculate eligible subtotal based on applies_to
             $eligible_subtotal = 0;
             
             if ($applies_to === 'all') {
-                // Discount applies to entire cart
                 $eligible_subtotal = $subtotal;
             } elseif ($applies_to === 'specific_products') {
-                // Get product IDs that this discount applies to
                 $prod_disc_stmt = $conn->prepare("SELECT product_id FROM discount_products WHERE discount_id = ?");
                 $prod_disc_stmt->bind_param("i", $discount['discount_id']);
                 $prod_disc_stmt->execute();
@@ -103,11 +94,9 @@ if (isset($_POST['apply_discount'])) {
                 }
                 $prod_disc_stmt->close();
                 
-                // If no products are specified, discount doesn't apply
                 if (empty($discount_product_ids)) {
                     $eligible_subtotal = 0;
                 } else {
-                    // Calculate subtotal only for matching products
                     foreach ($cart_items as $item) {
                         if (in_array(intval($item['product_id']), $discount_product_ids)) {
                             $eligible_subtotal += $item['price'] * $item['quantity'];
@@ -115,7 +104,6 @@ if (isset($_POST['apply_discount'])) {
                     }
                 }
             } elseif ($applies_to === 'specific_categories') {
-                // Get category IDs that this discount applies to
                 $cat_disc_stmt = $conn->prepare("SELECT category_id FROM discount_categories WHERE discount_id = ?");
                 $cat_disc_stmt->bind_param("i", $discount['discount_id']);
                 $cat_disc_stmt->execute();
@@ -126,11 +114,9 @@ if (isset($_POST['apply_discount'])) {
                 }
                 $cat_disc_stmt->close();
                 
-                // If no categories are specified, discount doesn't apply
                 if (empty($discount_category_ids)) {
                     $eligible_subtotal = 0;
                 } else {
-                    // Get product categories for cart items
                     foreach ($cart_items as $item) {
                         $prod_cat_stmt = $conn->prepare("SELECT category_id FROM product_categories WHERE product_id = ?");
                         $prod_cat_stmt->bind_param("i", $item['product_id']);
@@ -142,7 +128,6 @@ if (isset($_POST['apply_discount'])) {
                         }
                         $prod_cat_stmt->close();
                         
-                        // Check if any category matches
                         $has_match = false;
                         foreach ($item_categories as $cat_id) {
                             if (in_array($cat_id, $discount_category_ids)) {
@@ -158,17 +143,14 @@ if (isset($_POST['apply_discount'])) {
                 }
             }
             
-            // Check if there are eligible items for specific product/category discounts
             if ($applies_to !== 'all' && $eligible_subtotal == 0) {
                 unset($_SESSION['discount_code'], $_SESSION['discount_value'], $_SESSION['discount_type'], $_SESSION['discount_id']);
                 $discount_message = "This discount code does not apply to any items in your cart.";
             }
-            // Check minimum purchase amount
             elseif ($discount['min_purchase_amount'] && $eligible_subtotal < $discount['min_purchase_amount']) {
                 unset($_SESSION['discount_code'], $_SESSION['discount_value'], $_SESSION['discount_type'], $_SESSION['discount_id']);
                 $discount_message = "Minimum purchase amount of ₱" . number_format($discount['min_purchase_amount'], 2) . " required for this discount.";
             } else {
-                // Calculate discount based on eligible subtotal
                 if ($discount_type == 'fixed_amount') {
                     $discount_amount = $discount_value;
                 } elseif ($discount_type == 'percentage') {
@@ -196,26 +178,20 @@ if (isset($_POST['apply_discount'])) {
     }
 }
 
-// Apply any stored discount
 if (!empty($_SESSION['discount_value'])) {
     $discount_amount = $_SESSION['discount_value'];
 }
 
-//for place order
 if (isset($_POST['order_placed'])) {
-    // Server-side validation
     $address_id = intval($_POST['address_id'] ?? 0);
     $payment_method = sanitize($_POST['payment_method'] ?? '');
     
     if (empty($address_id) || empty($payment_method)) {
         $error = "Please select a shipping address and payment method.";
     } else {
-        // Get discount code from session or form
         $discount_code = sanitize($_POST['discount_code'] ?? $_SESSION['discount_code'] ?? '');
         
-        // redirect to place_order.php with POST data via form submission
-        // we'll use a hidden form to submit the data
-        // i-send sa place_order.php
+       
         $_SESSION['checkout_data'] = [
             'address_id' => $address_id,
             'payment_method' => $payment_method,
@@ -242,7 +218,6 @@ include '../../includes/navbar.php';
         <form method="POST" action="">
             <div class="row">
                 <div class="col-md-8">
-                    <!-- Shipping Address -->
                     <div class="card mb-4">
                         <div class="card-header">
                             <h5 class="mb-0">Shipping Address</h5>
@@ -270,7 +245,6 @@ include '../../includes/navbar.php';
                         </div>
                     </div>
                     
-                    <!-- Payment Method -->
                     <div class="card mb-4">
                         <div class="card-header">
                             <h5 class="mb-0">Payment Method</h5>
@@ -285,7 +259,6 @@ include '../../includes/navbar.php';
                         </div>
                     </div>
                     
-                    <!-- Discount Code -->
                     <div class="card mb-4">
                         <div class="card-header">
                             <h5 class="mb-0">Discount Code (Optional)</h5>
@@ -308,7 +281,6 @@ include '../../includes/navbar.php';
                     </div>
                 </div>
                 
-                <!-- ORDER SUMMARY -->
                 <div class="col-md-4">
                     <div class="card cart-summary">
                         <div class="card-header">

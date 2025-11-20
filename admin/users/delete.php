@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// delete
 $redirect = 'index.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

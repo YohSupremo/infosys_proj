@@ -16,7 +16,6 @@ if (!$review_id) {
     exit();
 }
 
-// Get review and verify ownership
 $review_stmt = $conn->prepare("SELECT r.*, p.product_name, p.product_id FROM product_reviews r JOIN products p ON r.product_id = p.product_id WHERE r.review_id = ? AND r.user_id = ?");
 $review_stmt->bind_param("ii", $review_id, $user_id);
 $review_stmt->execute();

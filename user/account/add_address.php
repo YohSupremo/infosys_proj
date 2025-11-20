@@ -9,7 +9,6 @@ $user_id = $_SESSION['user_id'];
 $error = '';
 $success = '';
 
-// for adding addresses
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address_line1 = sanitize($_POST['address_line1'] ?? '');
     $address_line2 = sanitize($_POST['address_line2'] ?? '');
@@ -22,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($address_line1) || empty($city) || empty($state) || empty($postal_code)) {
         $error = 'Please fill in all required fields.';
     } else {
-        // If setting as default, unset other defaults
         if ($is_default) {
             $unset_default = $conn->prepare("UPDATE user_addresses SET is_default = 0 WHERE user_id = ?");
             $unset_default->bind_param("i", $user_id);

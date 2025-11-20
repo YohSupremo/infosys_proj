@@ -4,7 +4,6 @@ $page_title = 'Categories - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 
-// UI
 requireAdmin();
 
 $categories = $conn->query("SELECT c.*, pc.category_name as parent_name FROM categories c LEFT JOIN categories pc ON c.parent_category_id = pc.category_id ORDER BY c.category_name");

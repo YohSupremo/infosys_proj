@@ -5,7 +5,6 @@ include '../../includes/header.php';
 requireAdminOrInventoryManager();
 $is_admin = hasRole('Admin');
 $is_inventory_manager = hasRole('Inventory Manager');
-// main UI
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 unset($_SESSION['error']);
 

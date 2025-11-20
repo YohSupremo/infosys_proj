@@ -12,7 +12,6 @@ if (!$order_id) {
     exit();
 }
 
-// verify order belongs to user
 $order_stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND user_id = ?");
 $order_stmt->bind_param("ii", $order_id, $user_id);
 $order_stmt->execute();

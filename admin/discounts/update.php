@@ -1,9 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// this is from edit.php form method
-//logic ng edit.php
-// puro validation to basta(9999)
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $discount_id = intval($_POST['discount_id'] ?? 0);
     $code = sanitize($_POST['code'] ?? '');

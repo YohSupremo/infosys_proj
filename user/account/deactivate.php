@@ -11,17 +11,14 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm = sanitize($_POST['confirm'] ?? '');
     
-    // Server-side validation
     if ($confirm !== 'DEACTIVATE') {
         $error = 'Please type "DEACTIVATE" to confirm.';
     } else {
-        // Deactivate user account 
         $deactivate_stmt = $conn->prepare("UPDATE users SET is_active = 0 WHERE user_id = ?");
         $deactivate_stmt->bind_param("i", $user_id);
         
         if ($deactivate_stmt->execute()) {
             $deactivate_stmt->close();
-            // Destroy session and redirect to login
             session_destroy();
             header('Location: ' . BASE_URL . '/user/auth/login.php?deactivated=1');
             exit();

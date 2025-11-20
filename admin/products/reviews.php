@@ -12,7 +12,6 @@ if ($product_id <= 0) {
     exit();
 }
 
-// Fetch product details
 $product_stmt = $conn->prepare("
     SELECT p.*, t.team_name 
     FROM products p 
@@ -32,7 +31,6 @@ if ($product_result->num_rows === 0) {
 $product = $product_result->fetch_assoc();
 $product_stmt->close();
 
-// Fetch review summary (count + average)
 $summary_stmt = $conn->prepare("SELECT COUNT(*) AS total_reviews, AVG(rating) AS avg_rating FROM product_reviews WHERE product_id = ?");
 $summary_stmt->bind_param("i", $product_id);
 $summary_stmt->execute();
@@ -42,7 +40,6 @@ $summary_stmt->close();
 $total_reviews = intval($summary['total_reviews'] ?? 0);
 $avg_rating = $summary['avg_rating'] !== null ? round(floatval($summary['avg_rating']), 1) : null;
 
-// Fetch individual reviews
 $reviews_stmt = $conn->prepare("
     SELECT r.*, u.first_name, u.last_name 
     FROM product_reviews r 

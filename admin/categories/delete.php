@@ -1,8 +1,7 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// jsut a delete nothing much the post method comes from when the user clicks delete in index.php
-// from the inline code
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_id = intval($_POST['category_id'] ?? 0);
     

@@ -10,7 +10,6 @@ if (!$image_id || !$product_id) {
     exit();
 }
 
-// kunin image
 $img_stmt = $conn->prepare("SELECT image_url FROM product_images WHERE image_id = ? AND product_id = ?");
 $img_stmt->bind_param("ii", $image_id, $product_id);
 $img_stmt->execute();
@@ -19,13 +18,11 @@ $img_result = $img_stmt->get_result();
 if ($img_result->num_rows > 0) {
     $image = $img_result->fetch_assoc();
     
-    //remove from db
     $delete_stmt = $conn->prepare("DELETE FROM product_images WHERE image_id = ? AND product_id = ?");
     $delete_stmt->bind_param("ii", $image_id, $product_id);
     $delete_stmt->execute();
     $delete_stmt->close();
     
-    // Delete file
     if ($image['image_url'] && file_exists('../../' . $image['image_url'])) {
         unlink('../../' . $image['image_url']);
     }

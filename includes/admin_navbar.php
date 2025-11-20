@@ -27,7 +27,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
 					</a>
 				</li>
 
-                <!-- Products -->
 				<?php if ($is_admin): ?>
 				<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown">
@@ -42,7 +41,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                 </li>
 				<?php endif; ?>
 
-                <!-- Orders -->
 				<?php if ($is_admin): ?>
 				<li class="nav-item">
                     <a class="nav-link" href="<?= $base_url ?>/admin/orders/index.php">
@@ -51,7 +49,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                 </li>
 				<?php endif; ?>
 
-                <!-- Users -->
 				<?php if ($is_admin): ?>
 				<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button" data-bs-toggle="dropdown">
@@ -64,7 +61,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                 </li>
 				<?php endif; ?>
 
-                <!-- Inventory -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-boxes"></i> Inventory
@@ -79,7 +75,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                     </ul>
                 </li>
 
-                <!-- Discounts -->
 				<?php if ($is_admin): ?>
 				<li class="nav-item">
                     <a class="nav-link" href="<?= $base_url ?>/admin/discounts/index.php">
@@ -88,7 +83,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                 </li>
 				<?php endif; ?>
 
-                <!-- Reports -->
 				<li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-graph-up"></i> Reports
@@ -108,7 +102,6 @@ $is_inventory_manager = $role_name === 'Inventory Manager';
                 </li>
             </ul>
 
-            <!-- Right side -->
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="<?= $base_url ?>/index.php">

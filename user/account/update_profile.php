@@ -3,7 +3,6 @@ include '../../config/config.php';
 requireLogin();
 
 $user_id = $_SESSION['user_id'];
-//dito yung action ng edit_profile, replacing what's and the form control and updates the database
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = sanitize($_POST['first_name'] ?? '');
     $last_name = sanitize($_POST['last_name'] ?? '');
@@ -11,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
-    // Server-side validation
     if (empty($first_name) || empty($last_name)) {
         $_SESSION['error'] = 'First name and last name are required.';
     } elseif (!empty($password) && $password !== $confirm_password) {
@@ -19,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!empty($password) && strlen($password) < 6) {
         $_SESSION['error'] = 'Password must be at least 6 characters long.';
     } else {
-        // get current user data to know existing profile photo
         $stmt = $conn->prepare("SELECT profile_photo FROM users WHERE user_id = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -29,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $profile_photo = $current ? $current['profile_photo'] : null;
 
-        // handle profile photo upload
         if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
             $upload_dir = '../../assets/images/profiles/';
             if (!is_dir($upload_dir)) {
@@ -44,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $upload_path = $upload_dir . $new_filename;
 
                 if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $upload_path)) {
-                    // Delete old photo if exists
                     if ($profile_photo && file_exists('../../' . $profile_photo)) {
                         unlink('../../' . $profile_photo);
                     }
@@ -53,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Update query - include password if provided
         if (!isset($_SESSION['error']) || $_SESSION['error'] === '') {
             if (!empty($password)) {
                 $password_hash = password_hash($password, PASSWORD_DEFAULT);

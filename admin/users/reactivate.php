@@ -3,7 +3,6 @@ include '../../config/config.php';
 requireAdmin();
 
 $redirect = 'index.php';
-// reactivate user
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = intval($_POST['user_id'] ?? 0);
     $redirect_input = $_POST['redirect'] ?? '';

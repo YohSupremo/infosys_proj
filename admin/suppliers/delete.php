@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// delete galing sa inline adding ng id
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $supplier_id = intval($_POST['supplier_id'] ?? 0);
     

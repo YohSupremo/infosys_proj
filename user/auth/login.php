@@ -7,7 +7,6 @@ $error = '';
 $success = '';
 $redirect_message = '';
 
-// check for redirect message
 if (isset($_SESSION['redirect_message'])) {
     $redirect_message = $_SESSION['redirect_message'];
     unset($_SESSION['redirect_message']);
@@ -17,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = sanitize($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         
-        // server-side validation - check kung may email at pass, pati kung valid email
         if (empty($email) || empty($password)) {
             $error = 'Please fill in all fields.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -30,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($result->num_rows === 1) {
                 $user = $result->fetch_assoc();
-                //if valid email, verify kung tama yung in-input na password ni user
                 if (password_verify($password, $user['password_hash'])) {
                     if ($user['is_active'] == 1) {
                         $_SESSION['user_id'] = $user['user_id'];
@@ -40,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['role_name'] = $user['role_name'];
                         $_SESSION['role_id'] = $user['role_id'];
                         
-                        // check if there's a redirect after login (e.g., from add to cart)
                         if (isset($_SESSION['redirect_after_login'])) {
                             $redirect_url = $_SESSION['redirect_after_login'];
                             unset($_SESSION['redirect_after_login']);

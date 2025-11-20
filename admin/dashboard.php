@@ -5,7 +5,6 @@ include '../includes/header.php';
 
 requireAdmin();
 
- // puro count lang due to nature of dashboards.
 $stats = [];
 
 $result = $conn->query("SELECT COUNT(*) as count FROM products");
@@ -17,9 +16,7 @@ $stats['orders'] = $result->fetch_assoc()['count'];
 $result = $conn->query("SELECT COUNT(*) as count FROM users");
 $stats['users'] = $result->fetch_assoc()['count'];
 
-// Total revenue
-// Cash payments are counted only when Delivered.
-// Non-cash payments are counted when not Cancelled.
+
 $result = $conn->query("
     SELECT SUM(total_amount) AS total 
     FROM orders 
@@ -47,7 +44,6 @@ $recent_orders = $conn->query("SELECT o.*, u.first_name, u.last_name FROM orders
 <div class="container my-5">
     <h2 class="mb-4">Dashboard</h2>
     
-    <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
             <div class="card stats-card">

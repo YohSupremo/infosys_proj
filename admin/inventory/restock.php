@@ -3,7 +3,7 @@ $page_title = 'Restock Products - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdminOrInventoryManager();
-// ui and logic for restock
+
 $error = '';
 $success = '';
 
@@ -23,13 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         foreach ($products as $index => $product_id) {
             if (!empty($quantities[$index]) && !empty($costs[$index])) {
-                // validation 1
                 if (!is_numeric($quantities[$index]) || intval($quantities[$index]) < 1) {
                     $error = 'Quantity must be a valid whole number greater than 0.';
                     break;
                 }
                 
-                 // validation 2
                 if (!is_numeric($costs[$index]) || floatval($costs[$index]) < 0) {
                     $error = 'Cost per unit must be a valid number greater than or equal to 0.';
                     break;
@@ -51,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($restock_items)) {
             $error = 'Please add at least one product with quantity and cost.';
         } else {
-            // ilog yung restock with who and total cost
             $restock_stmt = $conn->prepare("INSERT INTO restocking_transactions (supplier_id, manager_id, total_cost, notes) VALUES (?, ?, ?, ?)");
             $restock_stmt->bind_param("iids", $supplier_id, $manager_id, $total_cost, $notes);
             $restock_stmt->execute();
@@ -60,13 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
 
             foreach ($restock_items as $item) {
-                // this is just us logging the restocked items (specific)
                 $item_stmt = $conn->prepare("INSERT INTO restocking_items (restock_id, product_id, quantity, cost_per_unit, subtotal) VALUES (?, ?, ?, ?, ?)");
                 $item_stmt->bind_param("iiidd", $restock_id, $item['product_id'], $item['quantity'], $item['cost_per_unit'], $item['subtotal']);
                 $item_stmt->execute();
                 $item_stmt->close();
                 
-                //fetching stock
                 $stock_stmt = $conn->prepare("SELECT stock_quantity FROM products WHERE product_id = ?");
                 $stock_stmt->bind_param("i", $item['product_id']);
                 $stock_stmt->execute();
@@ -74,14 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $current_stock = $stock_result->fetch_assoc()['stock_quantity'];
                 $stock_stmt->close();
                 
-                //updates lang
                 $new_stock = $current_stock + $item['quantity'];
                 $update_stmt = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE product_id = ?");
                 $update_stmt->bind_param("ii", $new_stock, $item['product_id']);
                 $update_stmt->execute();
                 $update_stmt->close();
                 
-                //then log sa inventory history
                 $inv_stmt = $conn->prepare("INSERT INTO inventory_history (product_id, transaction_type, quantity_change, previous_stock, new_stock, reference_id, reference_type, created_by) VALUES (?, 'restock', ?, ?, ?, ?, 'restock', ?)");
                 $inv_stmt->bind_param("iiiiii", $item['product_id'], $item['quantity'], $current_stock, $new_stock, $restock_id, $manager_id);
                 $inv_stmt->execute();
@@ -188,9 +181,8 @@ if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manag
 </div>
 
 <script>
-    // dropdowns things for add product
 document.getElementById('addProduct').addEventListener('click', function() {
-    const container = document.getElementById('productsContainer'); // creation of container
+    const container = document.getElementById('productsContainer'); 
     const template = container.querySelector('.product-row');
     const newRow = template.cloneNode(true);
     newRow.querySelectorAll('input, select').forEach(input => {
@@ -199,12 +191,11 @@ document.getElementById('addProduct').addEventListener('click', function() {
     container.appendChild(newRow);
 });
 
-// remove button handling sabi ni __
 document.getElementById('productsContainer').addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-product') || e.target.closest('.remove-product')) { // name is from bootstrap things
+    if (e.target.classList.contains('remove-product') || e.target.closest('.remove-product')) { 
         const button = e.target.classList.contains('remove-product') ? e.target : e.target.closest('.remove-product');
         const rows = document.querySelectorAll('.product-row');
-        if (rows.length > 1) { //checker if isa lang natitira na product di na pwede idelete
+        if (rows.length > 1) { 
             button.closest('.product-row').remove();
         } else {
             alert('At least one product is required.'); 

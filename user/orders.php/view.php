@@ -12,7 +12,6 @@ if (!$order_id) {
     exit();
 }
 
-// fetch order and item details using view plus product image
 $details_stmt = $conn->prepare("SELECT v.*, p.image_url 
     FROM v_order_details v 
     LEFT JOIN products p ON v.product_id = p.product_id 
@@ -26,17 +25,14 @@ if ($details_result->num_rows === 0) {
     exit();
 }
 
-// First row holds order-level info
 $rows = [];
 while ($row = $details_result->fetch_assoc()) {
     $rows[] = $row;
 }
 $details_stmt->close();
 
-//rows[0] lang  since if maraming product sa isang order, pare-parehas lang naman ng order info like payment method, address, etc
 $order = $rows[0];
 
-// Items come from rows that have order_item_id
 $items = [];
 foreach ($rows as $row) {
     if (!empty($row['order_item_id'])) {
@@ -44,11 +40,9 @@ foreach ($rows as $row) {
     }
 }
 
-// Check which products can be reviewed (only if order is Delivered)
 $can_review_products = [];
 if ($order['order_status'] === 'Delivered') {
     foreach ($items as $item) {
-        // Check if review already exists for this product and order
         $review_check = $conn->prepare("SELECT review_id FROM product_reviews WHERE user_id = ? AND product_id = ? AND order_id = ?");
         $review_check->bind_param("iii", $user_id, $item['product_id'], $order_id);
         $review_check->execute();

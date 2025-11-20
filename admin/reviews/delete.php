@@ -2,7 +2,6 @@
 include '../../config/config.php';
 requireAdmin();
 
-//delete function sa button when admin views a review.
 
 $review_id = intval($_GET['id'] ?? 0);
 $product_id = intval($_GET['product_id'] ?? 0);

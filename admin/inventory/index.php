@@ -3,7 +3,7 @@ $page_title = 'Inventory - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdminOrInventoryManager();
-// main ui
+
 $search = trim($_GET['search'] ?? '');
 $status_filter = $_GET['status'] ?? 'active';
 $allowed_statuses = ['active', 'inactive', 'all'];

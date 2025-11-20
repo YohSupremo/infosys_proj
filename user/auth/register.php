@@ -20,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postal_code = sanitize($_POST['postal_code'] ?? '');
     $country = sanitize($_POST['country'] ?? 'Philippines');
     
-    // server-side validation
     if (empty($email) || empty($password) || empty($first_name) || empty($last_name)) {
         $error = 'Please fill in all required fields.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -32,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (empty($address_line1) || empty($city) || empty($state) || empty($postal_code)) {
         $error = 'Please fill in all address fields.';
     } else {
-        // check if email exists
         $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -41,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result->num_rows > 0) {
             $error = 'Email already exists.';
         } else {
-            // get Customer role_id
             $role_stmt = $conn->prepare("SELECT role_id FROM roles WHERE role_name = 'Customer'");
             $role_stmt->execute();
             $role_result = $role_stmt->get_result();
@@ -50,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             
-            // handle profile photo upload
             $profile_photo = null;
             if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = '../../assets/images/profiles/';
@@ -77,7 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($insert_stmt->execute()) {
                 $user_id = $conn->insert_id;
                 
-                // insert address
                 $addr_stmt = $conn->prepare("INSERT INTO user_addresses (user_id, address_line1, address_line2, city, state, postal_code, country, is_default) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
                 $addr_stmt->bind_param("issssss", $user_id, $address_line1, $address_line2, $city, $state, $postal_code, $country);
                 $addr_stmt->execute();

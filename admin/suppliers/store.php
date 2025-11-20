@@ -1,7 +1,6 @@
 <?php
 include '../../config/config.php';
 requireAdmin();
-// for create.php logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $supplier_name = sanitize($_POST['supplier_name'] ?? '');
     $contact_person = sanitize($_POST['contact_person'] ?? '');
