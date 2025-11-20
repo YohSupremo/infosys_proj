@@ -69,7 +69,7 @@ $categories = $conn->query("SELECT * FROM categories WHERE is_active = 1 ORDER B
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="images" class="form-label">Additional Product Images (MP1 - Multiple Photos)</label>
+                            <label for="images" class="form-label">Additional Product Images</label>
                             <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple>
                             <small class="text-muted">You can select multiple images. The first image will be set as primary.</small>
                             <div id="imagesPreview" class="mt-2"></div>

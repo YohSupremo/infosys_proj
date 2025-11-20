@@ -33,9 +33,9 @@ function censorText($text, $bad_words) {
             }
         }
        $pattern_chars = preg_replace('/\s+/', '\\s+', $pattern_chars);    
-        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu'; //negative look behind, negative lookahead
+        $pattern = '/(?<!\w)' . $pattern_chars . '(?!\w)/iu';
         $replacement = str_repeat('*', mb_strlen($word));
-        $text = preg_replace($pattern, $replacement, $text); //kapag na-detect yung word or same sa pattern na ginawa, papalitan ng ast
+        $text = preg_replace($pattern, $replacement, $text); 
     }
 
     return $text;

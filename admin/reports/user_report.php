@@ -5,7 +5,7 @@ include '../../includes/header.php';
 requireAdmin();
 $users = $conn->query("SELECT u.*, r.role_name,
     (SELECT COUNT(*) FROM orders WHERE user_id = u.user_id) as total_orders,
-    (SELECT SUM(total_amount) FROM orders WHERE user_id = u.user_id AND order_status != 'Cancelled') as total_spent
+    (SELECT SUM(total_amount) FROM orders WHERE user_id = u.user_id AND order_status != 'Cancelled' AND order_status = 'Delivered') as total_spent
     FROM users u 
     JOIN roles r ON u.role_id = r.role_id 
     ORDER BY u.created_at DESC");
