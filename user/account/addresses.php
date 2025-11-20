@@ -6,6 +6,10 @@ requireLogin();
 
 $user_id = $_SESSION['user_id'];
 
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+$success = isset($_SESSION['success']) ? $_SESSION['success'] : '';
+unset($_SESSION['error'], $_SESSION['success']);
+
 $stmt = $conn->prepare("SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, created_at DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -16,6 +20,13 @@ $result = $stmt->get_result();
 
 <div class="container my-5">
     <h2 class="mb-4">My Addresses</h2>
+    
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+    <?php endif; ?>
+    <?php if ($success): ?>
+        <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+    <?php endif; ?>
     
     <div class="mb-3">
         <a href="<?php echo BASE_URL; ?>/user/account/add_address.php" class="btn btn-primary">Add New Address</a>

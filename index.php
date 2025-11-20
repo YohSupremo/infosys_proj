@@ -67,6 +67,9 @@ $featured_result = $conn->query($featured_query);
                             <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin'): ?>
                                 <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/admin/dashboard.php"><i class="bi bi-shield-check"></i> Admin Panel</a></li>
                                 <li><hr class="dropdown-divider"></li>
+                                <?php elseif(isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Inventory Manager'): ?>
+                                    <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/admin/inventory_dashboard.php"><i class="bi bi-shield-check"></i> Inventory Manager Panel</a></li>
+                                <li><hr class="dropdown-divider"></li>
                             <?php endif; ?>
                             <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/user/auth/logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
                         </ul>

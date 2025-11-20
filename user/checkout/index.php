@@ -163,7 +163,7 @@ if (isset($_POST['apply_discount'])) {
                 $_SESSION['discount_value'] = $discount_amount;
                 $_SESSION['discount_type'] = $discount_type;
                 $_SESSION['discount_id'] = $discount['discount_id'];
-                $_SESSION['eligible_subtotal'] = $eligible_subtotal; // Store for reference
+                $_SESSION['eligible_subtotal'] = $eligible_subtotal;
                 $discount_message = "Discount applied: {$discount_value}" . ($discount_type == 'percentage' ? "%" : " PHP");
                 if ($applies_to !== 'all') {
                     $discount_message .= " (applies to eligible items only)";

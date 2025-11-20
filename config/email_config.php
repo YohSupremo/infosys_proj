@@ -51,8 +51,8 @@ function sendOrderStatusEmail($to_email, $to_name, $order_id, $order_status, $or
 		$mail->isSMTP();
 		$mail->Host = 'sandbox.smtp.mailtrap.io';
 		$mail->SMTPAuth = true;
-		$mail->Username = 'a5ef4344d2fe1d';
-		$mail->Password = 'bf071af51636d9';
+		$mail->Username = 'e83c6a37b37d48';
+		$mail->Password = 'ec0a37bed64e0c';
 		$mail->Port = 2525;
 		$mail->SMTPSecure = 'tls';
 		$mail->CharSet = 'UTF-8';
