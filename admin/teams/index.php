@@ -3,6 +3,11 @@ $page_title = 'NBA Teams - Admin';
 include '../../config/config.php';
 include '../../includes/header.php';
 requireAdmin();
+
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+$success = isset($_SESSION['success']) ? $_SESSION['success'] : '';
+unset($_SESSION['error'], $_SESSION['success']);
+
 $teams = $conn->query("SELECT * FROM nba_teams ORDER BY team_name");
 ?>
 
@@ -13,6 +18,13 @@ $teams = $conn->query("SELECT * FROM nba_teams ORDER BY team_name");
         <h2>NBA Teams</h2>
         <a href="create.php" class="btn btn-primary">Add New Team</a>
     </div>
+    
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+    <?php endif; ?>
+    <?php if ($success): ?>
+        <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+    <?php endif; ?>
     
     <div class="card">
         <div class="card-body">

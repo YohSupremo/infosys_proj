@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
             $upload_dir = '../../assets/images/profiles/';
             if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true); //if wala pang directory, gagawa ng directory
+                mkdir($upload_dir, 0777, true); 
             }
 
             $file_ext = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
