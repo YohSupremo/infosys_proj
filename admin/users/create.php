@@ -44,7 +44,7 @@ $roles = $conn->query("SELECT * FROM roles ORDER BY role_name");
                             <input type="password" class="form-control" id="password" name="password">
                         </div>
                         <div class="mb-3">
-                            <label for="contact_number" class="form-label">Contact Number</label>
+                            <label for="contact_number" class="form-label">Contact Number *</label>
                             <input type="text" class="form-control" id="contact_number" name="contact_number">
                         </div>
                         <div class="mb-3">

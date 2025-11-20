@@ -22,6 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = 'Password must be at least 6 characters long.';
         header('Location: create.php');
         exit();
+    } elseif (empty($contact_number)) {
+        $_SESSION['error'] = 'Contact number is required.';
+        header('Location: create.php');
+        exit();
+    } elseif (!empty($contact_number) && !preg_match('/^\d{11}$/', $contact_number)) {
+        $_SESSION['error'] = 'Contact number must be exactly 11 digits.';
+        header('Location: create.php');
+        exit();
     } else {
         $check_stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
         $check_stmt->bind_param("s", $email);

@@ -3,7 +3,7 @@ $page_title = 'Products - NBA Shop';
 include '../../config/config.php';
 include '../../includes/header.php';
 
-$search = sanitize($_GET['search'] ?? '');
+$search = $_GET['search'] ?? '';
 $team_id = intval($_GET['team_id'] ?? 0);
 $category_id = intval($_GET['category_id'] ?? 0);
 
@@ -58,7 +58,7 @@ $categories_result = $conn->query("SELECT * FROM categories WHERE is_active = 1 
             <form method="GET" action="">
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <input type="text" class="form-control" name="search" placeholder="Search products..." value="<?php echo htmlspecialchars($search); ?>">
+                        <input type="text" class="form-control" name="search" placeholder="Search products..." value="<?php echo $search; ?>">
                     </div>
                     <div class="col-md-3 mb-3">
                         <select class="form-select" name="team_id">

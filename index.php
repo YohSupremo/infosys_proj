@@ -4,14 +4,13 @@ include 'config/config.php';
 include 'includes/header.php';
 
 
-// Check for redirect message
+
 $redirect_message = '';
 if (isset($_SESSION['redirect_message'])) {
     $redirect_message = $_SESSION['redirect_message'];
     unset($_SESSION['redirect_message']);
 }
 
-// Get featured products
 $featured_query = "SELECT p.*, t.team_name, t.team_code 
                    FROM products p 
                    LEFT JOIN nba_teams t ON p.team_id = t.team_id 
@@ -114,7 +113,7 @@ $featured_result = $conn->query($featured_query);
         <div class="card-body">
             <form method="GET" action="<?php echo BASE_URL; ?>/user/products/index.php">
                 <div class="input-group input-group-lg">
-                    <input type="text" class="form-control" name="search" placeholder="Search products by name or description..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+                    <input type="text" class="form-control" name="search" placeholder="Search products by name or description..." value="<?php echo $_GET['search'] ?? ''; ?>">
                     <button class="btn btn-primary" type="submit">
                         <i class="bi bi-search"></i> Search
                     </button>

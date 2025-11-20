@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $state = sanitize($_POST['state'] ?? '');
     $postal_code = sanitize($_POST['postal_code'] ?? '');
     $country = sanitize($_POST['country'] ?? 'Philippines');
-    
+
     if (empty($email) || empty($password) || empty($first_name) || empty($last_name)) {
         $error = 'Please fill in all required fields.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -30,12 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Password must be at least 6 characters long.';
     } elseif (empty($address_line1) || empty($city) || empty($state) || empty($postal_code)) {
         $error = 'Please fill in all address fields.';
+    } elseif (empty($contact_number)) {
+        $error = 'Contact number is required.';
+    } elseif (!empty($contact_number) && !preg_match('/^\d{11}$/', $contact_number)) {
+        $error = 'Contact number must be exactly 11 digits.';
     } else {
         $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         if ($result->num_rows > 0) {
             $error = 'Email already exists.';
         } else {
@@ -44,40 +48,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $role_result = $role_stmt->get_result();
             $role = $role_result->fetch_assoc();
             $role_id = $role['role_id'];
-            
+
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            
+
             $profile_photo = null;
             if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = '../../assets/images/profiles/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
-                
+                if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
                 $file_ext = strtolower(pathinfo($_FILES['profile_photo']['name'], PATHINFO_EXTENSION));
                 $allowed_exts = ['jpg', 'jpeg', 'png', 'gif'];
-                
+
                 if (in_array($file_ext, $allowed_exts)) {
                     $new_filename = uniqid() . '.' . $file_ext;
                     $upload_path = $upload_dir . $new_filename;
-                    
+
                     if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $upload_path)) {
                         $profile_photo = 'assets/images/profiles/' . $new_filename;
                     }
                 }
             }
-            
+
             $insert_stmt = $conn->prepare("INSERT INTO users (role_id, email, password_hash, first_name, last_name, contact_number, profile_photo) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $insert_stmt->bind_param("issssss", $role_id, $email, $password_hash, $first_name, $last_name, $contact_number, $profile_photo);
-            
+
             if ($insert_stmt->execute()) {
                 $user_id = $conn->insert_id;
-                
+
                 $addr_stmt = $conn->prepare("INSERT INTO user_addresses (user_id, address_line1, address_line2, city, state, postal_code, country, is_default) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
                 $addr_stmt->bind_param("issssss", $user_id, $address_line1, $address_line2, $city, $state, $postal_code, $country);
                 $addr_stmt->execute();
                 $addr_stmt->close();
-                
+
                 $success = 'Registration successful! You can now login.';
             } else {
                 $error = 'Registration failed. Please try again.';
@@ -123,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <small class="text-muted">Enter a valid email address (e.g. example@email.com)</small>
                         </div>
                         <div class="mb-3">
-                            <label for="contact_number" class="form-label">Contact Number</label>
+                            <label for="contact_number" class="form-label">Contact Number *</label>
                             <input type="text" class="form-control" id="contact_number" name="contact_number" value="<?php echo htmlspecialchars($_POST['contact_number'] ?? ''); ?>">
                         </div>
                         <div class="mb-3">
@@ -183,5 +185,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <?php include '../../includes/foot.php'; ?>
-
-

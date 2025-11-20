@@ -36,6 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = 'Please fill in all required fields.';
         header('Location: edit.php?id=' . $user_id);
         exit();
+    } elseif (empty($contact_number)) {
+        $_SESSION['error'] = 'Contact number is required.';
+        header('Location: edit.php?id=' . $user_id);
+        exit();
+    } elseif (!empty($contact_number) && !preg_match('/^\d{11}$/', $contact_number)) {
+        $_SESSION['error'] = 'Contact number must be exactly 11 digits.';
+        header('Location: edit.php?id=' . $user_id);
+        exit();
     }
     
     if (!empty($password)) {

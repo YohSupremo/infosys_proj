@@ -46,7 +46,7 @@ $stmt->close();
                             <input type="text" class="form-control" id="last_name" name="last_name" value="<?php echo htmlspecialchars($user['last_name']); ?>">
                         </div>
                         <div class="mb-3">
-                            <label for="contact_number" class="form-label">Contact Number</label>
+                            <label for="contact_number" class="form-label">Contact Number *</label>
                             <input type="text" class="form-control" id="contact_number" name="contact_number" value="<?php echo htmlspecialchars($user['contact_number'] ?? ''); ?>">
                         </div>
                         <div class="mb-3">

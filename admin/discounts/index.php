@@ -10,8 +10,8 @@ $discounts = $conn->query("SELECT dc.*, COUNT(du.usage_id) AS times_used
                            GROUP BY dc.discount_id
                            ORDER BY dc.created_at DESC");
 ?>
- 
-<?php include '../../includes/admin_navbar.php';?>
+
+<?php include '../../includes/admin_navbar.php'; ?>
 
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -38,31 +38,57 @@ $discounts = $conn->query("SELECT dc.*, COUNT(du.usage_id) AS times_used
                         <?php if ($discounts->num_rows > 0): ?>
                             <?php while ($discount = $discounts->fetch_assoc()): ?>
                                 <tr>
-                                    <td><?php echo $discount['discount_id']; ?></td>
-                                    <td><strong><?php echo htmlspecialchars($discount['code']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($discount['discount_type']); ?></td>
-                                    <td><?php echo $discount['discount_type'] === 'percentage' ? $discount['discount_value'] . '%' : '₱' . number_format($discount['discount_value'], 2); ?></td>
-                                    <td><?php echo htmlspecialchars($discount['applies_to']); ?></td>
+                                    <td><?= $discount['discount_id']; ?></td>
+                                    <td><strong><?= htmlspecialchars($discount['code']); ?></strong></td>
+                                    <td><?= htmlspecialchars($discount['discount_type']); ?></td>
                                     <td>
-										<?php
-										$usage_limit = $discount['usage_limit'] ? intval($discount['usage_limit']) : null;
-										$times_used = $discount['times_used'] ? intval($discount['times_used']) : 0;
-										if (!is_null($usage_limit) && $times_used >= $usage_limit): ?>
-											<span class="badge bg-secondary">Max Usage</span>
-										<?php else: ?>
-											<?php if ($discount['is_active']): ?>
-												<span class="badge bg-success">Active</span>
-											<?php else: ?>
-												<span class="badge bg-danger">Inactive</span>
-											<?php endif; ?>
-										<?php endif; ?>
+                                        <?= $discount['discount_type'] === 'percentage'
+                                            ? $discount['discount_value'] . '%'
+                                            : '₱' . number_format($discount['discount_value'], 2); ?>
                                     </td>
+                                    <td><?= htmlspecialchars($discount['applies_to']); ?></td>
+
+                                    <!-- Status -->
                                     <td>
-                                        <a href="edit.php?id=<?php echo $discount['discount_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <form method="POST" action="delete.php" class="d-inline">
-                                            <input type="hidden" name="discount_id" value="<?php echo $discount['discount_id']; ?>">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this discount?')">Delete</button>
-                                        </form>
+                                        <?php
+                                            $usage_limit = $discount['usage_limit'] ? intval($discount['usage_limit']) : null;
+                                            $times_used = $discount['times_used'] ? intval($discount['times_used']) : 0;
+
+                                            if (!is_null($usage_limit) && $times_used >= $usage_limit):
+                                        ?>
+                                            <span class="badge bg-secondary">Max Usage</span>
+                                        <?php else: ?>
+                                            <?php if ($discount['is_active']): ?>
+                                                <span class="badge bg-success">Active</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-danger">Inactive</span>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td>
+                                        <a href="edit.php?id=<?= $discount['discount_id']; ?>" 
+                                           class="btn btn-sm btn-outline-primary">Edit</a>
+
+                                        <?php if ($discount['is_active']): ?>
+                                            <!-- Deactivate -->
+                                            <form method="POST" action="delete.php" class="d-inline">
+                                                <input type="hidden" name="discount_id" value="<?= $discount['discount_id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="return confirm('Deactivate this discount?')">
+                                                    Deactivate
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <!-- Reactivate -->
+                                            <form method="POST" action="activate.php" class="d-inline">
+                                                <input type="hidden" name="discount_id" value="<?= $discount['discount_id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                                    Reactivate
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -79,4 +105,3 @@ $discounts = $conn->query("SELECT dc.*, COUNT(du.usage_id) AS times_used
 </div>
 
 <?php include '../../includes/foot.php'; ?>
-

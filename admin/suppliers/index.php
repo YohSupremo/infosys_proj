@@ -47,10 +47,24 @@ $suppliers = $conn->query("SELECT * FROM suppliers ORDER BY supplier_name");
                                     </td>
                                     <td>
                                         <a href="edit.php?id=<?php echo $supplier['supplier_id']; ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <form method="POST" action="delete.php" class="d-inline">
-                                            <input type="hidden" name="supplier_id" value="<?php echo $supplier['supplier_id']; ?>">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this supplier?')">Delete</button>
-                                        </form>
+
+                                        <?php if (intval($supplier['is_active']) == 1): ?>
+                                            <form method="POST" action="delete.php" class="d-inline">
+                                                <input type="hidden" name="supplier_id" value="<?php echo $supplier['supplier_id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Deactivate this supplier?')">
+                                                    Deactivate
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <form method="POST" action="activate.php" class="d-inline">
+                                                <input type="hidden" name="supplier_id" value="<?php echo $supplier['supplier_id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                                    Reactivate
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -67,4 +81,3 @@ $suppliers = $conn->query("SELECT * FROM suppliers ORDER BY supplier_name");
 </div>
 
 <?php include '../../includes/foot.php'; ?>
-

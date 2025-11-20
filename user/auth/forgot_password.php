@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address (e.g. example@email.com)';
     } else {
-        $stmt = $conn->prepare("SELECT user_id, first_name FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT user_id, first_name, last_name FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->isSMTP();
                 $mail->Host = 'sandbox.smtp.mailtrap.io';
                 $mail->SMTPAuth = true;
-                $mail->Username = 'a5ef4344d2fe1d';
-                $mail->Password = 'bf071af51636d9';
+                $mail->Username = 'e83c6a37b37d48';
+		        $mail->Password = 'ec0a37bed64e0c';
                 $mail->Port = 2525;
                 $mail->SMTPSecure = 'tls';
 

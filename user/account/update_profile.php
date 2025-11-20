@@ -16,6 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = 'Passwords do not match.';
     } elseif (!empty($password) && strlen($password) < 6) {
         $_SESSION['error'] = 'Password must be at least 6 characters long.';
+     } elseif (empty($contact_number)) {
+        $_SESSION['error'] = 'Contact number is required.';
+    } elseif (!empty($contact_number) && !preg_match('/^\d{11}$/', $contact_number)) {
+        $_SESSION['error'] = 'Contact number must be exactly 11 digits.';
     } else {
         $stmt = $conn->prepare("SELECT profile_photo FROM users WHERE user_id = ?");
         $stmt->bind_param("i", $user_id);
